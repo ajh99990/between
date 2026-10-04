@@ -1,6 +1,6 @@
 # 离线封存恢复开发边界
 
-schema5、authority2、spool2在monorepo迁移前的冻结基线通过231项仓库测试及16项外部独立场景。迁移后的重新构建与分发验收另行记录，不把历史日志冒充本次结果。上一已封存schema4候选和公开上传快照不包含此功能，不改写其历史验证。
+历史schema5、authority2、spool2在monorepo迁移前的冻结基线通过231项仓库测试及16项外部独立场景。迁移后的重新构建与分发验收另行记录，不把历史日志冒充本次结果。上一已封存schema4候选和公开上传快照不包含此功能，不改写其历史验证。
 
 ## 为什么不能直接激活普通备份
 
@@ -40,3 +40,8 @@ schema5、authority2、spool2在monorepo迁移前的冻结基线通过231项仓�
 spool2在任何写入前只读核验安装identity，AAD采用安装/作用域/输入ID的版本化tuple；错配或未绑定旧spool拒绝且不迁移。input_resolved只由针对该输入的可信明确取消设置；暂停、记忆控制、关闭窗口及恢复不会借cancelled执行状态清掉未解决输入。两种控制/过期顺序均经过关闭及真实恢复复验。
 
 真实SQLite产生的WAL/SHM、重复SIGKILL、所有替换阶段及重命名、节点rename/fsync/unlink故障注入、MCP真实进程、PID namespace和跨安装spool均有证据。I/O错误是注入场景，不能称为真实硬件掉电试验。
+
+
+## 当前 schema6 候选边界
+
+当前主库为 schema6；旧 schema5 封存证据不等于当前可恢复输入，不自动迁移。只读离线 checkpoint 若发现已过期但尚未清理正文的内部待审记忆，明确拒绝 `RECOVERY_EXPIRED_PENDING_MEMORY`，不静默修改封存库或重签 seal。须沿受支持的恢复/启动流程完成清理，再重新封存。该路径和“不改变原库与seal”的回归应在本轮最终验收中独立核验。

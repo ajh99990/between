@@ -41,3 +41,6 @@ upstream/qwen-code-0.24.7/
 apps/desktop/resources/
 packages/*/build-meta.json
 packages/*/package-test-result.json
+
+# Regenerable local focused-test outputs.
+.focused-tests/

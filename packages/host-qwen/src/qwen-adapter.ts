@@ -25,6 +25,7 @@ export type ManagedQueryOptions = {
   captureProviderContent: boolean;
   providerCaptureMaxBytes: number;
   systemPrompt: string;
+  skipStartupContext: true;
   chatRecording: false;
   allowedTools: string[];
   permissionMode: 'default';
@@ -235,7 +236,7 @@ export class ManagedQwenAdapter implements HostAdapter {
     this.authType();
     const verified=await verifyManagedRuntime(this.options);
     const sdk=await import(pathToFileURL(verified.sdkModulePath).href) as {query?:SDKQueryFactory;SDK_VERSION?:string;MANAGED_HOST_CONTRACT_VERSION?:number};
-    if(typeof sdk.query!=='function'||sdk.SDK_VERSION!=='0.1.16'||sdk.MANAGED_HOST_CONTRACT_VERSION!==1)return fail('HOST_BUILD_UNVERIFIED');
+    if(typeof sdk.query!=='function'||sdk.SDK_VERSION!=='0.1.17'||sdk.MANAGED_HOST_CONTRACT_VERSION!==2)return fail('HOST_BUILD_UNVERIFIED');
     return sdk.query;
   }
 
@@ -318,7 +319,7 @@ export class ManagedQwenAdapter implements HostAdapter {
       const queryOptions:ManagedQueryOptions={
         sessionToolAllowlist:[...SESSION_TOOLS],pathToQwenExecutable:this.options.cliPath??path.join(root,'__unavailable_cli__.js'),env,cwd:runDir,sessionId:input.execution_id,abortController:active.abort,hooks,
         mcpServers:{relationship:{command:nodePath,args:[assets.mcpPath],env:mcpEnv,cwd:runDir,includeTools:['read_context','remember_user_report'],trust:false}},
-        captureProviderContent:contentEnabled,providerCaptureMaxBytes:16384,systemPrompt:skill,chatRecording:false,allowedTools:[...SESSION_TOOLS],permissionMode:'default',authType,allowedMcpServerNames:['relationship'],includePartialMessages:false,
+        captureProviderContent:contentEnabled,providerCaptureMaxBytes:16384,systemPrompt:skill,skipStartupContext:true,chatRecording:false,allowedTools:[...SESSION_TOOLS],permissionMode:'default',authType,allowedMcpServerNames:['relationship'],includePartialMessages:false,
         canUseTool:async(toolName,toolInput,callbackContext)=>{
           if(policy&&permitted(toolName)&&!callbackContext.signal.aborted&&!active!.abort.signal.aborted)return {behavior:'allow',updatedInput:toolInput};
           hookFailure='HOST_TOOL_BOUNDARY_FAILED';return {behavior:'deny',message:'Tool not authorized by this execution',interrupt:true};
@@ -347,7 +348,7 @@ export class ManagedQwenAdapter implements HostAdapter {
             if(policy)return fail('HOST_POLICY_CHANGED');
             if(msg.subtype==='host_policy'){
               const p=msg.data;
-              if(!object(p)||p.schema_version!==1||p.managed_host_contract_version!==1||p.source!=='runtime_config'||p.session_id!==input.execution_id||!sameTools(p.effective_session_tool_allowlist)||!sameTools(p.registered_tools)||p.hooks_status!=='present'||p.unmanaged_hooks_blocked!==true||!Array.isArray(p.sdk_hooks))return fail('HOST_POLICY_UNVERIFIED');
+              if(!object(p)||p.schema_version!==1||p.managed_host_contract_version!==2||p.skip_startup_context!==true||p.upstream_usage_statistics_enabled!==false||p.upstream_telemetry_enabled!==false||p.source!=='runtime_config'||p.session_id!==input.execution_id||!sameTools(p.effective_session_tool_allowlist)||!sameTools(p.registered_tools)||p.hooks_status!=='present'||p.unmanaged_hooks_blocked!==true||!Array.isArray(p.sdk_hooks))return fail('HOST_POLICY_UNVERIFIED');
               if(p.sdk_hooks.length!==HOOK_EVENTS.length||!HOOK_EVENTS.every(event=>p.sdk_hooks instanceof Array&&p.sdk_hooks.filter(h=>object(h)&&h.event===event&&typeof h.name==='string'&&h.name.startsWith('sdk:')&&(event==='InstructionsLoaded'?h.matcher===undefined||h.matcher==='*':h.matcher===TOOL_MATCHER)&&typeof h.timeout_ms==='number'&&h.timeout_ms>0).length===1))return fail('HOST_POLICY_UNVERIFIED');
               policyData=p;
             }else{
@@ -356,7 +357,7 @@ export class ManagedQwenAdapter implements HostAdapter {
             }
             if(policyData&&init){
               policy=true;
-              yield make({type:'policy',sessionToolAllowlist:[...(policyData.effective_session_tool_allowlist as string[])],registeredTools:[...(policyData.registered_tools as string[])],managed_host_contract_version:1,hooks:'sdk_functions',cli_version:init.qwen_code_version as string,sdk_version:'0.1.16',policy_source:'runtime_readback'});
+              yield make({type:'policy',sessionToolAllowlist:[...(policyData.effective_session_tool_allowlist as string[])],registeredTools:[...(policyData.registered_tools as string[])],managed_host_contract_version:2,skip_startup_context:true,upstream_usage_statistics_enabled:false,upstream_telemetry_enabled:false,hooks:'sdk_functions',cli_version:init.qwen_code_version as string,sdk_version:'0.1.17',policy_source:'runtime_readback'});
               yield make({type:'skill',phase:'read',resource_id:'relationship/SKILL.md',hash:skillHash,capture:disabled()});
             }
             continue;

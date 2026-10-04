@@ -1,10 +1,12 @@
+import {testTempRoot} from '../../../scripts/test-temp-root.mjs';
+process.env.TMPDIR=testTempRoot();
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const temporary = mkdtempSync(path.join(os.tmpdir(), 'between-mcp-installed-'));
+const temporary = mkdtempSync(path.join(testTempRoot(), 'between-mcp-installed-'));
 const packed = JSON.parse(execFileSync(process.execPath, [path.join(packageRoot, 'scripts/pack.mjs'), temporary], { encoding: 'utf8' }));
 const archive = path.join(temporary, packed[0].filename);
 writeFileSync(path.join(temporary, 'package.json'), JSON.stringify({ name: 'between-mcp-isolated-acceptance', private: true, version: '1.0.0', type: 'module' }));

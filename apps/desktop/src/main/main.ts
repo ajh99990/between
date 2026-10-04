@@ -23,11 +23,11 @@ app.on('second-instance',()=>{if(win){if(win.isMinimized())win.restore();win.foc
 // No plaintext Linux basic_text fallback for the memory-off receipt key.
 let dataKey:string|undefined;
 if(safeStorage.isEncryptionAvailable()&&(process.platform!=='linux'||safeStorage.getSelectedStorageBackend()!=='basic_text')){
- const dir=path.join(root,'.runtime/data-v5');mkdirSync(dir,{recursive:true,mode:0o700});const file=path.join(dir,'receipt-key.enc');
+ const dir=path.join(root,'.runtime/data-v6');mkdirSync(dir,{recursive:true,mode:0o700});const file=path.join(dir,'receipt-key.enc');
  if(existsSync(file))dataKey=safeStorage.decryptString(readFileSync(file));
  else {dataKey=randomBytes(32).toString('base64');writeFileSync(file,safeStorage.encryptString(dataKey),{mode:0o600,flag:'wx'});}
 }
-const environment:NodeJS.ProcessEnv={REL_ROOT:path.join(root,'resources'),REL_CONFIG_ROOT:root,REL_DB:process.env.REL_DB||path.join(root,'.runtime/data-v5/relationship.db'),PATH:process.env.PATH,LANG:process.env.LANG,TMPDIR:process.env.TMPDIR};
+const environment:NodeJS.ProcessEnv={REL_ROOT:path.join(root,'resources'),REL_CONFIG_ROOT:root,REL_DB:process.env.REL_DB||path.join(root,'.runtime/data-v6/relationship.db'),PATH:process.env.PATH,LANG:process.env.LANG,TMPDIR:process.env.TMPDIR};
 Object.assign(environment,selectedProviderEnvironment(loadRuntimeConfig(root)?.providerEnvironment,process.env));
 if(dataKey)environment.REL_DATA_KEY=dataKey;
 broker=spawn(process.env.REL_NODE||'node',[path.join(root,'dist/runtime-entry.js')],{cwd:root,env:environment,stdio:['pipe','pipe','pipe']});

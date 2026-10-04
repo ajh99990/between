@@ -16,7 +16,7 @@ export type HostTurn = ExecutionContext & {
 };
 type EventBase = ExecutionContext & {event_id:string; sequence:number; occurred_at:number};
 export type HostEvent = EventBase & (
-  | {type:'policy'; sessionToolAllowlist:readonly string[]; hooks:'sdk_functions'; registeredTools:readonly string[]; managed_host_contract_version:1; cli_version:string; sdk_version:string; policy_source:'runtime_readback'}
+  | {type:'policy'; sessionToolAllowlist:readonly string[]; hooks:'sdk_functions'; registeredTools:readonly string[]; managed_host_contract_version:2; skip_startup_context:true; upstream_usage_statistics_enabled:false; upstream_telemetry_enabled:false; cli_version:string; sdk_version:string; policy_source:'runtime_readback'}
   | {type:'attempt_started'; attempt_id:string; attempt_index:number; reason:string; provider:string; model:string; input:CapturedField; native_attempt?:NativeProviderAttempt}
   | {type:'attempt_finished'; attempt_id:string; response_complete:boolean; output:CapturedField; status:'succeeded'|'failed'|'cancelled'; usage?:{input_tokens?:number;output_tokens?:number}; native_attempt?:NativeProviderAttempt}
   | {type:'tool'; tool_call_id:string; operation_id?:string; tool:string; status:'started'|'succeeded'|'failed'; input:CapturedField; output?:CapturedField}

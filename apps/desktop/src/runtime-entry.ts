@@ -9,7 +9,7 @@ import {OffCache} from '@between/core/runtime/off-cache';
 import {RuntimeService} from '@between/core/runtime/service';
 import {loadRuntimeConfig,selectedProviderEnvironment} from '@between/host-qwen/config';
 const root=process.env.REL_ROOT||process.cwd();
-const file=process.env.REL_DB||path.join(root,'.runtime/data-v5/relationship.db');
+const file=process.env.REL_DB||path.join(root,'.runtime/data-v6/relationship.db');
 const runtimeConfig=loadRuntimeConfig(process.env.REL_CONFIG_ROOT||root);
 const {providerEnvironment,...config}=runtimeConfig??{};
 const providerEnv=selectedProviderEnvironment(providerEnvironment,process.env);

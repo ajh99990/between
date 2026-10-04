@@ -27,6 +27,8 @@ pnpm test:release
 pnpm start
 ```
 
+测试默认临时目录位于仓库相邻的`.between-test-tmp`，避免将依赖安装包堆到RAM-backed `/tmp`；可以显式设置绝对路径`BETWEEN_TEST_TMPDIR`。这不改变OS或网络安全设置。
+
 first-party统一`pnpm-lock.yaml`；Qwen保持上游独立锁。pnpm11使用精确版本allowBuilds：仅Electron、esbuild允许脚本；better-sqlite3明确false，因为13.0.3官方包已附prebuild，禁止binding.gyp触发不必要隐式重编译。`pnpm native:check`实际载入官方包内prebuild并执行SQLite事务；没有适配当前平台的二进制时直接失败，不静默替代。当前Linux Node验证不代表macOS安装包/签名通过。桌面broker用外部Node24，不在Electron main加载SQLite。
 
 `pnpm test`按包执行同一保留的业务/进程故障测试、浏览器contracts及Skills测试。`test:release`还检查独立分发产物；只通过单测不能当成完整产品完成。
@@ -43,13 +45,15 @@ first-party统一`pnpm-lock.yaml`；Qwen保持上游独立锁。pnpm11使用精�
 
 ## Qwen固定上游
 
-[构建与核验](upstream/README.md)。当前CLI v0.24.7、SDK0.1.16、managed host contract1。上游archive与补丁受hash约束；运行时必须核整套dist、chunks、assets，不只loader。无凭据/运行时配置时生产明确失败，不使用测试Host替身。
+[构建与核验](upstream/README.md)。当前CLI v0.24.7、SDK0.1.17、managed host contract2，使用完整123文件源码补丁；本轮应用整体验收仍在进行，不得将旧contract1运行时视为兼容。上游archive与补丁受hash约束；运行时必须核整套dist、chunks、assets，不只loader。无凭据/运行时配置时生产明确失败，不使用测试Host替身。
 
 ## 数据边界和未完成项
 
-当前main schema5、authority2、spool2，无旧库自动迁移。记忆关闭收件需可用安全密钥；Linux明文safeStorage backend拒绝。原始关闭记忆输入仅有界加密保留，不提供明文fallback。停止/取消控制优先于满普通队列。
+当前开发树使用main schema6、authority2、spool2，默认新数据目录为`.runtime/data-v6`；旧库拒绝打开，不做自动迁移。已发布schema5快照保留独立身份。记忆关闭收件需可用安全密钥；Linux明文safeStorage backend拒绝。原始关闭记忆输入仅有界加密保留，不提供明文fallback。停止/取消控制优先于满普通队列。
 
 [删除与备份](docs/privacy-and-backups.md)、[离线封存恢复](docs/offline-recovery.md)说明确切范围。可信API支持完整关系删除及独立权威屏障、当前离线seal的受限恢复；一般任意历史备份恢复、权威/密钥丢失恢复、前台恢复流程仍未实现。底层文件删除不声称介质物理擦除。
+
+[记忆候选边界](docs/memory-boundaries.md)：分层记忆候选只证明引文/状态/来源有效性与预算等机械边界，普通偏好自动语义准入、自然语言纠错和真实角色自然度仍未验证。needs_review为内部状态，不增加逐条确认前台。
 
 真实provider回合、完整Langfuse链路、OS级宿主隔离和跨平台签名安装包尚未通过。bwrap已遇到环境权限拒绝，不绕过；不能把未完成开发一概归为环境限制。云端实际Electron正常开窗/披露/开始/关闭有历史观察；设置/删除/恢复GUI未获准复测，不冒充通过。每次迁移后的视觉证据以最终验收报告为准。
 

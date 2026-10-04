@@ -15,7 +15,7 @@ function provider(phase:'started'|'finished',overrides:Partial<NativeProviderAtt
 }
 const wire=(options:ManagedQueryOptions,data:NativeProviderAttempt)=>({type:'system',subtype:'provider_attempt',uuid:data.event_id,session_id:options.sessionId,data});
 const init=(o:ManagedQueryOptions)=>({type:'system',subtype:'init',uuid:randomUUID(),session_id:o.sessionId,qwen_code_version:'0.24.7',tools:[...SESSION_TOOLS]});
-const policy=(o:ManagedQueryOptions,changes:Record<string,unknown>={})=>({type:'system',subtype:'host_policy',uuid:randomUUID(),session_id:o.sessionId,data:{schema_version:1,managed_host_contract_version:1,source:'runtime_config',session_id:o.sessionId,effective_session_tool_allowlist:[...SESSION_TOOLS],registered_tools:[...SESSION_TOOLS],hooks_status:'present',unmanaged_hooks_blocked:true,sdk_hooks:o.hooks.map(h=>({event:h.event,matcher:h.matcher,name:'sdk:'+randomUUID(),timeout_ms:h.timeoutMs+1000})),...changes}});
+const policy=(o:ManagedQueryOptions,changes:Record<string,unknown>={})=>({type:'system',subtype:'host_policy',uuid:randomUUID(),session_id:o.sessionId,data:{schema_version:1,managed_host_contract_version:2,skip_startup_context:true,upstream_usage_statistics_enabled:false,upstream_telemetry_enabled:false,source:'runtime_config',session_id:o.sessionId,effective_session_tool_allowlist:[...SESSION_TOOLS],registered_tools:[...SESSION_TOOLS],hooks_status:'present',unmanaged_hooks_blocked:true,sdk_hooks:o.hooks.map(h=>({event:h.event,matcher:h.matcher,name:'sdk:'+randomUUID(),timeout_ms:h.timeoutMs+1000})),...changes}});
 const success=(o:ManagedQueryOptions,changes:Record<string,unknown>={})=>({type:'result',subtype:'success',is_error:false,uuid:randomUUID(),session_id:o.sessionId,result:'SYNTHETIC character reply',provider_attempt_id:'SYNTHETIC_ATTEMPT',provider_attempt_ids:['SYNTHETIC_ATTEMPT'],permission_denials:[],...changes});
 type Scenario=(o:ManagedQueryOptions)=>AsyncGenerator<unknown>;
 function setup(scenario:Scenario,options:Partial<ManagedQwenAdapterOptions>={}){
@@ -59,7 +59,7 @@ test('native provider IDs, unmatched status, semantic usage and event dedupe sur
 
 test('runtime readback missing or wider tools never becomes a requested-options policy success',async()=>{
   for(const mode of ['missing','wider','hooks','version','registered'] as const){
-    const s=setup(async function*(o){yield init(o);if(mode!=='missing')yield policy(o,mode==='wider'?{effective_session_tool_allowlist:[...SESSION_TOOLS,'shell']}:mode==='hooks'?{sdk_hooks:[]}:mode==='version'?{managed_host_contract_version:2}:{registered_tools:[...SESSION_TOOLS,'shell']});yield success(o)});
+    const s=setup(async function*(o){yield init(o);if(mode!=='missing')yield policy(o,mode==='wider'?{effective_session_tool_allowlist:[...SESSION_TOOLS,'shell']}:mode==='hooks'?{sdk_hooks:[]}:mode==='version'?{managed_host_contract_version:1}:{registered_tools:[...SESSION_TOOLS,'shell']});yield success(o)});
     try{const events=await collect(s.adapter);assert.equal(failure(events)?.code,'HOST_POLICY_UNVERIFIED');assert.ok(!events.some(e=>e.type==='result'||e.type==='policy'))}finally{await s.cleanup()}
   }
 });
@@ -271,4 +271,16 @@ test('invalid UTF-8 skill or character bytes are rejected before query without r
     writeFileSync(path.join(app,source),Buffer.from([0x53,0x59,0xff,0x4e]));
     const s=setup(happy,{root:app});try{const events=await collect(s.adapter);assert.equal(failure(events)?.code,'HOST_APP_ASSET_UNVERIFIED');assert.equal(s.calls.length,0)}finally{await s.cleanup();rmSync(dir,{recursive:true,force:true})}
   }
+});
+
+test('managed role contract requires explicit skip-startup request and actual true readback',async()=>{
+ for(const value of [undefined,false,'true']){const s=setup(async function*(o){assert.equal(o.skipStartupContext,true);yield init(o);yield policy(o,{skip_startup_context:value});yield success(o);});
+ try{const events=await collect(s.adapter,turn());assert.ok(events.some(e=>e.type==='failure'&&e.code==='HOST_POLICY_UNVERIFIED'));assert.ok(!events.some(e=>e.type==='result'));}finally{await s.adapter.close();}}
+});
+
+test('managed role policy refuses absent or enabled upstream telemetry readback',async()=>{
+ for(const field of ['upstream_usage_statistics_enabled','upstream_telemetry_enabled'])for(const value of [undefined,true,'false']){
+  const s=setup(async function*(o){yield init(o);yield policy(o,{[field]:value});yield success(o);});
+  try{const events=await collect(s.adapter,turn());assert.ok(events.some(e=>e.type==='failure'&&e.code==='HOST_POLICY_UNVERIFIED'));assert.ok(!events.some(e=>e.type==='result'));}finally{await s.adapter.close();}
+ }
 });

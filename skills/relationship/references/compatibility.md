@@ -7,3 +7,7 @@ The required product schema is `between.host-context`, version 1: the neutral co
 A host must explicitly load SKILL.md from the installed directory and resolve these references relative to that directory. Host-specific auto-discovery locations vary. This package does not promise that installing into an arbitrary agent's directory automatically activates it.
 
 The packaging tests use synthetic files and local Node processes. They validate archive integrity, bounded extraction, frontmatter, references, and capability/schema declarations. They do not establish Qwen discovery, a live model response, or live MCP authorization. Those require separate integration evidence.
+
+## Memory capability semantics
+
+The current implementation returns source-backed quotations with admission, status, revision and selection metadata. A `needs_review` candidate is internal and is not a model-visible active memory. Supported deterministic explicit-save and literal-revision forms test mechanical boundaries; they do not establish general natural-language extraction, correction or semantic recall. Ordinary preference recognition remains a product validation requirement, not a command-only product definition. Hosts must honor actual tool outcomes rather than promise recall for every submitted quote. The two fixed MCP tools remain unchanged.

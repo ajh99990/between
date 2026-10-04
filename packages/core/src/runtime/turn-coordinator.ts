@@ -151,7 +151,7 @@ export class TurnCoordinator {
         if(!this.record(input,event))continue;
         this.observe(event);
         if(event.type==='policy'){
-          if(event.policy_source!=='runtime_readback'||event.hooks!=='sdk_functions'||event.managed_host_contract_version!==1||event.registeredTools.length!==SESSION_TOOLS.length||SESSION_TOOLS.some(x=>!event.registeredTools.includes(x))||event.cli_version!=='0.24.7'||event.sdk_version!=='0.1.16'||event.sessionToolAllowlist.length!==SESSION_TOOLS.length||SESSION_TOOLS.some(x=>!event.sessionToolAllowlist.includes(x)))throw new ProductError('HOST_POLICY_UNVERIFIED');
+          if(event.policy_source!=='runtime_readback'||event.hooks!=='sdk_functions'||event.managed_host_contract_version!==2||event.skip_startup_context!==true||event.upstream_usage_statistics_enabled!==false||event.upstream_telemetry_enabled!==false||event.registeredTools.length!==SESSION_TOOLS.length||SESSION_TOOLS.some(x=>!event.registeredTools.includes(x))||event.cli_version!=='0.24.7'||event.sdk_version!=='0.1.17'||event.sessionToolAllowlist.length!==SESSION_TOOLS.length||SESSION_TOOLS.some(x=>!event.sessionToolAllowlist.includes(x)))throw new ProductError('HOST_POLICY_UNVERIFIED');
           policy=true;this.store.db.prepare('UPDATE executions SET policy_verified=1 WHERE execution_id=?').run(execution_id);continue;
         }
         if(event.type==='failure')throw new ProductError(event.outcome==='unknown_outcome'?'UNKNOWN_OUTCOME':event.code);

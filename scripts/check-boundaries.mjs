@@ -21,3 +21,10 @@ assert.match(workspace,/^strictDepBuilds: true$/m);assert.match(workspace,/^allo
 const buildMap=Object.fromEntries([...workspace.matchAll(/^  ([^\s:]+@\d+\.\d+\.\d+): (true|false)$/gm)].map(m=>[m[1],m[2]]));
 assert.deepEqual(buildMap,{'better-sqlite3@13.0.3':'false','electron@44.5.1':'true','esbuild@0.25.12':'true'},'only exact reviewed native/build dependency scripts');
 console.log('pnpm11 exact-version build policy checked');
+
+// The desktop copies the externalized MCP artifact into its own resources. Its
+// package, not an ancestor's accidental node_modules, owns the public closure.
+const mcpRuntime=JSON.parse(readFileSync('packages/mcp-server/package.json','utf8')).dependencies;
+const desktopRuntime=JSON.parse(readFileSync('apps/desktop/package.json','utf8')).dependencies;
+for(const [name,version]of Object.entries(mcpRuntime))if(!name.startsWith('@between/'))assert.equal(desktopRuntime[name],version,`desktop copied MCP runtime dependency missing/mismatched: ${name}`);
+console.log('desktop copied MCP public runtime closure explicitly declared');

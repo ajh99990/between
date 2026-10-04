@@ -1,3 +1,5 @@
+import {testTempRoot} from './test-temp-root.mjs';
+process.env.TMPDIR=testTempRoot();
 import {readFileSync,readdirSync} from 'node:fs';import {execFileSync} from 'node:child_process';import path from 'node:path';
 const root=path.resolve('../..'),name=JSON.parse(readFileSync('package.json','utf8')).name.split('/')[1];
 if(name==='contracts'){execFileSync(process.execPath,['scripts/test-contracts.mjs'],{cwd:root,stdio:'inherit'});process.exit(0);}

@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3';
 import {ProductError} from '../store.js';
 import type {ScopeAuthority} from './authority.js';
+import {minimizeSources,expireReviewCandidates,invalidateSourceDependencies} from '../memory/retention.js';
 
 const scopedTables=['scope_controls','business_versions','scope_safety','events','messages','sources','memories','memory_fts','grants','tool_audit','pending','operations'] as const;
 const runtimeTables=['runtime_turns','executions','render_receipts'] as const;
@@ -84,8 +85,9 @@ export function sanitizeRestoredImage(db:Database.Database,authority:ScopeAuthor
     }
     if(hasTable(db,'executions'))db.prepare("UPDATE executions SET status='interrupted',approval_id=NULL WHERE status='running'").run();
     const cutoff=now-30*86400000;
-    db.prepare('UPDATE sources SET text=(SELECT group_concat(text,char(10)) FROM memories WHERE source=sources.id AND scope=sources.scope) WHERE at<? AND EXISTS(SELECT 1 FROM memories WHERE source=sources.id AND scope=sources.scope)').run(cutoff);
-    db.prepare('DELETE FROM sources WHERE at<? AND NOT EXISTS(SELECT 1 FROM memories WHERE source=sources.id AND scope=sources.scope)').run(cutoff);
+    expireReviewCandidates(db,now);
+    invalidateSourceDependencies(db,now);
+    minimizeSources(db,cutoff,now);
     db.prepare('DELETE FROM messages WHERE at<?').run(cutoff);
     db.prepare('DELETE FROM tool_audit WHERE at<?').run(cutoff);
     if(hasTable(db,'runtime_turns'))db.prepare('UPDATE runtime_turns SET body=NULL WHERE memory=0 OR created_at<?').run(cutoff);

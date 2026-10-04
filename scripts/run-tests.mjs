@@ -1,0 +1,6 @@
+import {spawnSync} from 'node:child_process';import {testTempRoot} from './test-temp-root.mjs';
+const args=process.argv.slice(2);if(args.length>1||(args.length===1&&args[0]!=='--release'))throw Error('Usage: run-tests.mjs [--release]');
+const env={...process.env,TMPDIR:testTempRoot()};
+const steps=[[process.execPath,['--test','tests/packaging/test-temp-root.test.mjs']],['pnpm',['run','build']],['pnpm',['run','native:check']],['pnpm',['run','check:boundaries']],['pnpm',['-r','--sort','run','test']],[process.execPath,['--test','tests/integration/dist/mcp.test.js']],['pnpm',['run','test:skills']],[process.execPath,['--test','tests/packaging/desktop.test.mjs']]];
+if(args[0]==='--release')steps.push(['pnpm',['run','typecheck']],['pnpm',['--filter','@between/mcp-server','test:pack']],[process.execPath,['--test','tests/packaging/desktop-install.test.mjs']]);
+for(const [command,argv]of steps){const result=spawnSync(command,argv,{stdio:'inherit',env:argv.includes('tests/packaging/desktop-install.test.mjs')?{...env,BETWEEN_DESKTOP_INSTALL_TEST:'1'}:env});if(result.error)throw result.error;if(result.status!==0){console.error('Required test phase failed:',command,argv.join(' '),result.signal||result.status);process.exit(result.status||1);}}

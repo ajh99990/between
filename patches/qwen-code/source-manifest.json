@@ -1,15 +1,46 @@
 {
   "base": "QwenLM/qwen-code v0.24.7",
-  "sdk_version": "0.1.16",
-  "managed_host_contract_version": 1,
+  "sdk_version": "0.1.17",
+  "managed_host_contract_version": 2,
   "license": "Apache-2.0",
   "base_archive_sha256": "aa7082cbf80590dbc481209f49402b369879868302dda2836f8ae0a1329120d3",
+  "official_source_url": "https://codeload.github.com/QwenLM/qwen-code/tar.gz/refs/tags/v0.24.7",
   "files": [
+    {
+      "path": ".qwen/e2e-tests/managed-host.md",
+      "sha256": "0e1d79f559339ae63deee6b3a7776ef0364734a60a021263b9aab2a4024ae6eb",
+      "bytes": 949,
+      "kind": "added"
+    },
+    {
+      "path": "docs/design/managed-host-contract.md",
+      "sha256": "4fa55206afad2aa48b68fd05bf1196422c742a4cbbf8eff5ab82bf6696976681",
+      "bytes": 5562,
+      "kind": "added"
+    },
+    {
+      "path": "docs/design/managed-host-contract.zh-CN.md",
+      "sha256": "a77c1dbb0385e84bf2bf9eee52eeef6bedb7eecfbc5ed3fdf28e2b445479a5f0",
+      "bytes": 4876,
+      "kind": "added"
+    },
     {
       "path": "package.json",
       "sha256": "9e74a3919ebcba4954a51056435e134e47ed3007c4476ee87bf34bbfa05f0915",
       "bytes": 12533,
       "kind": "modified"
+    },
+    {
+      "path": "packages/acp-bridge/tsconfig.managed.json",
+      "sha256": "03081cd56bf3ce52bdad6e0454dc149f7bb4bd5a51facbd793adfa484eabf4cd",
+      "bytes": 251,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/alternate-cli-strict-vitest.config.ts",
+      "sha256": "e85ceee0d9b017fc15a7892edd253c9db35cf50b3e667305753d4f1571445573",
+      "bytes": 1050,
+      "kind": "added"
     },
     {
       "path": "packages/cli/src/acp-integration/acpAgent.ts",
@@ -24,15 +55,39 @@
       "kind": "modified"
     },
     {
-      "path": "packages/cli/src/config/config.ts",
-      "sha256": "90a05f2904e63ab2be287c9c354f5bfdb4a83ea3e7f9b3cc8612228d5880af41",
-      "bytes": 119239,
+      "path": "packages/cli/src/acp-integration/session/session.alternate-strict-policy.test.ts",
+      "sha256": "a197ebcff2ac27299a3b2864dacc3021a9b62d9464da306a974f821aa5626a7a",
+      "bytes": 29047,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/src/config/config.test.ts",
+      "sha256": "4ac8cbec56afa985e6cd472464e157f0a2ff7dcde88e57a2cbf0ee73c47c7749",
+      "bytes": 244207,
       "kind": "modified"
     },
     {
+      "path": "packages/cli/src/config/config.ts",
+      "sha256": "341a0a3e00957ba95ff33783d96e749d83b18c803c40d9873cba99932f4f5cce",
+      "bytes": 119002,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/cli/src/config/fixtures/relationship-skill.md",
+      "sha256": "73d5985c70cb26418f6823627daf2e457e0d4a610c1c7d3e28f7f8fd3c7d8f06",
+      "bytes": 2177,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/src/config/managed-startup-context.integration.test.ts",
+      "sha256": "7cd76555a72b41c4a885ebc1526a967083b291dd2333e2be1c67a1add327b5bf",
+      "bytes": 11596,
+      "kind": "added"
+    },
+    {
       "path": "packages/cli/src/config/top-level-options.ts",
-      "sha256": "b45ec6bd03cc1450b1a00458edb23522dba66621efa77893c50809e388a25a1e",
-      "bytes": 17053,
+      "sha256": "c5460f11603bf3c2dac0943524b8fd731197507750d1709eab0ec781c076863e",
+      "bytes": 17205,
       "kind": "modified"
     },
     {
@@ -54,15 +109,33 @@
       "kind": "modified"
     },
     {
+      "path": "packages/cli/src/nonInteractive/control/controllers/hook-controller.test.ts",
+      "sha256": "5b3b2c5da26c69dc0e875358ee030b47b296c1d81b1eceff6bf399bb4b26268c",
+      "bytes": 12238,
+      "kind": "added"
+    },
+    {
       "path": "packages/cli/src/nonInteractive/control/controllers/hookController.ts",
       "sha256": "96bdf902c73747e74c55bfeb747bdff431cd54a2e8d0941ff78bbab7ed81ce03",
       "bytes": 5681,
       "kind": "modified"
     },
     {
+      "path": "packages/cli/src/nonInteractive/control/controllers/managed-bare-hooks.integration.test.ts",
+      "sha256": "d66554cf8ad43f025f9b79af9a3bda81c39037fd57652e69587d31af3647203e",
+      "bytes": 13864,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/src/nonInteractive/control/controllers/systemController.test.ts",
+      "sha256": "b740e170d3f54263796bf4698fb1f5b1ba4b4f7640b2cc174c9218a8da6e977d",
+      "bytes": 20073,
+      "kind": "modified"
+    },
+    {
       "path": "packages/cli/src/nonInteractive/control/controllers/systemController.ts",
-      "sha256": "545d50030a5764fb4c1360b2a38a8f2436c039b990b26dc0cd5f8070467c86b7",
-      "bytes": 21833,
+      "sha256": "71a2608f7178b7a21cbe38fbc9debf4c3ffd0b78d50f26ec86d9f1552cf4a893",
+      "bytes": 22119,
       "kind": "modified"
     },
     {
@@ -82,6 +155,24 @@
       "sha256": "9071ddd5bd48989eb9ef18bc846c8cc3a06383705733e9858a327ad7c89afc40",
       "bytes": 10348,
       "kind": "modified"
+    },
+    {
+      "path": "packages/cli/src/nonInteractive/io/provider-result-provenance.test.ts",
+      "sha256": "70a9fd9d2894ecd30e9ec5c2f3e52468008384d03e8122b5b6819ba4f6028eb9",
+      "bytes": 6177,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/src/nonInteractive/managed-host-policy.test.ts",
+      "sha256": "d7fc2eadb8ca31a2a3e969f58a2db2f12e17ed2db604851a75171ccfd3f04591",
+      "bytes": 2521,
+      "kind": "added"
+    },
+    {
+      "path": "packages/cli/src/nonInteractive/managed-host-policy.ts",
+      "sha256": "7a76c8c8cffa5b0e248fec1595423b59a148dd86a5b18b729c34d6a0f20061e1",
+      "bytes": 1366,
+      "kind": "added"
     },
     {
       "path": "packages/cli/src/nonInteractive/session.ts",
@@ -108,16 +199,34 @@
       "kind": "modified"
     },
     {
+      "path": "packages/cli/src/serve/managed-runtime-tool-executor.alternate-strict-policy.test.ts",
+      "sha256": "f75c9560764d861bffd86dcd9a2afaabbcf767d6ea23487e02269bff03e81824",
+      "bytes": 13529,
+      "kind": "added"
+    },
+    {
       "path": "packages/cli/src/serve/managed-runtime-tool-executor.ts",
       "sha256": "965dea8400411d18df8d6d373a62f76440411d45e4140910e099c8f7ada0a69c",
       "bytes": 28587,
       "kind": "modified"
     },
     {
+      "path": "packages/cli/tsconfig.managed.json",
+      "sha256": "9785d83c35144d0b9eb93ee54ed9159de91aaa4543243210c81a916b97beab28",
+      "bytes": 555,
+      "kind": "added"
+    },
+    {
       "path": "packages/cli/vitest.config.ts",
-      "sha256": "e672692e5e606b9a692bfc9fa5ffa8210423d04d18f59cbd248160a36acc1434",
-      "bytes": 11762,
+      "sha256": "9952d11d208ed6d3832a7f7d920278961fbb0299103b4905a5f4689eddc89de5",
+      "bytes": 12092,
       "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/agents/runtime/agent-core.strict-policy.test.ts",
+      "sha256": "8d3a34b86053355cb2a891da97f8c1ff1a90b82dbc783db0bb4b21225efedd5d",
+      "bytes": 8434,
+      "kind": "added"
     },
     {
       "path": "packages/core/src/agents/runtime/agent-core.ts",
@@ -126,10 +235,34 @@
       "kind": "modified"
     },
     {
-      "path": "packages/core/src/config/config.ts",
-      "sha256": "1991a64a28831a67bb50cee441453813ee7c692ebe9e1f7853c3de399d68f572",
-      "bytes": 490510,
+      "path": "packages/core/src/config/config.test.ts",
+      "sha256": "f6f67fa0f1a36916383c71cdee5e9369b02c43725a2a9d1f28409182e2e64533",
+      "bytes": 604618,
       "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/config/config.ts",
+      "sha256": "75158a2983d8d4beea79c4250c85d687a96c353dd7ca9531d217a29c8a33b885",
+      "bytes": 490585,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/config/provider-content-store.ts",
+      "sha256": "03bdbc854e8d1d93cdf6308887390c6b1671339745afe2a80a506cf651c6fdc9",
+      "bytes": 1644,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/config/session-tool-policy.test.ts",
+      "sha256": "0b2ade17cc4b0b5a150f3f568db84e4482def1ea8be3e926897e35437bb07899",
+      "bytes": 4535,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/config/session-tool-policy.ts",
+      "sha256": "76b82b030916330436b2844d8dcecd035fe019364cc8992de56993a6042cb896",
+      "bytes": 2906,
+      "kind": "added"
     },
     {
       "path": "packages/core/src/core/anthropicContentGenerator/anthropicContentGenerator.test.ts",
@@ -154,6 +287,12 @@
       "sha256": "ba763c5efcb95f3052bf78be6803909c2adc42ab50eb5b169bd20bc784d23d9b",
       "bytes": 22229,
       "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/core/coreToolScheduler.strict-policy.test.ts",
+      "sha256": "1066ae34310c206c23e65b76b2be326dd70c2835f825c9313485b9849402ab18",
+      "bytes": 18876,
+      "kind": "added"
     },
     {
       "path": "packages/core/src/core/coreToolScheduler.ts",
@@ -234,6 +373,12 @@
       "kind": "modified"
     },
     {
+      "path": "packages/core/src/followup/speculation.strict-policy.test.ts",
+      "sha256": "c054d9dbf4d74ba15c512f9f0722954ea24d0af66b54abc4ec4a9d35e3e3a206",
+      "bytes": 5168,
+      "kind": "added"
+    },
+    {
       "path": "packages/core/src/followup/speculation.ts",
       "sha256": "0f7622f46cde4f62d0a729a7442fe2cced3442886915a8d05a3f8d9f12aa8c96",
       "bytes": 25792,
@@ -250,6 +395,60 @@
       "sha256": "7ea615570e9068ab52bbb0d95c08f75185d69c0592fda5de874edb5c832e99da",
       "bytes": 52871,
       "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/hooks/hooks-listing.test.ts",
+      "sha256": "88c839cb13dd04577eb6a0c643e6e6a42646050454b8b0e701eb3fef910cf751",
+      "bytes": 23294,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/hooks/hooks-listing.ts",
+      "sha256": "fc5ce93a005d5e48895163ce55abf172e704cba7cfb01fa4fe5797196d55227f",
+      "bytes": 15901,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/hooks/managed-hooks.test.ts",
+      "sha256": "33bcf8a70343d7c182a6ea9bc9c1c0365694d239371beab94a51165721f4c2c5",
+      "bytes": 3397,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/observability/provider-attempt.test.ts",
+      "sha256": "541d855ede0a13598743d8072aa4ddb3a6473c48c877352f72aff2f1ae23db5a",
+      "bytes": 15801,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/observability/provider-attempt.ts",
+      "sha256": "516aeda2a54f162698d6f05778f751f3fe7e28ddef2def3de8d0f7c217980cce",
+      "bytes": 17326,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/observability/provider-boundary.test.ts",
+      "sha256": "32febe15237fe6986607274e917bd99a4254085742e326ec9908686663ff8799",
+      "bytes": 14328,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/observability/response-provenance.ts",
+      "sha256": "99ab1f05b8c92d515e32fbc7a5a093d5567e32a3b33eeaf32cb7f32f0c358104",
+      "bytes": 803,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/observability/vitest.config.ts",
+      "sha256": "60cb7882d9a13a1e6a1f1592698ba0000150fc8b42250dc25a2da02036e37b98",
+      "bytes": 218,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/permissions/permission-manager.strict-policy.test.ts",
+      "sha256": "7c0692f6aa2e2da02747f8e9e3ed2a915dd41a8720d11c614e4ef3acb4e0a1fb",
+      "bytes": 3339,
+      "kind": "added"
     },
     {
       "path": "packages/core/src/permissions/permission-manager.ts",
@@ -276,6 +475,12 @@
       "kind": "modified"
     },
     {
+      "path": "packages/core/src/services/local-execution-environment.strict-policy.test.ts",
+      "sha256": "48ee7fc2cc274bb5c3f8859b9540cc1527213a82d119074536b8ed073b173c21",
+      "bytes": 4570,
+      "kind": "added"
+    },
+    {
       "path": "packages/core/src/services/local-execution-environment.ts",
       "sha256": "d38e0b606a5471319ea94ec8e14ac0247e9802bfd5152f4fc012e18865a32e1d",
       "bytes": 8041,
@@ -285,6 +490,18 @@
       "path": "packages/core/src/subagents/subagent-manager.ts",
       "sha256": "486792dddad34fff102f9d077f950b3782be73a101310cd4e481a31fa889c9a1",
       "bytes": 96084,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/telemetry/config.test.ts",
+      "sha256": "780ac222c02a5b43a42056ebffb6e856d37e381f68057d30827075b2a6e46edb",
+      "bytes": 23149,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/telemetry/config.ts",
+      "sha256": "4d04c0555d0144eca7fe0c540ba7c422cecc9f6a65644749c63246fda4a8b32e",
+      "bytes": 8469,
       "kind": "modified"
     },
     {
@@ -306,10 +523,22 @@
       "kind": "modified"
     },
     {
+      "path": "packages/core/src/tools/managed-tool-runtime.strict-policy.test.ts",
+      "sha256": "f94bf6d3505cabd13d9622a1058ba08c7e50577f7b816ea5a3799e163c18e4f0",
+      "bytes": 5659,
+      "kind": "added"
+    },
+    {
       "path": "packages/core/src/tools/managed-tool-runtime.ts",
       "sha256": "b129b336f0995331f5a59dbb12fc3b0a564136a2b57a2b3b7e94aaf4bde91665",
       "bytes": 32448,
       "kind": "modified"
+    },
+    {
+      "path": "packages/core/src/tools/mcp-tool.strict-policy.test.ts",
+      "sha256": "75c170cfa192b7c4abacc7dc2ef8775442829df65ed7724d1c1a15158f8359d7",
+      "bytes": 5287,
+      "kind": "added"
     },
     {
       "path": "packages/core/src/tools/mcp-tool.ts",
@@ -318,9 +547,39 @@
       "kind": "modified"
     },
     {
+      "path": "packages/core/src/tools/strict-tool-policy.test.ts",
+      "sha256": "4e41d2c0166fa0edbd7291263c6657d4dfea73cbb7e4c6c2583b8d65edaf8f5d",
+      "bytes": 1896,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/tools/strict-tool-policy.ts",
+      "sha256": "36d21078468ba058b4563c4bd131a33cba8d59745d5be9001d61970af95538bc",
+      "bytes": 988,
+      "kind": "added"
+    },
+    {
+      "path": "packages/core/src/tools/tool-registry.strict-policy.test.ts",
+      "sha256": "2cf3f0ff8707e28187cb226292f1db7c8580b0569dfb3c66bb31e93486871fcf",
+      "bytes": 10409,
+      "kind": "added"
+    },
+    {
       "path": "packages/core/src/tools/tool-registry.ts",
       "sha256": "a02d02926c2560771bbbade915d137effcd5c216f3c89082aafe381cf91d0940",
       "bytes": 51261,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/core/tsconfig.managed.json",
+      "sha256": "6afe05c35cce19e6369665541a38a0347ef217f852f1d8942197721f42327d9b",
+      "bytes": 346,
+      "kind": "added"
+    },
+    {
+      "path": "packages/sdk-typescript/package.json",
+      "sha256": "6c4be0cc17d2996a02597210083b8b720bb5b00d63e88361eb3575f5dff66153",
+      "bytes": 2951,
       "kind": "modified"
     },
     {
@@ -337,21 +596,33 @@
     },
     {
       "path": "packages/sdk-typescript/src/query/Query.ts",
-      "sha256": "319793a7ac93326d0f292bd45d82326c4f23e941c05aadcf99b09c7f94560b6b",
-      "bytes": 39628,
+      "sha256": "03b7ef3ec51f4d8a0b7324c59cded44ab1e31e888de313832fd87cf3aa2304fe",
+      "bytes": 40359,
       "kind": "modified"
     },
     {
       "path": "packages/sdk-typescript/src/query/createQuery.ts",
-      "sha256": "3bac28ba4c383b6e8be29fe3953c0f22a8fe89b32a3c40cf89728d749dd5ac6f",
-      "bytes": 5618,
+      "sha256": "9304799e6ebe9ab424d2a4251158243ced6f2f07fc1ea81f2cd47fc35be5a778",
+      "bytes": 5670,
       "kind": "modified"
     },
     {
       "path": "packages/sdk-typescript/src/transport/ProcessTransport.ts",
-      "sha256": "ebfae0f0a962addc15b717ef62c67f9c669726f1d2457b9e8d8dec78d42b5a4b",
-      "bytes": 19149,
+      "sha256": "4bf5c2fdfe1b4ae3f20d0ba51c5ad7d6854e82820b724b9ab3b4fd66b77d0c91",
+      "bytes": 19250,
       "kind": "modified"
+    },
+    {
+      "path": "packages/sdk-typescript/src/types/hooks.ts",
+      "sha256": "2ddf3fea5a27daa750eb2206347d5ca1e6b00a0400786500fbc8867253e51f64",
+      "bytes": 3150,
+      "kind": "added"
+    },
+    {
+      "path": "packages/sdk-typescript/src/types/managed-host-policy.ts",
+      "sha256": "c4cdbb51b161c57a6bb56e87729b0649f3b8d9b00121f3f591c75f5b77ca8afe",
+      "bytes": 617,
+      "kind": "added"
     },
     {
       "path": "packages/sdk-typescript/src/types/protocol.ts",
@@ -360,15 +631,21 @@
       "kind": "modified"
     },
     {
+      "path": "packages/sdk-typescript/src/types/provider-attempt.ts",
+      "sha256": "0b4019db625ca713e19f00f724fb2f82feeca35dd555a6a56285910d4bf6f64b",
+      "bytes": 1355,
+      "kind": "added"
+    },
+    {
       "path": "packages/sdk-typescript/src/types/queryOptionsSchema.ts",
-      "sha256": "32ead537bc8ea7eebfe53184d87b3f80def71984def18bd9bb564bf666536c9a",
-      "bytes": 10654,
+      "sha256": "c1a36204182116c930ea936705e9cda91547828ee9c1c3d0e0f0f7a5dbabadd5",
+      "bytes": 10816,
       "kind": "modified"
     },
     {
       "path": "packages/sdk-typescript/src/types/types.ts",
-      "sha256": "11876f50adf256e85a469221261947efb792f57a2bced693ceb45e9c9e2f7a09",
-      "bytes": 25563,
+      "sha256": "97abf328d6b40c908ad287524fb65adb238f19be710da6407aac4a63d6a66f5e",
+      "bytes": 25775,
       "kind": "modified"
     },
     {
@@ -378,201 +655,15 @@
       "kind": "modified"
     },
     {
-      "path": "packages/sdk-typescript/test/query.test.ts",
-      "sha256": "009315443e2373f2aa6492d31c8b65e7f12df38ae9f6bfb50205a10d0f187a17",
-      "bytes": 10161,
-      "kind": "modified"
-    },
-    {
-      "path": "packages/sdk-typescript/test/unit/Query.test.ts",
-      "sha256": "0160b9ea259abbf9d977a94ab41b71033b73c04d297a8b510cd7b7f63d122177",
-      "bytes": 54514,
-      "kind": "modified"
-    },
-    {
-      "path": "packages/core/src/permissions/permission-manager.strict-policy.test.ts",
-      "sha256": "7c0692f6aa2e2da02747f8e9e3ed2a915dd41a8720d11c614e4ef3acb4e0a1fb",
-      "bytes": 3339,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/followup/speculation.strict-policy.test.ts",
-      "sha256": "c054d9dbf4d74ba15c512f9f0722954ea24d0af66b54abc4ec4a9d35e3e3a206",
-      "bytes": 5168,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/hooks/managed-hooks.test.ts",
-      "sha256": "33bcf8a70343d7c182a6ea9bc9c1c0365694d239371beab94a51165721f4c2c5",
-      "bytes": 3397,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/services/local-execution-environment.strict-policy.test.ts",
-      "sha256": "48ee7fc2cc274bb5c3f8859b9540cc1527213a82d119074536b8ed073b173c21",
-      "bytes": 4570,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/config/session-tool-policy.ts",
-      "sha256": "76b82b030916330436b2844d8dcecd035fe019364cc8992de56993a6042cb896",
-      "bytes": 2906,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/config/session-tool-policy.test.ts",
-      "sha256": "0b2ade17cc4b0b5a150f3f568db84e4482def1ea8be3e926897e35437bb07899",
-      "bytes": 4535,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/config/provider-content-store.ts",
-      "sha256": "03bdbc854e8d1d93cdf6308887390c6b1671339745afe2a80a506cf651c6fdc9",
-      "bytes": 1644,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/tools/tool-registry.strict-policy.test.ts",
-      "sha256": "2cf3f0ff8707e28187cb226292f1db7c8580b0569dfb3c66bb31e93486871fcf",
-      "bytes": 10409,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/tools/strict-tool-policy.test.ts",
-      "sha256": "4e41d2c0166fa0edbd7291263c6657d4dfea73cbb7e4c6c2583b8d65edaf8f5d",
-      "bytes": 1896,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/tools/strict-tool-policy.ts",
-      "sha256": "36d21078468ba058b4563c4bd131a33cba8d59745d5be9001d61970af95538bc",
-      "bytes": 988,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/tools/mcp-tool.strict-policy.test.ts",
-      "sha256": "75c170cfa192b7c4abacc7dc2ef8775442829df65ed7724d1c1a15158f8359d7",
-      "bytes": 5287,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/tools/managed-tool-runtime.strict-policy.test.ts",
-      "sha256": "f94bf6d3505cabd13d9622a1058ba08c7e50577f7b816ea5a3799e163c18e4f0",
-      "bytes": 5659,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/observability/response-provenance.ts",
-      "sha256": "99ab1f05b8c92d515e32fbc7a5a093d5567e32a3b33eeaf32cb7f32f0c358104",
-      "bytes": 803,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/observability/provider-attempt.test.ts",
-      "sha256": "541d855ede0a13598743d8072aa4ddb3a6473c48c877352f72aff2f1ae23db5a",
-      "bytes": 15801,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/observability/provider-attempt.ts",
-      "sha256": "516aeda2a54f162698d6f05778f751f3fe7e28ddef2def3de8d0f7c217980cce",
-      "bytes": 17326,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/observability/vitest.config.ts",
-      "sha256": "60cb7882d9a13a1e6a1f1592698ba0000150fc8b42250dc25a2da02036e37b98",
-      "bytes": 218,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/observability/provider-boundary.test.ts",
-      "sha256": "32febe15237fe6986607274e917bd99a4254085742e326ec9908686663ff8799",
-      "bytes": 14328,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/core/coreToolScheduler.strict-policy.test.ts",
-      "sha256": "1066ae34310c206c23e65b76b2be326dd70c2835f825c9313485b9849402ab18",
-      "bytes": 18876,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/src/agents/runtime/agent-core.strict-policy.test.ts",
-      "sha256": "8d3a34b86053355cb2a891da97f8c1ff1a90b82dbc783db0bb4b21225efedd5d",
-      "bytes": 8434,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/serve/managed-runtime-tool-executor.alternate-strict-policy.test.ts",
-      "sha256": "f75c9560764d861bffd86dcd9a2afaabbcf767d6ea23487e02269bff03e81824",
-      "bytes": 13529,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/nonInteractive/managed-host-policy.ts",
-      "sha256": "747c1999dec92db4d2646ce75173a206eee19d7583e340a0e669b549d7273618",
-      "bytes": 1171,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/nonInteractive/managed-host-policy.test.ts",
-      "sha256": "ccece14dfcda3854a87817bf776938b3362a3731221985404437199fa9edd0c5",
-      "bytes": 2032,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/nonInteractive/io/provider-result-provenance.test.ts",
-      "sha256": "70a9fd9d2894ecd30e9ec5c2f3e52468008384d03e8122b5b6819ba4f6028eb9",
-      "bytes": 6177,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/nonInteractive/control/controllers/hook-controller.test.ts",
-      "sha256": "58bf9858e405e026b9b77ee86d4679bcd9a0d31dd21a95fbb0fc0350d2148a0d",
-      "bytes": 12111,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/src/acp-integration/session/session.alternate-strict-policy.test.ts",
-      "sha256": "a197ebcff2ac27299a3b2864dacc3021a9b62d9464da306a974f821aa5626a7a",
-      "bytes": 29047,
-      "kind": "added"
-    },
-    {
       "path": "packages/sdk-typescript/src/version.ts",
-      "sha256": "f8ab92e0d5cbce3370640b0df9668ea1549ecb5ffe310c51e4d3fdf8ca5cd5d1",
+      "sha256": "8aced5088ce348363b194b01d3b0d0020216e203c11935c6d2ab91d795664e78",
       "bytes": 186,
       "kind": "added"
     },
     {
-      "path": "packages/sdk-typescript/src/types/managed-host-policy.ts",
-      "sha256": "50875fd81893fbbcbcd38d3ab6a7d59882d458ca417a68cdbc04d5ef3f991d2c",
-      "bytes": 499,
-      "kind": "added"
-    },
-    {
-      "path": "packages/sdk-typescript/src/types/hooks.ts",
-      "sha256": "2ddf3fea5a27daa750eb2206347d5ca1e6b00a0400786500fbc8867253e51f64",
-      "bytes": 3150,
-      "kind": "added"
-    },
-    {
-      "path": "packages/sdk-typescript/src/types/provider-attempt.ts",
-      "sha256": "0b4019db625ca713e19f00f724fb2f82feeca35dd555a6a56285910d4bf6f64b",
-      "bytes": 1355,
-      "kind": "added"
-    },
-    {
-      "path": "packages/sdk-typescript/test/version-contract.test.ts",
-      "sha256": "aa6dfbab0fae5e89c3f1c01e2491a6d239724fac7f3066e4c99f360fe1341a60",
-      "bytes": 474,
-      "kind": "added"
-    },
-    {
-      "path": "packages/sdk-typescript/test/managed-policy.test.ts",
-      "sha256": "a0505cd5ea8c7fdd0460317a35405c06ee5a7d3ea04a83d88337a3acdc5299a2",
-      "bytes": 3309,
+      "path": "packages/sdk-typescript/test/helpers/managed-env.ts",
+      "sha256": "eee4fd0189c2d5a454fbc2e247790acd2244dd5c32299c26052aad7efdc6c8a6",
+      "bytes": 334,
       "kind": "added"
     },
     {
@@ -588,63 +679,51 @@
       "kind": "added"
     },
     {
+      "path": "packages/sdk-typescript/test/managed-policy.test.ts",
+      "sha256": "a8277f3346eb7bb1b45873247b941daf0c9b3ae5d6098008b25dfb9f67785069",
+      "bytes": 4183,
+      "kind": "added"
+    },
+    {
+      "path": "packages/sdk-typescript/test/managed-startup-options.test.ts",
+      "sha256": "251eb801dfd08a2b558f5664bc38f41aa89512095886cf81282fc210baec8529",
+      "bytes": 1588,
+      "kind": "added"
+    },
+    {
       "path": "packages/sdk-typescript/test/provider-wire-contract.typecheck.ts",
       "sha256": "be3626557c9b9a85c5b4f04d13c41931214f89a70a7dee77f2759ff0537171fd",
       "bytes": 405,
       "kind": "added"
     },
     {
+      "path": "packages/sdk-typescript/test/query.test.ts",
+      "sha256": "8bfffbb49e766fbc4ad7cd26536e2ea3713f3dafbcd19df1cfdb207da120352b",
+      "bytes": 10428,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/sdk-typescript/test/unit/ProcessTransport.test.ts",
+      "sha256": "0461c186b4da928e6ecbfc299745f989ee7302b5148b6e8650248d4d1f1e816a",
+      "bytes": 62738,
+      "kind": "modified"
+    },
+    {
+      "path": "packages/sdk-typescript/test/unit/Query.test.ts",
+      "sha256": "11fa6aa726387feb5d56e2a2d5046bd96cfad6de8c5ac99a58270be3205a1fb3",
+      "bytes": 55524,
+      "kind": "modified"
+    },
+    {
       "path": "packages/sdk-typescript/test/unit/hooks.test.ts",
-      "sha256": "ca3a513cc5ca41d278c22e7c1efd97ef3b90ac46b836fc0b94779d4e28453d78",
-      "bytes": 12132,
+      "sha256": "109148f68f8cddc49fdc74e68cd321498a5cb248e057c75ac375a1c6bbed1a8d",
+      "bytes": 16094,
       "kind": "added"
     },
     {
-      "path": "packages/sdk-typescript/test/helpers/managed-env.ts",
-      "sha256": "eee4fd0189c2d5a454fbc2e247790acd2244dd5c32299c26052aad7efdc6c8a6",
-      "bytes": 334,
-      "kind": "added"
-    },
-    {
-      "path": "docs/design/managed-host-contract.md",
-      "sha256": "3c06f224b995da9d91b2006d2c4af0eff1906a38d9fe81d3e41304d092574b77",
-      "bytes": 2582,
-      "kind": "added"
-    },
-    {
-      "path": "docs/design/managed-host-contract.zh-CN.md",
-      "sha256": "bbb19c145f6ac2181b3e47f1fdc2de96673add4d22e416ab16491444861e855c",
-      "bytes": 2202,
-      "kind": "added"
-    },
-    {
-      "path": ".qwen/e2e-tests/managed-host.md",
-      "sha256": "0e1d79f559339ae63deee6b3a7776ef0364734a60a021263b9aab2a4024ae6eb",
-      "bytes": 949,
-      "kind": "added"
-    },
-    {
-      "path": "scripts/build-managed-host.js",
-      "sha256": "d954bc4182c5a70056e7bac34192bd0d81adc1de1682bf8f0965015358b96917",
-      "bytes": 1835,
-      "kind": "added"
-    },
-    {
-      "path": "packages/core/tsconfig.managed.json",
-      "sha256": "6afe05c35cce19e6369665541a38a0347ef217f852f1d8942197721f42327d9b",
-      "bytes": 346,
-      "kind": "added"
-    },
-    {
-      "path": "packages/cli/tsconfig.managed.json",
-      "sha256": "9785d83c35144d0b9eb93ee54ed9159de91aaa4543243210c81a916b97beab28",
-      "bytes": 555,
-      "kind": "added"
-    },
-    {
-      "path": "packages/acp-bridge/tsconfig.managed.json",
-      "sha256": "03081cd56bf3ce52bdad6e0454dc149f7bb4bd5a51facbd793adfa484eabf4cd",
-      "bytes": 251,
+      "path": "packages/sdk-typescript/test/version-contract.test.ts",
+      "sha256": "c268620c63667f474929f8e1cca7ae197b27cbc696bad0de93950c3228d77381",
+      "bytes": 474,
       "kind": "added"
     },
     {
@@ -660,25 +739,15 @@
       "kind": "added"
     },
     {
-      "path": "packages/cli/alternate-cli-strict-vitest.config.ts",
-      "sha256": "e85ceee0d9b017fc15a7892edd253c9db35cf50b3e667305753d4f1571445573",
-      "bytes": 1050,
+      "path": "scripts/build-managed-host.js",
+      "sha256": "d954bc4182c5a70056e7bac34192bd0d81adc1de1682bf8f0965015358b96917",
+      "bytes": 1835,
       "kind": "added"
     }
   ],
-  "qwen-v0.24.7-managed-host.patch": {
-    "sha256": "8abd3abfd595f5d5f0164906cb45934aa6135334ab0f12574dcfeae815e2d9c0",
-    "bytes": 434466
-  },
-  "qwen-v0.24.7-managed-host-source.tar.gz": {
-    "sha256": "79d47a4a192e71a87809b973b14c192e32c69917133a39d7a0aa90c4375cd318",
-    "bytes": 59717098
-  },
-  "official_source_url": "https://github.com/QwenLM/qwen-code/archive/refs/tags/v0.24.7.tar.gz",
-  "frozen_runtime_entrypoints": {
-    "dist/cli.js": "6e9a4808b2ee45a2afc71a018c62fa64fa2cb0a5a755a6e82ee1e958888588e4",
-    "packages/sdk-typescript/dist/index.mjs": "4945ac6880bf9876fb43d9f46f0fbb3fc323ee3321c0060a74ed791167a852f4",
-    "packages/sdk-typescript/dist/index.cjs": "045815b2948987a547022882901654b1cf51fd72dde29cf7b5baa1daadfa9750",
-    "packages/sdk-typescript/dist/index.d.ts": "e4aaeeff619ff4618daab7584c0f7de6232d6dd0910941a070eb19b2ceeae6f6"
+  "patch": {
+    "file": "qwen-v0.24.7-managed-host.patch",
+    "sha256": "c937f30e76cf26ef1ee1ecac51c243dc46ec0c707429a87e89d86a3df7ca4bdf",
+    "bytes": 502442
   }
 }

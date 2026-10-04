@@ -129,13 +129,14 @@ test('restore applies raw-content retention before exposure and preserves minimu
   const f=fixture();try{
     await f.coordinator.close();
     const retained=f.store.receive('old-memory','SYNTHETIC_DISCARD_BEFORE favorite blue SYNTHETIC_DISCARD_AFTER')!;f.store.context(retained.token,{});f.store.remember(retained.token,'favorite blue','retained-operation');
+    const complete=f.store.receive('complete-memory','favorite blue')!;f.store.context(complete.token,{});f.store.remember(complete.token,complete.text,'complete-operation');
     f.store.receive('old-ordinary','SYNTHETIC_DISCARD_ORDINARY');seedTurn(f,'old-memory','unknown_outcome');seedTurn(f,'old-ordinary','failed');
     seedTurn(f,'lost-off','failed',{memory:false,input_lost:1});f.store.db.prepare('UPDATE scope_safety SET control_uncertain=1 WHERE scope=?').run(f.store.scope);
     const operations=f.store.db.prepare('SELECT * FROM operations').all(),controls=f.store.controls();f.advance(30*86400000+1);
     assert.deepEqual(sanitizeRestoredImage(f.store.db,f.store.authority.all(),f.now()),{unresolved_off_inputs:1});
     assert.equal((f.store.db.prepare('SELECT count(*) n FROM messages').get() as {n:number}).n,0);
-    assert.deepEqual(f.store.db.prepare('SELECT text FROM sources').all(),[{text:'favorite blue'}]);
-    assert.deepEqual(f.store.db.prepare('SELECT text FROM memories').all(),[{text:'favorite blue'}]);
+    assert.deepEqual(f.store.db.prepare('SELECT text FROM sources WHERE text!=\'\'').all(),[{text:'favorite blue'}]);
+    assert.deepEqual(f.store.db.prepare('SELECT text FROM memories WHERE status=\'active\'').all(),[{text:'favorite blue'}]);
     assert.deepEqual(f.store.db.prepare('SELECT text FROM memory_fts').all(),[{text:'favorite blue'}]);
     assert.equal((f.store.db.prepare('SELECT count(*) n FROM tool_audit').get() as {n:number}).n,0);
     assert.equal((f.store.db.prepare('SELECT count(*) n FROM runtime_turns WHERE body IS NOT NULL').get() as {n:number}).n,0);
@@ -165,7 +166,7 @@ test('ordinary close and reopen preserve visible unresolved off inputs until eac
     await f.coordinator.close();off=new OffCache(path.join(f.dir,'spool.sqlite'),f.key,f.store.authority,f.now);
     const host:HostAdapter={
       async *startTurn(input:HostTurn):AsyncIterable<HostEvent>{let sequence=0;const common=()=>({...input,event_id:randomUUID(),sequence:sequence++,occurred_at:f.now()});
-        yield {...common(),type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:1,cli_version:'0.24.7',sdk_version:'0.1.16',policy_source:'runtime_readback'};
+        yield {...common(),type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:2,skip_startup_context:true,upstream_usage_statistics_enabled:false,upstream_telemetry_enabled:false,cli_version:'0.24.7',sdk_version:'0.1.17',policy_source:'runtime_readback'};
         f.store.context(input.grant,{});ready();await gate;
         yield {...common(),type:'failure',code:'HOST_DISCONNECTED',retryable:true,outcome:'definite_failure'};
       },resumeExecution(input){return this.startTurn(input);},async cancelTurn(){},async close(){}

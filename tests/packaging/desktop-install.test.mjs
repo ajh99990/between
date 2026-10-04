@@ -1,3 +1,4 @@
+import {testTempRoot} from '../../scripts/test-temp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -107,7 +108,7 @@ export async function smokeInstalledDesktop({ artifact, root }) {
 }
 
 test('clean external installation runs native Node broker with installed assets and separate official Electron', { skip: process.env.BETWEEN_DESKTOP_INSTALL_TEST !== '1', timeout: 600000 }, async t => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'between-desktop-installed-'));
+  const root = await fs.mkdtemp(path.join(testTempRoot(), 'between-desktop-installed-'));
   if (process.env.BETWEEN_DESKTOP_KEEP_INSTALL !== '1') t.after(() => fs.rm(root, { recursive: true, force: true }));
   await fs.mkdir(path.join(root, 'home')); const release = await packageDesktop({ outDir: path.join(root, 'release'), dependencyLock: process.env.BETWEEN_DESKTOP_PUBLIC_LOCK });
   const install = path.join(root, 'install'); await fs.mkdir(install);

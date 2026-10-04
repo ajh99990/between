@@ -92,7 +92,7 @@ import { fileURLToPath } from 'node:url';
 ${versionGuard}const root = path.dirname(fileURLToPath(import.meta.url));
 process.env.REL_ROOT = path.join(root, 'resources');
 process.env.REL_CONFIG_ROOT = root;
-process.env.REL_DB ||= path.join(root, '.runtime/data-v5/relationship.db');
+process.env.REL_DB ||= path.join(root, '.runtime/data-v6/relationship.db');
 await import('./dist/runtime-entry.js');
 `;
 const desktopLauncher = `import { spawn } from 'node:child_process';

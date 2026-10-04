@@ -9,24 +9,24 @@
   "qwen_cli": {
     "tag": "v0.24.7",
     "commit": "b12edec1401a28fc53cd9e714d5928b285071fc8",
-    "build_status": "recovery_build_app_bytes_and_auth_failclosed_verified",
-    "entry_sha256": "f8bc1ca0e85adac1d813eac62353dd97ebe4a6bd833b4e00badd6b73db5467d4"
+    "build_status": "contract2_hard_off_build_and_app_binding_verified_no_model",
+    "entry_sha256": "56d608072b01c4bd22628979d139728a811aefb447dd4acbcae795aa77d7ffcf"
   },
   "qwen_sdk": {
-    "version": "0.1.16",
-    "build_status": "frozen_candidate",
-    "entry_sha256": "4945ac6880bf9876fb43d9f46f0fbb3fc323ee3321c0060a74ed791167a852f4"
+    "version": "0.1.17",
+    "managed_host_contract_version": 2,
+    "build_status": "actual_import_verified_no_query",
+    "entry_sha256": "dc5a5d6c50f7123bbedf37f3f3231e6a875a00e23a83974577ab77873b410c2b"
   },
   "langfuse": {
     "tag": "v4.50.0",
     "deployment_status": "not_running"
   },
   "baseline_sha256": "f8d46c11de9b4feac0ded41576f9ec83f2ed26d475d6161717c00fceb5e84f94",
-  "business_schema": 5,
+  "business_schema": 6,
   "development_environment": "cloud-linux-x64",
   "handoff_sha256": "5e866532ee94d7c60e096becaca58e90dce79c68898859f6e09c098428347e2b",
-  "qwen_runtime_manifest_sha256": "ccf2e81c07c579ab273b0720b3f7e19e578b6775371b4812d952edc36a0aa9d1",
-  "host_candidate_archive_sha256": "0a93de91cfec4a244a294a9c37503237b0a7d50c1349009f5c9db6763528ca2b",
+  "qwen_runtime_manifest_sha256": "4eb850a757d77f1405914303d047f6ffb81fbe846976519e354c53adcf3a5160",
   "collector": {
     "candidate_version": "0.162.0",
     "artifact_sha256": null,
@@ -41,13 +41,13 @@
     "status": "historical_runtime_missing_after_workspace_change"
   },
   "portable_runtime": {
-    "version": 0,
-    "sha256": "a86573e64f428426f338d90c9e4f9820ed0d2595cd4213e143cc87b9dda7c3bc",
-    "bytes": 134513505,
+    "name": "qwen-managed-host-v2-runtime-linux-x64.tar.gz",
+    "sha256": "a3b7d91d64e32f3f21de511b43325dd3928e1bcaab0d754491152549b1addd09",
+    "bytes": 127321920,
     "archive_manifest_entries": 5820,
-    "status": "host_owner_portable_smokes_and_app_2048_file_binding_verified_no_model"
+    "status": "host_owner_smokes_and_app_source_runtime_sdk_import_verified_no_model"
   },
-  "development_status": "sealed_offline_restore_source_and_tests_independently_verified",
+  "development_status": "schema6_contract2_role_host_mechanical_candidate_no_real_model_validation",
   "previous_frozen_application": {
     "schema": 4,
     "tests_passed": 137,
@@ -66,5 +66,35 @@
   "product_version": "0.1.0",
   "runtime_protocol_schema": 1,
   "host_context_schema": 1,
-  "pnpm_lock_sha256": "6784d1bacf096126bfe81ad1141477cb69be2e34a3954556792df923e4377db7"
+  "pnpm_lock_sha256": "6784d1bacf096126bfe81ad1141477cb69be2e34a3954556792df923e4377db7",
+  "previous_contract1_binding": {
+    "qwen_cli": {
+      "tag": "v0.24.7",
+      "commit": "b12edec1401a28fc53cd9e714d5928b285071fc8",
+      "build_status": "recovery_build_app_bytes_and_auth_failclosed_verified",
+      "entry_sha256": "f8bc1ca0e85adac1d813eac62353dd97ebe4a6bd833b4e00badd6b73db5467d4"
+    },
+    "qwen_sdk": {
+      "version": "0.1.16",
+      "build_status": "frozen_candidate",
+      "entry_sha256": "4945ac6880bf9876fb43d9f46f0fbb3fc323ee3321c0060a74ed791167a852f4"
+    },
+    "runtime_manifest_sha256": "ccf2e81c07c579ab273b0720b3f7e19e578b6775371b4812d952edc36a0aa9d1",
+    "status": "historical_not_accepted_by_current_adapter",
+    "portable_archive": {
+      "version": 0,
+      "sha256": "a86573e64f428426f338d90c9e4f9820ed0d2595cd4213e143cc87b9dda7c3bc",
+      "bytes": 134513505,
+      "archive_manifest_entries": 5820,
+      "status": "historical_contract1_archive_not_current"
+    }
+  },
+  "skill_sha256": "3c399ae30fe03dd113ca4cc3bbd03b881d3c5976db9179609a00b523caf8e8ca",
+  "historical_host_candidate_archive_sha256": "0a93de91cfec4a244a294a9c37503237b0a7d50c1349009f5c9db6763528ca2b",
+  "host_source_archive": {
+    "name": "qwen-managed-host-v2-source.tar.gz",
+    "sha256": "90080a35385d7f4866be6e5babd12d56aa91792fced0471eb42a96dfd315bf06",
+    "bytes": 345448,
+    "patched_source_files": 123
+  }
 }

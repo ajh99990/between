@@ -18,7 +18,7 @@ try {
     for (const message of ephemeral.messages) store.transient.set(message.id, message);
   }
   const attached = store;
-  await runStdio({ readContext: () => attached.context(token, character), rememberUserReport: (quote, id) => attached.remember(token, quote, id) }, () => attached.close());
+  await runStdio({ readContext: () => attached.context(token, character), rememberUserReport: (quote,id,details) => details?.mode==='standing'?attached.rememberStanding(token,{quote,operation_id:id,expected_version:details.expected_version}):details?.mode==='propose'?attached.rememberProposed(token,{quote,operation_id:id,proposed_kind:details.proposed_kind,expected_version:details.expected_version}):details?.mode==='revise'?attached.reviseMemory(token,{quote,operation_id:id,target_id:details.target_id,target_revision:details.target_revision,mode:details.revision_mode,replacement_quote:details.replacement_quote,expected_version:details.expected_version}):attached.remember(token,quote,id) }, () => attached.close());
 } catch (error) {
   store?.close();
   process.stderr.write((error instanceof ProductError ? error.code : 'MCP_START_FAILED') + '\n');

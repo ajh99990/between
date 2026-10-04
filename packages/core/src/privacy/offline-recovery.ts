@@ -11,7 +11,7 @@ import {verifyScopeVector,sanitizeRestoredImage} from './restore-policy.js';
 const MAGIC=Buffer.from('REL_SEALED_CHECKPOINT_V2\0');
 const uuid=z.string().uuid(),sha=z.string().regex(/^[a-f0-9]{64}$/);
 const vector=z.array(z.object({scope:z.string(),version:z.number().int().nonnegative(),generation:z.number().int().nonnegative(),state:z.enum(['active','deleted']),spool_required:z.number().int().min(0).max(1)}).strict()).max(10000);
-const sealSchema=z.object({format:z.literal(2),schema:z.literal(5),identity:uuid,id:uuid,seal_id:uuid,created_at:z.number().int(),expires_at:z.number().int(),business_digest:sha,archive_hash:sha,authority:vector,incarnation:z.number().int().nonnegative()}).strict();
+const sealSchema=z.object({format:z.literal(2),schema:z.literal(6),identity:uuid,id:uuid,seal_id:uuid,created_at:z.number().int(),expires_at:z.number().int(),business_digest:sha,archive_hash:sha,authority:vector,incarnation:z.number().int().nonnegative()}).strict();
 export type RecoverySeal=z.infer<typeof sealSchema>;
 const payloadSchema=sealSchema.omit({archive_hash:true}).extend({database:z.string().max(MAX_ARCHIVE)}).strict();
 type Stamp={dev:number;ino:number;size?:number;mtime?:number;hash?:string};
@@ -66,8 +66,8 @@ export class OfflineRecovery {
   const {database,...certificate}=payload,{archive_hash,...expected}=seal;if(!same(certificate,expected))throw new ProductError('RECOVERY_CERTIFICATE_MISMATCH');const bytes=Buffer.from(database,'base64');if(bytes.length>MAX_DATABASE||bytes.toString('base64')!==database)throw new ProductError('RECOVERY_DATABASE_INVALID');return bytes;
  }
  async createSealedCheckpoint(){this.authority.expireSealedArchives(this.now());const j=this.begin('checkpoint');let source:Database.Database|undefined;
-  try{this.ensureOperationDirectory(j);assertSqliteBundle(this.file);stamp(this.file);source=new Database(this.file,{readonly:true,fileMustExist:true});const authority=this.captureVector(source),business_digest=businessDigest(source),created_at=this.now();
-   const seal:RecoverySeal={format:2,schema:5,identity:this.authority.identity,id:randomUUID(),seal_id:randomUUID(),created_at,expires_at:created_at+RETENTION,business_digest,archive_hash:'0'.repeat(64),authority:vector.parse(authority),incarnation:this.authority.maintenanceState().incarnation};j.seal=seal;this.writeJournal(j);
+  try{this.ensureOperationDirectory(j);assertSqliteBundle(this.file);stamp(this.file);source=new Database(this.file,{readonly:true,fileMustExist:true});const authority=this.captureVector(source);if(source.prepare("SELECT 1 FROM memories WHERE status='needs_review' AND valid_until<=? AND (text!='' OR evidence_text!='') LIMIT 1").get(this.now()))throw new ProductError('RECOVERY_EXPIRED_PENDING_MEMORY');const business_digest=businessDigest(source),created_at=this.now();
+   const seal:RecoverySeal={format:2,schema:6,identity:this.authority.identity,id:randomUUID(),seal_id:randomUUID(),created_at,expires_at:created_at+RETENTION,business_digest,archive_hash:'0'.repeat(64),authority:vector.parse(authority),incarnation:this.authority.maintenanceState().incarnation};j.seal=seal;this.writeJournal(j);
    const temporary=this.allocate(j,'candidate');j.sidecars={'-wal':null,'-shm':null,'-journal':null};this.writeJournal(j);await source.backup(temporary,{progress:info=>{for(const suffix of Object.keys(j.sidecars!) as ('-wal'|'-shm'|'-journal')[]){const sidecar=temporary+suffix;if(present(sidecar)){if(j.sidecars![suffix])matches(sidecar,j.sidecars![suffix]!);else j.sidecars![suffix]=stamp(sidecar,false);}}this.writeJournal(j);this.onCheckpoint(info.remainingPages===info.totalPages?'capture:opened':'capture:copying');return 100;}});source.close();source=undefined;j.files.candidate=stamp(temporary);this.writeJournal(j);
    // SQLite's backup is a complete standalone image. Force rollback-format
    // header before its first open, so readonly validation cannot allocate WAL.

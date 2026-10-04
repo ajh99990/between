@@ -3,7 +3,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { Store, ProductError } from '@between/core/store';
 import type { Turn } from '@between/contracts/records';
-import type { RelationshipToolBinding } from './index.js';
+import type { RelationshipToolBinding,MemoryDetails } from './index.js';
 import { characterDigest, characterFromSnapshot } from './character.js';
 import { canonicalRoot, readBoundedFile, verifyPrivateDirectory } from './files.js';
 
@@ -76,7 +76,7 @@ export function openTrustedSession(options: { dataDir: string }): TrustedSession
   };
   const binding: RelationshipToolBinding = Object.freeze({
     readContext: () => store.context(requireActive().token, character),
-    rememberUserReport: (quote: string, operationId: string) => store.remember(requireActive().token, quote, operationId),
+    rememberUserReport: (quote:string,operationId:string,details?:MemoryDetails) => {const token=requireActive().token;return details?.mode==='standing'?store.rememberStanding(token,{quote,operation_id:operationId,expected_version:details.expected_version}):details?.mode==='propose'?store.rememberProposed(token,{quote,operation_id:operationId,proposed_kind:details.proposed_kind,expected_version:details.expected_version}):details?.mode==='revise'?store.reviseMemory(token,{quote,operation_id:operationId,target_id:details.target_id,target_revision:details.target_revision,mode:details.revision_mode,replacement_quote:details.replacement_quote,expected_version:details.expected_version}):store.remember(token,quote,operationId);},
   });
   const endTurn = () => {
     if (!active) return;

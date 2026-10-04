@@ -54,6 +54,10 @@
     "./observability/contracts": {
       "types": "./dist/observability/contracts.d.ts",
       "import": "./dist/observability/contracts.js"
+    },
+    "./memory/model": {
+      "types": "./dist/memory/model.d.ts",
+      "import": "./dist/memory/model.js"
     }
   },
   "scripts": {

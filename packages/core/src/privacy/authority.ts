@@ -14,7 +14,7 @@ export function assertCanonicalParent(file:string){let directory=path.resolve(pa
 export const sqliteSidecars=['-wal','-shm','-journal'] as const;
 export function assertSqliteSidecars(file:string){for(const suffix of sqliteSidecars){const sibling=file+suffix;if(pathExists(sibling)){const stat=lstatSync(sibling);if(!stat.isFile()||stat.isSymbolicLink()||stat.nlink!==1)throw new ProductError('SQLITE_SIDECAR_UNVERIFIED');}}}
 export function assertSqliteBundle(file:string){assertCanonicalParent(file);assertSqliteSidecars(file);if(pathExists(file)){const stat=lstatSync(file);if(!stat.isFile()||stat.isSymbolicLink()||stat.nlink!==1)throw new ProductError('SQLITE_BUNDLE_UNVERIFIED');}}
-export const MAIN_SCHEMA=5,AUTHORITY_SCHEMA=2;
+export const MAIN_SCHEMA=6,AUTHORITY_SCHEMA=2;
 export type ProcessIdentity={pid:number;boot_id:string;starttime:string;pid_namespace:string};
 export type HandleLease={id:string;epoch:number;incarnation:number};
 export type MaintenanceState={mode:'ready'|'maintenance';epoch:number;incarnation:number;owner:string|null};

@@ -14,7 +14,7 @@ class SyntheticHost implements HostAdapter {
   calls=0; cancels:string[]=[]; beforeResult?:()=>Promise<void>; badContext=false; noPolicy=false; approvals=false; fail=false; noContext=false;
   constructor(private store:Store){}
   async *startTurn(input:HostTurn):AsyncIterable<HostEvent>{this.calls++;let sequence=0;const common=()=>({...input,grant:undefined,input:undefined,event_id:randomUUID(),sequence:sequence++,occurred_at:Date.now(),...(this.badContext?{conversation_id:'other'}:{})});
-    if(!this.noPolicy)yield {...common(),type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:1,cli_version:'0.24.7',sdk_version:'0.1.16',policy_source:'runtime_readback'};
+    if(!this.noPolicy)yield {...common(),type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:2,skip_startup_context:true,upstream_usage_statistics_enabled:false,upstream_telemetry_enabled:false,cli_version:'0.24.7',sdk_version:'0.1.17',policy_source:'runtime_readback'};
     if(this.approvals){yield {...common(),type:'approval',approval_id:randomUUID(),status:'pending'};return;}
     const attempt_id=randomUUID();yield {...common(),type:'attempt_started',attempt_id,attempt_index:0,reason:'initial',provider:'synthetic',model:'fixture',input:{capture_status:'disabled'}};
     if(!this.noContext)this.store.context(input.grant,{synthetic:true});if(this.beforeResult)await this.beforeResult();

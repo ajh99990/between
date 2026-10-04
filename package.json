@@ -11,14 +11,14 @@
   "scripts": {
     "build": "pnpm -r --sort run build && node scripts/build-integration.mjs",
     "typecheck": "pnpm -r --sort run typecheck && tsc -p tests/integration/tsconfig.json",
-    "test": "pnpm run build && pnpm run native:check && pnpm run check:boundaries && pnpm -r --sort run test && node --test tests/integration/dist/mcp.test.js && pnpm run test:skills && node --test tests/packaging/desktop.test.mjs",
+    "test": "node scripts/run-tests.mjs",
     "start": "pnpm --filter @between/desktop start",
     "skills:check": "node scripts/skills.mjs validate --source skills/relationship",
     "skills:pack": "node scripts/skills.mjs pack --source skills/relationship --out artifacts/skills",
     "test:skills": "node --test tests/packaging/skills*.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "test:contracts": "node scripts/test-contracts.mjs",
-    "test:release": "pnpm test && pnpm typecheck && pnpm --filter @between/mcp-server test:pack && BETWEEN_DESKTOP_INSTALL_TEST=1 node --test tests/packaging/desktop-install.test.mjs",
+    "test:release": "node scripts/run-tests.mjs --release",
     "pack:desktop": "node scripts/package-desktop.mjs",
     "native:check": "node scripts/check-native.mjs"
   },

@@ -4,7 +4,7 @@ import type {HostTurn,HostEvent,HostAdapter} from '@between/contracts/host';
 const [file,stage]=process.argv.slice(2),store=new Store(file);store.start(true,true,true);let coordinator:TurnCoordinator;
 const stop=async()=>{process.stdout.write(JSON.stringify({stage,pid:process.pid})+'\n');await new Promise(()=>setInterval(()=>{},60000));};
 const host:HostAdapter={async *startTurn(input:HostTurn):AsyncIterable<HostEvent>{let sequence=0;const event=(details:object)=>({...input,event_id:randomUUID(),sequence:sequence++,occurred_at:Date.now(),...details}) as unknown as HostEvent;
- yield event({type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:1,cli_version:'0.24.7',sdk_version:'0.1.16',policy_source:'runtime_readback'});
+ yield event({type:'policy',sessionToolAllowlist:input.sessionToolAllowlist,hooks:'sdk_functions',registeredTools:input.sessionToolAllowlist,managed_host_contract_version:2,skip_startup_context:true,upstream_usage_statistics_enabled:false,upstream_telemetry_enabled:false,cli_version:'0.24.7',sdk_version:'0.1.17',policy_source:'runtime_readback'});
  yield event({type:'attempt_started',attempt_id:'synthetic-attempt',attempt_index:1,reason:'initial',provider:'synthetic',model:'fixture',input:{capture_status:'disabled'}});
  store.context(input.grant,{});
  if(stage==='model_stream'||stage==='before_write')await stop();
