@@ -1,0 +1,32 @@
+{
+  "name": "@between/host-qwen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./qwen-adapter": {
+      "types": "./dist/qwen-adapter.d.ts",
+      "import": "./dist/qwen-adapter.js"
+    },
+    "./verified-read": {
+      "types": "./dist/verified-read.d.ts",
+      "import": "./dist/verified-read.js"
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/clean-package.mjs && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node ../../scripts/test-package.mjs"
+  },
+  "dependencies": {
+    "@between/contracts": "workspace:*",
+    "zod": "4.6.5"
+  }
+}

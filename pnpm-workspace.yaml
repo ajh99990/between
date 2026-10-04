@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  better-sqlite3@13.0.3: false
+  electron@44.5.1: true
+  esbuild@0.25.12: true
+strictDepBuilds: true

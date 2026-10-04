@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "layer": "deterministic-contract",
+  "cases": [
+    {
+      "id": "explicit-memory-off",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "关闭长期记忆",
+      "expected": {
+        "memory": "off"
+      }
+    },
+    {
+      "id": "explicit-memory-on",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "开启长期记忆",
+      "expected": {
+        "memory": "on"
+      }
+    },
+    {
+      "id": "quote-not-consent",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "“开启长期记忆”是什么意思",
+      "expected": {}
+    },
+    {
+      "id": "question-not-consent",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "开启长期记忆？",
+      "expected": {}
+    },
+    {
+      "id": "negated-not-consent",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "不要开启长期记忆",
+      "expected": {}
+    },
+    {
+      "id": "friend-and-name",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "叫我夜猫子但只做朋友",
+      "expected": {
+        "nickname": "夜猫子",
+        "nicknameState": "allowed",
+        "direction": "friends"
+      }
+    },
+    {
+      "id": "pause-role",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "暂停角色扮演",
+      "expected": {
+        "role": "paused"
+      }
+    },
+    {
+      "id": "resume-role",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "恢复角色扮演",
+      "expected": {
+        "role": "active"
+      }
+    },
+    {
+      "id": "revoke-name",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "别这样叫我了",
+      "expected": {
+        "nicknameState": "suspended"
+      }
+    },
+    {
+      "id": "ordinary-not-consent",
+      "requirement": "CTRL-01/03; REL-03/04",
+      "kind": "controls",
+      "text": "SYNTHETIC 今天很开心",
+      "expected": {}
+    },
+    {
+      "id": "capture-disabled",
+      "requirement": "R2.2/R2.4",
+      "kind": "capture",
+      "field": {
+        "capture_status": "present",
+        "value": "SYNTHETIC_CANARY"
+      },
+      "policy": {
+        "captureContent": false
+      },
+      "expected": {
+        "capture_status": "disabled",
+        "reason": "export_content_disabled"
+      },
+      "forbidden": [
+        "SYNTHETIC_CANARY"
+      ],
+      "absent": [
+        "value",
+        "content_ref"
+      ]
+    },
+    {
+      "id": "credential-redacted",
+      "requirement": "R2.2/R2.4",
+      "kind": "capture",
+      "field": {
+        "capture_status": "present",
+        "value": {
+          "password": "SYNTHETIC_CANARY"
+        }
+      },
+      "policy": {
+        "captureContent": true
+      },
+      "expected": {
+        "capture_status": "redacted"
+      },
+      "forbidden": [
+        "SYNTHETIC_CANARY"
+      ]
+    },
+    {
+      "id": "known-canary-redacted",
+      "requirement": "R2.2/R2.4",
+      "kind": "capture",
+      "field": {
+        "capture_status": "present",
+        "value": "body SYNTHETIC_CANARY"
+      },
+      "policy": {
+        "captureContent": true,
+        "redactValues": [
+          "SYNTHETIC_CANARY"
+        ]
+      },
+      "expected": {
+        "capture_status": "redacted"
+      },
+      "forbidden": [
+        "SYNTHETIC_CANARY"
+      ]
+    },
+    {
+      "id": "unicode-byte-overflow",
+      "requirement": "R2.2/R2.4",
+      "kind": "capture",
+      "field": {
+        "capture_status": "present",
+        "value": "汉字"
+      },
+      "policy": {
+        "captureContent": true,
+        "maxBytes": 7
+      },
+      "expected": {
+        "capture_status": "oversize",
+        "bytes": 8
+      },
+      "forbidden": [],
+      "absent": [
+        "value",
+        "content_ref"
+      ]
+    },
+    {
+      "id": "unicode-byte-boundary",
+      "requirement": "R2.2/R2.4",
+      "kind": "capture",
+      "field": {
+        "capture_status": "present",
+        "value": "汉字"
+      },
+      "policy": {
+        "captureContent": true,
+        "maxBytes": 8
+      },
+      "expected": {
+        "capture_status": "present",
+        "bytes": 8
+      },
+      "forbidden": []
+    },
+    {
+      "id": "system-only-preserved",
+      "requirement": "R2.2",
+      "kind": "attempt",
+      "input": {
+        "capture_status": "oversize",
+        "reason": "byte_limit"
+      },
+      "system": {
+        "capture_status": "present",
+        "value": [
+          {
+            "type": "text",
+            "content": "SYNTHETIC SYSTEM"
+          }
+        ]
+      },
+      "output": {
+        "capture_status": "disabled"
+      },
+      "policy": {
+        "captureContent": true
+      },
+      "expected": {
+        "qwen.capture.input.status": "oversize",
+        "qwen.input.compatibility": "system-prepended-v1",
+        "gen_ai.input.messages": "[{\"role\":\"system\",\"parts\":[{\"type\":\"text\",\"content\":\"SYNTHETIC SYSTEM\"}]}]",
+        "qwen.correlation.status": "unmatched"
+      },
+      "absent": [
+        "langfuse.observation.output"
+      ]
+    },
+    {
+      "id": "malformed-input-explicit",
+      "requirement": "R2.2",
+      "kind": "attempt",
+      "input": {
+        "capture_status": "present",
+        "value": "[bad json"
+      },
+      "system": {
+        "capture_status": "disabled"
+      },
+      "output": {
+        "capture_status": "disabled"
+      },
+      "policy": {
+        "captureContent": true
+      },
+      "expected": {
+        "qwen.input.compatibility": "unavailable"
+      },
+      "absent": [
+        "gen_ai.input.messages"
+      ]
+    },
+    {
+      "id": "metadata-only-no-canary",
+      "requirement": "R2.4",
+      "kind": "attempt",
+      "input": {
+        "capture_status": "present",
+        "value": [
+          {
+            "role": "user",
+            "parts": [
+              {
+                "type": "text",
+                "content": "SYNTHETIC_CANARY"
+              }
+            ]
+          }
+        ]
+      },
+      "system": {
+        "capture_status": "disabled"
+      },
+      "output": {
+        "capture_status": "disabled"
+      },
+      "policy": {
+        "captureContent": false
+      },
+      "expected": {
+        "qwen.capture.input.status": "disabled",
+        "qwen.capture.input.source_status": "present"
+      },
+      "absent": [
+        "gen_ai.input.messages",
+        "langfuse.observation.output"
+      ],
+      "forbidden": [
+        "SYNTHETIC_CANARY"
+      ]
+    }
+  ]
+}

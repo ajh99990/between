@@ -1,0 +1,15 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+execFileSync('pnpm',['run','build'],{stdio:'inherit'});
+const {runDeterministicDataset}=await import('@between/core/evaluation/deterministic');
+const input='evaluation/deterministic-v1.json';
+const result=runDeterministicDataset(JSON.parse(readFileSync(input,'utf8')));
+const bound=[input,'scripts/evaluate.mjs','packages/core/src/evaluation/deterministic.ts','packages/core/src/store.ts','packages/core/src/observability/normalize.ts','skills/relationship/SKILL.md','characters/alan.json','pnpm-lock.yaml','versions.lock.json','packages/core/dist/evaluation/deterministic.js','packages/core/dist/store.js','packages/core/dist/observability/normalize.js'];
+result.provenance=Object.fromEntries(bound.map(file=>[file,createHash('sha256').update(readFileSync(file)).digest('hex')]));
+result.generated_at=new Date().toISOString();
+const output=process.argv[2];
+if(!output)throw Error('An explicit versioned output path is required');
+writeFileSync(output,JSON.stringify(result,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({passed:result.passed,failed:result.failed,real_model_calls:0,output}));
+if(result.failed)process.exitCode=1;

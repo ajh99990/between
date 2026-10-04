@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "relationship",
+  "name": "online-relationship",
+  "version": "0.1.0",
+  "entrypoint": "SKILL.md",
+  "product": "between",
+  "product_schema": "between.host-context",
+  "product_schema_versions": [
+    1
+  ],
+  "required_capabilities": [
+    "relationship.read_context"
+  ],
+  "optional_capabilities": [
+    "relationship.remember_user_report"
+  ],
+  "files": [
+    "SKILL.md",
+    "references/compatibility.md"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "@between/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./records": {
+      "types": "./dist/records.d.ts",
+      "import": "./dist/records.js"
+    },
+    "./commands": {
+      "types": "./dist/commands.d.ts",
+      "import": "./dist/commands.js"
+    },
+    "./host": {
+      "types": "./dist/host.d.ts",
+      "import": "./dist/host.js"
+    },
+    "./protocol-version": {
+      "types": "./dist/protocol-version.d.ts",
+      "import": "./dist/protocol-version.js"
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/clean-package.mjs && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node ../../scripts/test-package.mjs"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "provider": "openai",
+  "runtimeRootPath": "/absolute/path/to/qwen-code-0.24.7",
+  "runtimeManifestPath": "/absolute/path/to/host-patch/runtime-manifest.json",
+  "runtimeManifestSha256": "ccf2e81c07c579ab273b0720b3f7e19e578b6775371b4812d952edc36a0aa9d1",
+  "sdkModulePath": "/absolute/path/to/qwen-code-0.24.7/packages/sdk-typescript/dist/index.mjs",
+  "cliPath": "/absolute/path/to/qwen-code-0.24.7/dist/cli.js",
+  "sdkSha256": "4945ac6880bf9876fb43d9f46f0fbb3fc323ee3321c0060a74ed791167a852f4",
+  "cliSha256": "f8bc1ca0e85adac1d813eac62353dd97ebe4a6bd833b4e00badd6b73db5467d4",
+  "providerEnvironment": []
+}

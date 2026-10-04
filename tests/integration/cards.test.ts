@@ -1,0 +1,9 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';import {parseCard,decodePng} from '@between/core/cards';
+const require=createRequire(import.meta.url);const crc=require('crc-32');
+const v1={name:'测试',description:'素材',personality:'沉静',scenario:'初识',first_mes:'你好',mes_example:'<START>\n{{user}}:你好\n{{char}}:你好'};
+const chunk=(name:string,data:Buffer)=>{const head=Buffer.alloc(8);head.writeUInt32BE(data.length);head.write(name,4);const tail=Buffer.alloc(4);tail.writeUInt32BE(crc.buf(Buffer.concat([Buffer.from(name),data]))>>>0);return Buffer.concat([head,data,tail]);};
+function png(blocks:[string,string][]){const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(1);ihdr.writeUInt32BE(1,4);ihdr[8]=8;ihdr[9]=6;return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),...blocks.map(([n,t])=>chunk('tEXt',Buffer.from(n+'\0'+t))),chunk('IEND',Buffer.alloc(0))]);}
+test('复用V1库转V2，只产生审核草稿',()=>{const r=parseCard(Buffer.from(JSON.stringify(v1)));assert.equal(r.sourceFormat,'v1');assert.equal(r.status,'draft_requires_review');});
+test('未知版本不能宽松回退为V1',()=>{assert.throws(()=>parseCard(Buffer.from(JSON.stringify({...v1,spec:'chara_card_v2',spec_version:'999'}))),/INVALID_IMPORT/);});
+test('PNG真实字节解析，重复块/坏CRC/尾随数据/截断均拒绝',()=>{const p=png([['chara',Buffer.from(JSON.stringify(v1)).toString('base64')]]);assert.equal(parseCard(p).sourceFormat,'v1');assert.throws(()=>decodePng(Buffer.concat([p,Buffer.from('x')])),/INVALID_IMPORT/);assert.throws(()=>decodePng(p.subarray(0,-1)),/INVALID_IMPORT/);const bad=Buffer.from(p);bad[30]^=1;assert.throws(()=>decodePng(bad),/INVALID_IMPORT/);assert.throws(()=>decodePng(png([['chara','e30='],['chara','e30=']])),/INVALID_IMPORT/);});
+test('损坏首选ccv3即整卡失败，不退有效chara',()=>{assert.throws(()=>parseCard(png([['chara',Buffer.from(JSON.stringify(v1)).toString('base64')],['ccv3','%%%%']])),/INVALID_IMPORT/);});

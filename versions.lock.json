@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "product": "between-monorepo",
+  "node": "24.19.0",
+  "npm": "11.9.0",
+  "electron": "44.5.1",
+  "mcp_server": "2.3.0",
+  "mcp_client": "2.3.0",
+  "qwen_cli": {
+    "tag": "v0.24.7",
+    "commit": "b12edec1401a28fc53cd9e714d5928b285071fc8",
+    "build_status": "recovery_build_app_bytes_and_auth_failclosed_verified",
+    "entry_sha256": "f8bc1ca0e85adac1d813eac62353dd97ebe4a6bd833b4e00badd6b73db5467d4"
+  },
+  "qwen_sdk": {
+    "version": "0.1.16",
+    "build_status": "frozen_candidate",
+    "entry_sha256": "4945ac6880bf9876fb43d9f46f0fbb3fc323ee3321c0060a74ed791167a852f4"
+  },
+  "langfuse": {
+    "tag": "v4.50.0",
+    "deployment_status": "not_running"
+  },
+  "baseline_sha256": "f8d46c11de9b4feac0ded41576f9ec83f2ed26d475d6161717c00fceb5e84f94",
+  "business_schema": 5,
+  "development_environment": "cloud-linux-x64",
+  "handoff_sha256": "5e866532ee94d7c60e096becaca58e90dce79c68898859f6e09c098428347e2b",
+  "qwen_runtime_manifest_sha256": "ccf2e81c07c579ab273b0720b3f7e19e578b6775371b4812d952edc36a0aa9d1",
+  "host_candidate_archive_sha256": "0a93de91cfec4a244a294a9c37503237b0a7d50c1349009f5c9db6763528ca2b",
+  "collector": {
+    "candidate_version": "0.162.0",
+    "artifact_sha256": null,
+    "validation_status": "not_installed_or_run"
+  },
+  "privacy_authority_schema": 2,
+  "continuation_baseline_version": 0,
+  "continuation_baseline_zip_sha256": "b8519975ae50c0c55d5c372a08884befc16f3dfd9768f10e4f27d1895c6f284b",
+  "previous_runtime_binding": {
+    "manifest_sha256": "1a4b8662b8a9f570d3b55786cdc0294ebb92e24c139d02d00e6e62814b9790b0",
+    "cli_sha256": "6e9a4808b2ee45a2afc71a018c62fa64fa2cb0a5a755a6e82ee1e958888588e4",
+    "status": "historical_runtime_missing_after_workspace_change"
+  },
+  "portable_runtime": {
+    "version": 0,
+    "sha256": "a86573e64f428426f338d90c9e4f9820ed0d2595cd4213e143cc87b9dda7c3bc",
+    "bytes": 134513505,
+    "archive_manifest_entries": 5820,
+    "status": "host_owner_portable_smokes_and_app_2048_file_binding_verified_no_model"
+  },
+  "development_status": "sealed_offline_restore_source_and_tests_independently_verified",
+  "previous_frozen_application": {
+    "schema": 4,
+    "tests_passed": 137,
+    "source_freeze_sha256": "96c5f64f51c30d5d25f32ace3a90a92b30cf038bac5390369fb0325170bedfe8",
+    "publication_manifest_sha256": "a540041b0067d158b9b904cc1521504e0639bf87a83f3e3290e33bb7dec8b982"
+  },
+  "spool_schema": 2,
+  "offline_restore": {
+    "format": 2,
+    "scope": "exact_current_sealed_checkpoint_only",
+    "normal_open_consumes_seal": true,
+    "platform": "linux_same_pid_namespace_registered_handles",
+    "gui_integration": false
+  },
+  "pnpm": "11.19.0",
+  "product_version": "0.1.0",
+  "runtime_protocol_schema": 1,
+  "host_context_schema": 1,
+  "pnpm_lock_sha256": "6784d1bacf096126bfe81ad1141477cb69be2e34a3954556792df923e4377db7"
+}

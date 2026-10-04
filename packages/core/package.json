@@ -1,0 +1,74 @@
+{
+  "name": "@between/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./cards": {
+      "types": "./dist/cards.d.ts",
+      "import": "./dist/cards.js"
+    },
+    "./store": {
+      "types": "./dist/store.d.ts",
+      "import": "./dist/store.js"
+    },
+    "./runtime/service": {
+      "types": "./dist/runtime/service.d.ts",
+      "import": "./dist/runtime/service.js"
+    },
+    "./runtime/turn-coordinator": {
+      "types": "./dist/runtime/turn-coordinator.d.ts",
+      "import": "./dist/runtime/turn-coordinator.js"
+    },
+    "./runtime/off-cache": {
+      "types": "./dist/runtime/off-cache.d.ts",
+      "import": "./dist/runtime/off-cache.js"
+    },
+    "./evaluation/deterministic": {
+      "types": "./dist/evaluation/deterministic.d.ts",
+      "import": "./dist/evaluation/deterministic.js"
+    },
+    "./privacy/authority": {
+      "types": "./dist/privacy/authority.d.ts",
+      "import": "./dist/privacy/authority.js"
+    },
+    "./privacy/offline-recovery": {
+      "types": "./dist/privacy/offline-recovery.d.ts",
+      "import": "./dist/privacy/offline-recovery.js"
+    },
+    "./privacy/backup": {
+      "types": "./dist/privacy/backup.d.ts",
+      "import": "./dist/privacy/backup.js"
+    },
+    "./privacy/restore-policy": {
+      "types": "./dist/privacy/restore-policy.d.ts",
+      "import": "./dist/privacy/restore-policy.js"
+    },
+    "./observability/normalize": {
+      "types": "./dist/observability/normalize.d.ts",
+      "import": "./dist/observability/normalize.js"
+    },
+    "./observability/contracts": {
+      "types": "./dist/observability/contracts.d.ts",
+      "import": "./dist/observability/contracts.js"
+    }
+  },
+  "scripts": {
+    "build": "node ../../scripts/clean-package.mjs && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node ../../scripts/test-package.mjs"
+  },
+  "dependencies": {
+    "@between/contracts": "workspace:*",
+    "better-sqlite3": "13.0.3",
+    "character-card-utils": "2.0.3",
+    "crc-32": "1.2.2",
+    "png-chunk-text": "1.0.0",
+    "png-chunks-extract": "1.0.0",
+    "xstate": "5.33.2",
+    "zod": "4.6.5"
+  }
+}

@@ -1,0 +1,452 @@
+{
+  "generated_from": "installed pinned pnpm dependency graph on current platform; non-installed platform optional binaries retain upstream notices in their own distribution",
+  "packages": [
+    {
+      "name": "@electron-internal/extract-zip",
+      "version": "1.0.5",
+      "license": "BSD-2-Clause",
+      "notices": []
+    },
+    {
+      "name": "@electron/get",
+      "version": "5.1.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "_electron_get-5.1.0-LICENSE",
+          "sha256": "edab8abb78d9c5b36944c3e00aebf6a90eb32378993f49ac8a3904007029c629"
+        }
+      ]
+    },
+    {
+      "name": "@esbuild/linux-x64",
+      "version": "0.25.12",
+      "license": "MIT",
+      "notices": []
+    },
+    {
+      "name": "@modelcontextprotocol/client",
+      "version": "2.3.0",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "_modelcontextprotocol_client-2.3.0-LICENSE",
+          "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+        }
+      ]
+    },
+    {
+      "name": "@modelcontextprotocol/core",
+      "version": "2.3.0",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "_modelcontextprotocol_core-2.3.0-LICENSE",
+          "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+        }
+      ]
+    },
+    {
+      "name": "@modelcontextprotocol/server",
+      "version": "2.3.0",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "_modelcontextprotocol_server-2.3.0-LICENSE",
+          "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+        }
+      ]
+    },
+    {
+      "name": "@types/better-sqlite3",
+      "version": "7.6.13",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "_types_better-sqlite3-7.6.13-LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ]
+    },
+    {
+      "name": "@types/node",
+      "version": "22.19.3",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "_types_node-22.19.3-LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ]
+    },
+    {
+      "name": "@types/node",
+      "version": "24.19.1",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "_types_node-24.19.1-LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+        }
+      ]
+    },
+    {
+      "name": "better-sqlite3",
+      "version": "13.0.3",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "better-sqlite3-13.0.3-LICENSE",
+          "sha256": "09856b52897c91ab67e7456ef43067019f31dfd3b87fda72e655736b1ebdee55"
+        }
+      ]
+    },
+    {
+      "name": "character-card-utils",
+      "version": "2.0.3",
+      "license": "ISC",
+      "notices": []
+    },
+    {
+      "name": "crc-32",
+      "version": "0.3.0",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "crc-32-0.3.0-LICENSE",
+          "sha256": "698c2f95f5be09d622189559a02e936c9db3e2bcb31413af58cef1688ad03efa"
+        }
+      ]
+    },
+    {
+      "name": "crc-32",
+      "version": "1.2.2",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "crc-32-1.2.2-LICENSE",
+          "sha256": "c542ba7851b5d39a5face477e47a27cb7c00a9759e321b66824e79718bffe1ac"
+        }
+      ]
+    },
+    {
+      "name": "cross-spawn",
+      "version": "7.0.6",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "cross-spawn-7.0.6-LICENSE",
+          "sha256": "aaa78451b6fecd1b9c4594c796c133c0e90cad100372ff8bc6de615e9ef9adf1"
+        }
+      ]
+    },
+    {
+      "name": "debug",
+      "version": "4.4.3",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "debug-4.4.3-LICENSE",
+          "sha256": "3a61c6c96caf5c1d9b623fb9b04c822b783dfcb78aa7e49c76a3f643e6ed7f95"
+        }
+      ]
+    },
+    {
+      "name": "electron",
+      "version": "44.5.1",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "electron-44.5.1-LICENSE",
+          "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+        }
+      ]
+    },
+    {
+      "name": "env-paths",
+      "version": "3.0.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "env-paths-3.0.0-license",
+          "sha256": "5c932d88256b4ab958f64a856fa48e8bd1f55bc1d96b8149c65689e0c61789d3"
+        }
+      ]
+    },
+    {
+      "name": "esbuild",
+      "version": "0.25.12",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "esbuild-0.25.12-LICENSE.md",
+          "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
+        }
+      ]
+    },
+    {
+      "name": "eventsource-parser",
+      "version": "3.1.1",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "eventsource-parser-3.1.1-LICENSE",
+          "sha256": "835eb611a23301b27115ca1be9f754c876e643ceb7fe63049c6b50609a1cafeb"
+        }
+      ]
+    },
+    {
+      "name": "eventsource",
+      "version": "3.0.7",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "eventsource-3.0.7-LICENSE",
+          "sha256": "f683a72ffe6a9675b5507af22fe0f448d8c8de3da1e14f139d370a7e6a54a23e"
+        }
+      ]
+    },
+    {
+      "name": "graceful-fs",
+      "version": "4.2.11",
+      "license": "ISC",
+      "notices": [
+        {
+          "file": "graceful-fs-4.2.11-LICENSE",
+          "sha256": "f65c5d9f22a317b2a10803bd1868461ce6499c2ed7217bc80c0cc772a748789c"
+        }
+      ]
+    },
+    {
+      "name": "isexe",
+      "version": "2.0.0",
+      "license": "ISC",
+      "notices": [
+        {
+          "file": "isexe-2.0.0-LICENSE",
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
+        }
+      ]
+    },
+    {
+      "name": "jose",
+      "version": "6.2.12",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "jose-6.2.12-LICENSE.md",
+          "sha256": "8078b0829d6c3e9ecde2f003e1966e4cad3efc6e7a640efbab0313cc166b1af1"
+        }
+      ]
+    },
+    {
+      "name": "ms",
+      "version": "2.1.3",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "ms-2.1.3-license.md",
+          "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801"
+        }
+      ]
+    },
+    {
+      "name": "node-addon-api",
+      "version": "8.9.2",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "node-addon-api-8.9.2-LICENSE.md",
+          "sha256": "89024017b88a9f2b763f79b941a4f2db3b4428edfcacdc0b23866b2da633ad0c"
+        }
+      ]
+    },
+    {
+      "name": "path-key",
+      "version": "3.1.1",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "path-key-3.1.1-license",
+          "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+        }
+      ]
+    },
+    {
+      "name": "pkce-challenge",
+      "version": "5.0.1",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "pkce-challenge-5.0.1-LICENSE",
+          "sha256": "feb87a2e0c305de3464cc44077da5393c52d8ca6362d37427157d04ec6f4510d"
+        }
+      ]
+    },
+    {
+      "name": "png-chunk-text",
+      "version": "1.0.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "png-chunk-text-1.0.0-LICENSE.md",
+          "sha256": "82d4cd7899b219ef29e6bd30820b22d12fd8d95ca2a43a6dc675c72ea2a19cc7"
+        }
+      ]
+    },
+    {
+      "name": "png-chunks-extract",
+      "version": "1.0.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "png-chunks-extract-1.0.0-LICENSE.md",
+          "sha256": "82d4cd7899b219ef29e6bd30820b22d12fd8d95ca2a43a6dc675c72ea2a19cc7"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "version": "2.0.3",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "progress-2.0.3-LICENSE",
+          "sha256": "d7d2a7786de7c7cfd96f920c6f12927d74e1d2a861ca4498bf465c3bc3f4c21c"
+        }
+      ]
+    },
+    {
+      "name": "semver",
+      "version": "7.8.5",
+      "license": "ISC",
+      "notices": [
+        {
+          "file": "semver-7.8.5-LICENSE",
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
+        }
+      ]
+    },
+    {
+      "name": "shebang-command",
+      "version": "2.0.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "shebang-command-2.0.0-license",
+          "sha256": "69dee148a2cc470554dfa7142e830662062394d0fe67cddd379aba90dc60d6b3"
+        }
+      ]
+    },
+    {
+      "name": "shebang-regex",
+      "version": "3.0.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "shebang-regex-3.0.0-license",
+          "sha256": "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+        }
+      ]
+    },
+    {
+      "name": "sumchecker",
+      "version": "3.0.1",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "sumchecker-3.0.1-LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        }
+      ]
+    },
+    {
+      "name": "typescript",
+      "version": "5.9.3",
+      "license": "Apache-2.0",
+      "notices": [
+        {
+          "file": "typescript-5.9.3-LICENSE.txt",
+          "sha256": "a7d00bfd54525bc694b6e32f64c7ebcf5e6b7ae3657be5cc12767bce74654a47"
+        }
+      ]
+    },
+    {
+      "name": "undici-types",
+      "version": "6.21.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "undici-types-6.21.0-LICENSE",
+          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ]
+    },
+    {
+      "name": "undici-types",
+      "version": "7.24.6",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "undici-types-7.24.6-LICENSE",
+          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ]
+    },
+    {
+      "name": "undici",
+      "version": "7.30.0",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "undici-7.30.0-LICENSE",
+          "sha256": "a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27"
+        }
+      ]
+    },
+    {
+      "name": "which",
+      "version": "2.0.2",
+      "license": "ISC",
+      "notices": [
+        {
+          "file": "which-2.0.2-LICENSE",
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
+        }
+      ]
+    },
+    {
+      "name": "xstate",
+      "version": "5.33.2",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "xstate-5.33.2-LICENSE",
+          "sha256": "542d926d7bbb099785e322d1d5574c539d51942e52ec8adce2be4629ba81fc7f"
+        }
+      ]
+    },
+    {
+      "name": "zod",
+      "version": "3.25.76",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "zod-3.25.76-LICENSE",
+          "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+        }
+      ]
+    },
+    {
+      "name": "zod",
+      "version": "4.6.5",
+      "license": "MIT",
+      "notices": [
+        {
+          "file": "zod-4.6.5-LICENSE",
+          "sha256": "3f1189b28e3866e0d979968d466b78f813f76827cfdca1fbb124cc0a5c8841f8"
+        }
+      ]
+    }
+  ]
+}

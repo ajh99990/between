@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {pathToFileURL} from 'node:url';import path from 'node:path';
+if(!process.argv[2])throw Error('Pass built Qwen root');
+const sdk=await import(pathToFileURL(path.resolve(process.argv[2],'packages/sdk-typescript/dist/index.mjs')).href);
+assert.equal(sdk.SDK_VERSION,'0.1.16');
+assert.equal(sdk.MANAGED_HOST_CONTRACT_VERSION,1);
+const parsed=sdk.QueryOptionsSchema.safeParse({sessionToolAllowlist:[],env:{HOME:'/synthetic/home',QWEN_HOME:'/synthetic/qwen',QWEN_RUNTIME_DIR:'/synthetic/runtime'},chatRecording:false,captureProviderContent:false,hooks:[{event:'PreToolUse',callback:()=>false}]});
+assert.equal(parsed.success,true);
+assert.equal(sdk.QueryOptionsSchema.safeParse({sessionToolAllowlist:[],env:{}}).success,false);
+console.log(JSON.stringify({builtSdk:true,checks:4,passed:4,spawned:false}));

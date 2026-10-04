@@ -1,0 +1,43 @@
+# Candidate for otelcol-contrib 0.162.0; configuration/HTTP/restart NOT yet executed.
+# Only redacted, authorized synthetic content may reach this receiver in development.
+# Do not start in an environment where listeners have been denied.
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: ${env:OTEL_RECEIVER_ENDPOINT}
+extensions:
+  file_storage/relationship:
+    directory: ${env:OTEL_QUEUE_DIRECTORY}
+    timeout: 1s
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 128
+exporters:
+  otlphttp/langfuse:
+    endpoint: ${env:LANGFUSE_OTLP_ENDPOINT}
+    headers:
+      Authorization: ${env:LANGFUSE_OTLP_AUTHORIZATION}
+      x-langfuse-ingestion-version: '4'
+    timeout: 5s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 24h
+    sending_queue:
+      enabled: true
+      sizer: bytes
+      queue_size: 104857600
+      block_on_overflow: false
+      wait_for_result: false
+      num_consumers: 2
+      storage: file_storage/relationship
+service:
+  extensions: [file_storage/relationship]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlphttp/langfuse]

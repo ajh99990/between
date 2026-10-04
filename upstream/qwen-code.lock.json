@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/QwenLM/qwen-code",
+  "tag": "v0.24.7",
+  "commit": "b12edec1401a28fc53cd9e714d5928b285071fc8",
+  "commit_verification": "git ls-remote official refs/tags/v0.24.7 on 2026-10-04",
+  "archive_url": "https://github.com/QwenLM/qwen-code/archive/refs/tags/v0.24.7.tar.gz",
+  "archive_sha256": "aa7082cbf80590dbc481209f49402b369879868302dda2836f8ae0a1329120d3",
+  "patches": [
+    {
+      "path": "patches/qwen-code/0001-managed-host.patch",
+      "sha256": "8abd3abfd595f5d5f0164906cb45934aa6135334ab0f12574dcfeae815e2d9c0"
+    }
+  ],
+  "source_manifest": "upstream/qwen-source-manifest.json",
+  "source_manifest_sha256": "0a8ee42a94057dcb9ca8406946321139b42e292aeff95e049fc415cd3a52f829",
+  "node": "24.19.0",
+  "pnpm": "11.24.0",
+  "sdk_version": "0.1.16",
+  "managed_host_contract_version": 1,
+  "package_manager": "pnpm@11.24.0+sha512.bd27e345e976dcb0be0b7a1228217b049a817e21b1f355c90dbe7dc46671895a8bc1e6d06c24554505ea93ea0b45f489a27ec1bfbc8de6a9659fca0f16fa0000",
+  "build_steps": [
+    "corepack pnpm install --frozen-lockfile --ignore-scripts",
+    "npm run generate",
+    "npm run build:managed-host"
+  ]
+}

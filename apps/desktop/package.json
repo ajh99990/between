@@ -1,0 +1,32 @@
+{
+  "name": "@between/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.js",
+  "files": [
+    "dist",
+    "resources"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/clean-package.mjs && tsc -p tsconfig.json && node ../../scripts/desktop-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node ../../scripts/test-package.mjs",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "@between/contracts": "workspace:*",
+    "@between/core": "workspace:*",
+    "@between/host-qwen": "workspace:*",
+    "@between/mcp-server": "workspace:*"
+  },
+  "devDependencies": {
+    "electron": "44.5.1"
+  },
+  "exports": {
+    "./trusted-page": {
+      "types": "./dist/main/trusted-page.d.ts",
+      "import": "./dist/main/trusted-page.js"
+    }
+  }
+}

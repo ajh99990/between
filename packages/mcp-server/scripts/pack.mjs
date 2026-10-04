@@ -1,0 +1,12 @@
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const destination = path.resolve(process.argv[2] || path.join(root, 'artifacts'));
+mkdirSync(destination, { recursive: true });
+const manifest = JSON.parse(readFileSync(path.join(root, 'publish/package.json')));
+if (JSON.stringify(manifest).includes('workspace:') || Object.keys(manifest.dependencies).some(name => name.startsWith('@between/'))) throw Error('Private dependency in publish manifest');
+const args = ['pack', path.join(root, 'publish'), '--pack-destination', destination, '--json'];
+if (process.env.BETWEEN_NPM_CACHE) args.push('--cache', process.env.BETWEEN_NPM_CACHE);
+process.stdout.write(execFileSync('npm', args, { encoding: 'utf8' }));
