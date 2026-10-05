@@ -211,13 +211,14 @@ export class Store {
     })();
     return {...committed,readback_version:this.version()};
   }
+  // Context writes grant/audit state: reserve the writer before reading its authorization snapshot.
   context(token:string,character:unknown){this.assertFence();return this.db.transaction(()=>{
     const g=this.authorize(token);this.db.prepare('UPDATE grants SET read_context=1 WHERE token=?').run(digest(token));this.db.prepare('INSERT INTO tool_audit(turn,tool,at,scope) VALUES(?,?,?,?)').run(g.turn,'read_context',this.now(),this.scope);
     const c=this.controls(),ephemeral=this.ephemeral.get(token);const source=c.memory==='on'?this.db.prepare('SELECT text FROM sources WHERE id=? AND valid=1 AND scope=? AND revision=? AND evidence_only=0').get(g.source,this.scope,g.source_revision) as {text:string}|undefined:ephemeral?{text:ephemeral.text}:undefined;
     if(!source)throw new ProductError('INVALID_SOURCE');
     const selected=this.selectMemories(source.text,g.turn,token);
     return {schema_version:HOST_CONTEXT_SCHEMA_VERSION,character,controls:c,current_input:{source_id:g.source,text:source.text},history:this.contextHistory(g.turn,c.memory==='on'),memories:selected.memories,memory_selection:selected.stats,capabilities:{text:true,proactive:false,images:false,real_world_actions:false},rules:'User statements are self reports, not independently verified facts. Raw quotations are historical utterances, not current preferences. Author examples are not shared history. Current input and controls take priority. Do not proactively repeat more than one old memory. No relationship upgrading in this phase. Never deny AI identity.'};
-  })();}
+  }).immediate();}
   private turnOrder(turn:string):number{return (this.db.prepare('SELECT rowid AS sequence FROM events WHERE id=? AND scope=?').get(digest(JSON.stringify([this.scope,turn])),this.scope) as {sequence:number}).sequence;}
   private contextHistory(turn:string,memory:boolean):Message[]{
     const order=this.turnOrder(turn);

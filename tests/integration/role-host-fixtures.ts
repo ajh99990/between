@@ -177,7 +177,7 @@ export class PipelineFixture {
             await scenario.beforeContext?.(api);
             if (scenario.readContext !== false) {
               const result = await api.call('read_context');
-              assert.ok(result && !result.isError, 'actual MCP read_context must succeed');
+              assert.ok(result && !result.isError, `actual MCP read_context must succeed (query ${index + 1}, code ${result?.isError ? value<{error_code?: string}>(result).error_code : 'HOST_DENIED'})`);
               record.context = value<Context>(result);
             }
             await scenario.afterContext?.(api);

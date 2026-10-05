@@ -243,3 +243,24 @@ test.after(() => {
     records,
   }, null, 2) + '\n');
 });
+
+test('SYNTHETIC real MCP read_context survives an overlapping owner SQLite writer', {timeout:15000}, async()=>{
+ let releaseTimer:ReturnType<typeof setTimeout>|undefined;
+ const fixture=new PipelineFixture(true,()=>({beforeContext:async()=>{
+  fixture.store.db.exec('BEGIN IMMEDIATE');
+  fixture.store.db.prepare('UPDATE grants SET read_context=read_context').run();
+  // Keep the real owner writer active while the separate MCP process starts
+  // reading. Its context transaction must wait before taking its read snapshot.
+  releaseTimer=setTimeout(()=>{fixture.store.db.exec('COMMIT');},200);
+ }}));
+ try{
+  const row=await fixture.send('SYNTHETIC_OVERLAPPING_OWNER_WRITER');
+  assert.equal(row.status,'completed',row.error_code??'unexpected failure');
+  checkRequest(fixture.records[0],'SYNTHETIC_OVERLAPPING_OWNER_WRITER');
+  assert.equal(count(fixture.store,'tool_audit'),1);
+ }finally{
+  if(releaseTimer)clearTimeout(releaseTimer);
+  if(fixture.store.db.inTransaction)fixture.store.db.exec('ROLLBACK');
+  await fixture.close();records.push(...fixture.records);
+ }
+});

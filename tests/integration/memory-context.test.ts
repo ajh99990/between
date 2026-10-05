@@ -76,3 +76,44 @@ test('invalidated or revised source evidence is excluded from context history im
 test('raw-fragment candidates expire within four hours and cached receipt readback never restores their body',()=>{
  const f=fixture();try{const t=f.turn('以前我喜欢这首歌，现在不喜欢了');f.store.context(t.token,{});const quote='我喜欢这首歌',original=f.store.remember(t.token,quote,'partial');const row=f.store.db.prepare('SELECT * FROM memories WHERE id=?').get(original.result.id) as any;assert.equal(row.valid_until,f.now()+4*3600000);f.advance(4*3600000);f.store.purge();const updated=f.store.db.prepare('SELECT * FROM memories WHERE id=?').get(original.result.id) as any;assert.equal(updated.status,'invalid');assert.equal(updated.text,'');assert.equal(updated.evidence_text,'');const current=f.store.reauthorize(t.id,t.text,true,t.epoch);f.store.context(current.token,{});const retry=f.store.remember(current.token,quote,'partial');assert.deepEqual(retry.result,original.result);assert.equal(retry.readback_memory?.status,'invalid');assert.throws(()=>f.store.remember(current.token,quote,'new-operation'),/STALE_REVISION/);}finally{f.store.close();}
 });
+
+// Context reads also write the grant/audit. Reserve the SQLite writer before
+// reading authorization so an overlapping maintenance commit cannot invalidate
+// a deferred read snapshot during its later write upgrade.
+test('context waits for a concurrent SQLite writer and checks the committed authorization state', {timeout:10000}, async()=>{
+ const {Worker}=await import('node:worker_threads');
+ const {createRequire}=await import('node:module');
+ const require=createRequire(import.meta.url);
+ for(const revoke of [false,true]){
+  const f=fixture();let worker:InstanceType<typeof Worker>|undefined;let exited:Promise<void>|undefined;
+  try{
+   const turn=f.turn('SYNTHETIC_CONTEXT_WRITER_CONTENTION');
+   const state=new SharedArrayBuffer(4),signal=new Int32Array(state);
+   worker=new Worker(`
+    const {parentPort,workerData}=require('node:worker_threads');
+    const Database=require(workerData.module),db=new Database(workerData.file);
+    const signal=new Int32Array(workerData.state);
+    try{
+     db.exec('BEGIN IMMEDIATE');
+     db.prepare(workerData.revoke?'UPDATE grants SET active=0':'UPDATE grants SET read_context=read_context').run();
+     parentPort.postMessage('writer-locked');
+     if(Atomics.wait(signal,0,0,5000)==='timed-out')throw Error('Context did not start');
+     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,200);
+     db.exec('COMMIT');
+    }finally{db.close();}
+   `,{eval:true,workerData:{module:require.resolve('better-sqlite3'),file:f.store.file,state,revoke}});
+   exited=new Promise<void>((resolve,reject)=>{worker!.once('error',reject);worker!.once('exit',code=>code===0?resolve():reject(Error(`SQLite writer exited ${code}`)));});
+   // Attach a rejection handler immediately, then propagate it in finally.
+   void exited.catch(()=>{});
+   await new Promise<void>((resolve,reject)=>{worker!.once('message',message=>message==='writer-locked'?resolve():reject(Error('Unexpected writer barrier')));worker!.once('error',reject);});
+   Atomics.store(signal,0,1);Atomics.notify(signal,0);
+   if(revoke){
+    assert.throws(()=>f.store.context(turn.token,{}),/NOT_AUTHORIZED/);
+    assert.equal((f.store.db.prepare('SELECT count(*) n FROM tool_audit').get() as {n:number}).n,0);
+   }else{
+    assert.equal(f.store.context(turn.token,{}).current_input.text,turn.text);
+    assert.equal((f.store.db.prepare('SELECT count(*) n FROM tool_audit').get() as {n:number}).n,1);
+   }
+  }finally{try{if(exited)await exited;}finally{await worker?.terminate();f.store.close();}}
+ }
+});
