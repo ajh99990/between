@@ -1,0 +1,48 @@
+{
+  "commit": "06bde939fb1e9c4c8d8641d810f0a916b5bce127",
+  "file": "public/scripts/world-info.js",
+  "declarations": [
+    {
+      "name": "world_info_logic",
+      "startLine": 33,
+      "endLine": 38,
+      "sha256": "59c7d74b59d69dc5029edd59acce61e03f4cc4435548c1e984b3cde8d564878e"
+    },
+    {
+      "name": "DEFAULT_DEPTH",
+      "startLine": 96,
+      "endLine": 96,
+      "sha256": "9e44dccbd76731cc50da8cfcfb14de83583f22377aab8a9a49dc9c5635f0671e"
+    },
+    {
+      "name": "DEFAULT_WEIGHT",
+      "startLine": 97,
+      "endLine": 97,
+      "sha256": "d9797f2441bc99e219115b53c1498879773fcb83147e8fd28b00b66a222f38ba"
+    },
+    {
+      "name": "world_info_position",
+      "startLine": 855,
+      "endLine": 864,
+      "sha256": "d882ca66e1771971e96c8ee1649ac2a76be8eb9495318f793717704c2b5d7832"
+    },
+    {
+      "name": "newWorldInfoEntryDefinition",
+      "startLine": 4082,
+      "endLine": 4125,
+      "sha256": "41cdd80f1acb209ea3d656498eb3b43a41d4d4adbba85c651ca5f59af5822337"
+    },
+    {
+      "name": "newWorldInfoEntryTemplate",
+      "startLine": 4127,
+      "endLine": 4129,
+      "sha256": "b4e3650c6263ebb1fecd1ce62bc16a60b7b5e89613f2a33ee6bdc6faa99ce37f"
+    },
+    {
+      "name": "convertCharacterBook",
+      "startLine": 5617,
+      "endLine": 5674,
+      "sha256": "29715f0840cff60fe04aa5c08e3635a5c54d9c760ce1952be500d481e9573ea0"
+    }
+  ]
+}

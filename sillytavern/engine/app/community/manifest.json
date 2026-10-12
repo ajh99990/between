@@ -1,0 +1,51 @@
+{
+  "repository": "https://github.com/foreverse-app/character-card-skills",
+  "commit": "dab0da437810b2ea4b5eec414c10c8fa35e779f8",
+  "files": [
+    {
+      "id": "peiyu",
+      "sourcePath": "cards/zh/peiyu/peiyu.v2.json",
+      "file": "peiyu.v2.json",
+      "bytes": 19278,
+      "sha256": "7dd714fdd35d4f479b91540700b25628cf518768b50222309e14722b56e2756a",
+      "researchBytes": 19279,
+      "researchSha256": "487ea83aefd7cbfe37ae4c61e0749ffb36b309f410b8d5d13e9aa347d7043be8",
+      "difference": "Research copy adds exactly one terminal LF; packaged source preserves raw upstream bytes"
+    },
+    {
+      "id": "tangtuantuan",
+      "sourcePath": "cards/zh/tangtuantuan/tangtuantuan.v2.json",
+      "file": "tangtuantuan.v2.json",
+      "bytes": 19988,
+      "sha256": "e4338fd4941f07857447f50b349568d3d001e07e024bde889c29672528d71d34",
+      "researchBytes": 19989,
+      "researchSha256": "4cb0ea715b726ae535d78b406dd70f60a153112017c5597c99d7f131fcc91c5a",
+      "difference": "Research copy adds exactly one terminal LF; packaged source preserves raw upstream bytes"
+    },
+    {
+      "id": "wangushi",
+      "sourcePath": "cards/zh/wangushi/wangushi.v2.json",
+      "file": "wangushi.v2.json",
+      "bytes": 17594,
+      "sha256": "6bf91f72bddd973191b3953560059a89383a823215f4aea8710b3652387cf3a9",
+      "researchBytes": 17595,
+      "researchSha256": "4d062ea667347fedd4e1223d3426a305da0bcb266dd555044d046540559b5e3f",
+      "difference": "Research copy adds exactly one terminal LF; packaged source preserves raw upstream bytes"
+    },
+    {
+      "id": "huoyushen",
+      "sourcePath": "cards/zh/huoyushen/huoyushen.v2.json",
+      "file": "huoyushen.v2.json",
+      "bytes": 20570,
+      "sha256": "872bb81fb07273c7487cd2dd14c5b71d694048a12a676c286ed800bf39ee229b",
+      "researchBytes": 20571,
+      "researchSha256": "9d121b94f6c8fba96634256310bdb4babf7cba35ab987debebfec0f7b5ddea99",
+      "difference": "Research copy adds exactly one terminal LF; packaged source preserves raw upstream bytes"
+    }
+  ],
+  "licenseSha256": "6e6fba2e29ea6118e5719d4cab03803a4a4c3160afedda247ee27650137be492",
+  "licenseResearchDifference": "one terminal LF",
+  "licenseResearchSha256": "c6825c32f5a52f46d87e283ceed0bd02f10be57cdf7a8b4d0c9646294c66ceeb",
+  "licenseBytes": 1384,
+  "licenseResearchBytes": 1385
+}

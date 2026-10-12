@@ -1,0 +1,690 @@
+[
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "Prompt",
+    "line": 80,
+    "sha256": "3d7ca3c972c7346aaff5a49d5bdabd4f8b10587d0f35debcaa5859a078854219",
+    "bytes": 3363,
+    "lines": 117
+  },
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "PromptCollection",
+    "line": 201,
+    "sha256": "77e85c3b56191369229af89493ef3613f82ddd2f8f1158412aa7fc111492f582",
+    "bytes": 3116,
+    "lines": 98
+  },
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "PromptManager",
+    "line": 300,
+    "sha256": "6d1e8883fe0389de714f3ceff30c71c86aaf40803d3b7dc1f455479956b65a4b",
+    "bytes": 77844,
+    "lines": 1700
+  },
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "INJECTION_POSITION",
+    "line": 37,
+    "sha256": "1b45ea0827c604de1241eaa4c215e3c88252b1f6c5662fdfa639b46e3fd3fb43",
+    "bytes": 58,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "chatCompletionDefaultPrompts",
+    "line": 2001,
+    "sha256": "597802f2005ceb6ef58b03c4895b147104f58742f4cf924f22deddcc1908c877",
+    "bytes": 2441,
+    "lines": 81
+  },
+  {
+    "file": "public/scripts/PromptManager.js",
+    "name": "promptManagerDefaultPromptOrder",
+    "line": 2087,
+    "sha256": "3de750691ee2399b1962b74151a8c235beee65f23a3b689e5e8c726697806e22",
+    "bytes": 953,
+    "lines": 50
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "TokenHandler",
+    "line": 3420,
+    "sha256": "244b1be79e361eafc62b4ae09095839029bb50f5e1776f749da1fc5462fb6487",
+    "bytes": 1572,
+    "lines": 60
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "Message",
+    "line": 3511,
+    "sha256": "d216ea8edc07ade83a1bf91c2d294f142eb4e2a8f55e8d499725fbd7a0ecba66",
+    "bytes": 10970,
+    "lines": 291
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "MessageCollection",
+    "line": 3808,
+    "sha256": "9c8df64a18036358bcb16d2cce1f15d11b3aff08860df071d2e98e2124f76694",
+    "bytes": 3386,
+    "lines": 98
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "ChatCompletion",
+    "line": 3917,
+    "sha256": "e8c55df5792c373f2e6521e487d319cd724d75831896379566f4a4c5d9484cc0",
+    "bytes": 12260,
+    "lines": 352
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "TokenBudgetExceededError",
+    "line": 3493,
+    "sha256": "db74f81c721b0ff70716cfc1f651475d279144a80edc554871f853638cee6cae",
+    "bytes": 196,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "InvalidCharacterNameError",
+    "line": 3501,
+    "sha256": "f5bcd0ee1377a197cbf65151332893555c7435e1c39f73d2a739e091626420aa",
+    "bytes": 199,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "IdentifierNotFoundError",
+    "line": 3485,
+    "sha256": "0f124ccf71ce52100131f74b29ee50f343086b833a0b80166c0073a710e59a4d",
+    "bytes": 184,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "populateChatHistory",
+    "line": 885,
+    "sha256": "2383782590629b6d1fcdf2047faa7659448c1c9726958efb98fd39327db655ea",
+    "bytes": 10274,
+    "lines": 208
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "populateDialogueExamples",
+    "line": 1101,
+    "sha256": "05444043a2063087aa4b8e4645d4324b501b417935272f6bf1666f1f2e78e7a5",
+    "bytes": 1497,
+    "lines": 34
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "populateChatCompletion",
+    "line": 1185,
+    "sha256": "0f9558143dad99e7315e533f471917b25398bb8e9bf264351b651cc54dc7204d",
+    "bytes": 7644,
+    "lines": 163
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "populationInjectionPrompts",
+    "line": 810,
+    "sha256": "cd7418dab0a8f2c49cb7adf1ecd34c58ed4ce820d823154d0d469b68df2912ae",
+    "bytes": 2493,
+    "lines": 66
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "preparePromptsForChatCompletion",
+    "line": 1367,
+    "sha256": "1ba90d4c210ee6a20cf975d47a9f616f5e31f869f537f17bf4a63ceeefc0f4be",
+    "bytes": 7074,
+    "lines": 150
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "prepareOpenAIMessages",
+    "line": 1542,
+    "sha256": "8b53fafda92b0d908bcebb2bcd3a5a37fce55e1bf584c5df603d93012899a776",
+    "bytes": 3374,
+    "lines": 83
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "getPromptPosition",
+    "line": 1140,
+    "sha256": "7560ee0b924b46615b3a371d3c3ab2b093205f99434a5aa18bde100846cb73e0",
+    "bytes": 234,
+    "lines": 11
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "getPromptRole",
+    "line": 1157,
+    "sha256": "710fa00e6e109ca9fa3cbba462c9d46885e7308da4d44158e14d50d155036832",
+    "bytes": 325,
+    "lines": 12
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "formatWorldInfo",
+    "line": 789,
+    "sha256": "6f681db394705fc94ad4ed5816d60eae45c11c12b01c153dd2afeeac47eb37c7",
+    "bytes": 256,
+    "lines": 13
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "setOpenAIMessages",
+    "line": 570,
+    "sha256": "3ca68e5e689344ab0a36bdbfa620dda6d379e43a64ae77793c00d65dc43f3755",
+    "bytes": 3579,
+    "lines": 80
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "setOpenAIMessageExamples",
+    "line": 656,
+    "sha256": "615d7ec570d3219cd6f01daa16ebbb982225b190a39599e8c4a20fa2324671b5",
+    "bytes": 556,
+    "lines": 12
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "parseExampleIntoIndividual",
+    "line": 729,
+    "sha256": "6619d059eb31b36c3dbc38d6d5c05889b4b3d9fd5c46969a350f15af1ffd8e37",
+    "bytes": 2409,
+    "lines": 59
+  },
+  {
+    "file": "public/scripts/openai.js",
+    "name": "character_names_behavior",
+    "line": 206,
+    "sha256": "9f2c81bafb00b21c9d57494bb9332ee94f5823e0460f7c687295e10529b9c859",
+    "bytes": 95,
+    "lines": 6
+  },
+  {
+    "file": "public/script.js",
+    "name": "MAX_INJECTION_DEPTH",
+    "line": 500,
+    "sha256": "bd3eb591addc14dcd31608bb20e6113f7507a7d77707f93f28b0ca3b92842a0e",
+    "bytes": 27,
+    "lines": 1
+  },
+  {
+    "file": "public/script.js",
+    "name": "createLazyFields",
+    "line": 3375,
+    "sha256": "b068582662107a035e958bbb157507877e3647cf1134ebaf7cddc2acc7811946",
+    "bytes": 552,
+    "lines": 19
+  },
+  {
+    "file": "public/script.js",
+    "name": "getCharacterCardFieldsLazy",
+    "line": 3402,
+    "sha256": "e9a6d84bc853adfb2803a8d827cda6b3fe8d1d4211ccede8db41e03ed5ceb32f",
+    "bytes": 3041,
+    "lines": 67
+  },
+  {
+    "file": "public/script.js",
+    "name": "getCharacterCardFields",
+    "line": 3476,
+    "sha256": "ef58ee3b318ff64bd8adc2ae63dcd2bab9ccbd8b4294f415f728b36377420a1b",
+    "bytes": 647,
+    "lines": 19
+  },
+  {
+    "file": "public/script.js",
+    "name": "baseChatReplace",
+    "line": 3341,
+    "sha256": "b742cc52debddc99dd8a2c2cb0c47d5f805f68da32b974ed70de4c8fa536fef3",
+    "bytes": 407,
+    "lines": 12
+  },
+  {
+    "file": "public/script.js",
+    "name": "substituteParams",
+    "line": 2981,
+    "sha256": "7de11af2cda90c2d4cf9b834756bd3cc74530975f9a0fd9727e0964d4979baad",
+    "bytes": 1594,
+    "lines": 35
+  },
+  {
+    "file": "public/script.js",
+    "name": "substituteParamsLegacy",
+    "line": 2831,
+    "sha256": "2d5504ad68f95ddd6c869570ef253518945b6a66499a7ca23be7fec551e83e91",
+    "bytes": 5411,
+    "lines": 131
+  },
+  {
+    "file": "public/script.js",
+    "name": "substituteParamsExtended",
+    "line": 2815,
+    "sha256": "e86be7c374f20a4736f55304104e573e03ffd049c90a45388174db1e96df915a",
+    "bytes": 183,
+    "lines": 3
+  },
+  {
+    "file": "public/script.js",
+    "name": "parseMesExamples",
+    "line": 3501,
+    "sha256": "3634381ee78f7417ebc1ac6dddafefbc406f6114f19f6d37d5aa2821217b015d",
+    "bytes": 646,
+    "lines": 15
+  },
+  {
+    "file": "public/script.js",
+    "name": "getExtensionPromptByName",
+    "line": 3257,
+    "sha256": "03cde9f8164b8dd90b8bff613343a3e457086454bc731b527acf9a97c6dbd482",
+    "bytes": 376,
+    "lines": 19
+  },
+  {
+    "file": "public/script.js",
+    "name": "getExtensionPromptMaxDepth",
+    "line": 3281,
+    "sha256": "9d8a0a67a619b21cc233a204791bc63cb129c8ab22e4ad95f07fbd69f38e3622",
+    "bytes": 322,
+    "lines": 9
+  },
+  {
+    "file": "public/script.js",
+    "name": "getExtensionPrompt",
+    "line": 3301,
+    "sha256": "4ab3cf6ace6fe0f8c7eda15fb825bdfbc34d1152d64dd3cb2f1b28ec87ab79e6",
+    "bytes": 1188,
+    "lines": 29
+  },
+  {
+    "file": "public/script.js",
+    "name": "setExtensionPrompt",
+    "line": 8930,
+    "sha256": "9739d669119a28e31a7f7fe4bf990a073f69ca4805db1abaec41f004deae635a",
+    "bytes": 368,
+    "lines": 10
+  },
+  {
+    "file": "public/script.js",
+    "name": "extension_prompt_types",
+    "line": 484,
+    "sha256": "59dac2f5ae6e22f58c1a76eaf516f051e979c5205ea2a8e0a6480e51ed16476f",
+    "bytes": 98,
+    "lines": 6
+  },
+  {
+    "file": "public/script.js",
+    "name": "extension_prompt_roles",
+    "line": 494,
+    "sha256": "b335f605d62d54c4e6d43adf0552a320c11d6b31c66d1ba1eca49bc95eef1081",
+    "bytes": 74,
+    "lines": 5
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "WorldInfoBuffer",
+    "line": 199,
+    "sha256": "26e01f9dac3af6a8558872b918f326186ccbb42125949db014cd6d6289ecbf0d",
+    "bytes": 9417,
+    "lines": 276
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "WorldInfoTimedEffects",
+    "line": 479,
+    "sha256": "0093824a53b8ab708ec1adb54b25320b0e63ec2a7870309bc50d7ee81396ef52",
+    "bytes": 10521,
+    "lines": 315
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "checkWorldInfo",
+    "line": 4709,
+    "sha256": "673a59f44dbe84d4749b1dd4ed57d1737659765cdce283d7f1a77517994a1c34",
+    "bytes": 26361,
+    "lines": 574
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "getWorldInfoPrompt",
+    "line": 892,
+    "sha256": "4b257f134369cb59e59643ab5c8707c0cd1ed93335a1ee270ae095f3d59c0a05",
+    "bytes": 1099,
+    "lines": 24
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "parseRegexFromString",
+    "line": 2901,
+    "sha256": "2fd36860c19356f280cca8b775be3e060e33bd749e4924463c015ab223da1273",
+    "bytes": 936,
+    "lines": 26
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "filterByInclusionGroups",
+    "line": 5388,
+    "sha256": "f1f13fc28bfeba29492048617bf53a6f92f81b2c00ae52fd0aa2711f98d8282f",
+    "bytes": 3411,
+    "lines": 88
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "filterGroupsByScoring",
+    "line": 5292,
+    "sha256": "8ab7e00807e7e00466a35db8b28cc0395e38bc6ba8a8f9e03b65e6f2ff776ae7",
+    "bytes": 1584,
+    "lines": 37
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "filterGroupsByTimedEffects",
+    "line": 5337,
+    "sha256": "256116a5152a96dce727848c68197eaaee470eb080206c3b4834725bc7d19edd",
+    "bytes": 1725,
+    "lines": 42
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "world_info_position",
+    "line": 855,
+    "sha256": "0f88d9bd27b5262c058c59852146e62644b74729fd77255a1794a2c25d985fde",
+    "bytes": 147,
+    "lines": 10
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "world_info_logic",
+    "line": 33,
+    "sha256": "39f7fae4dc65e3588a6a2579c3114a928671d200a8566b94f3b4796db5711192",
+    "bytes": 86,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "scan_state",
+    "line": 43,
+    "sha256": "ff57b844a8d13e0135e0ce0be0396e9045e521f1b60a22614799534150293034",
+    "bytes": 318,
+    "lines": 18
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "defaultGlobalScanData",
+    "line": 186,
+    "sha256": "e06a4bc9060d4811fc3939929c34be972cd574ed5dbaaf995ffb7d549138621a",
+    "bytes": 223,
+    "lines": 9
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "wi_anchor_position",
+    "line": 866,
+    "sha256": "b02b207bcd6bba4e5bfaf9837a0c74ca13945a699809c5185ffab3512e4b8013",
+    "bytes": 53,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "MAX_SCAN_DEPTH",
+    "line": 98,
+    "sha256": "d018526716134ee5f6834a3e5cb44f268f9b27b52d3397124a8bb847460defaf",
+    "bytes": 21,
+    "lines": 1
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "DEFAULT_WEIGHT",
+    "line": 97,
+    "sha256": "bcc3ccbbf7d6b72a0741e6430a58b3aa68c717625d75101652185866a26cfc86",
+    "bytes": 20,
+    "lines": 1
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "KNOWN_DECORATORS",
+    "line": 100,
+    "sha256": "ad87cefcd21819181893cbb9b8c78f1b98d9075d78e0a2edc42a4718afc7c6cf",
+    "bytes": 52,
+    "lines": 1
+  },
+  {
+    "file": "public/scripts/world-info.js",
+    "name": "sortFn",
+    "line": 88,
+    "sha256": "0234bc38e1d58fac5c1ebb1ce63211c7182319c0c9ea8d456e3f7a0ca32a8630",
+    "bytes": 36,
+    "lines": 1
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "MacrosParser",
+    "line": 42,
+    "sha256": "8b7598d02e27793dbc20f40e7c22f4f38ff053fd27b3cd0e2fe57246084eb15e",
+    "bytes": 8895,
+    "lines": 267
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "evaluateMacros",
+    "line": 610,
+    "sha256": "6f970171950494f7a7138a61c9e73d05ece120080a7a567a31a2316afcf0afd3",
+    "bytes": 5105,
+    "lines": 106
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getChatIdHash",
+    "line": 315,
+    "sha256": "13878f99c4e1f55c15576e71333af511be87f16b8c49f0310e6d53adad6f8e4f",
+    "bytes": 473,
+    "lines": 14
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getLastMessageId",
+    "line": 340,
+    "sha256": "e1520b599eb5483cb316e56049fdd2d7e7593b82506e6d4345ba1196de89c8f2",
+    "bytes": 691,
+    "lines": 18
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getLastMessage",
+    "line": 388,
+    "sha256": "d0e98ba4d16751d646d2d470efef5ba8d088ee10c41ea0b68854f993b4cfd9e7",
+    "bytes": 98,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getLastUserMessage",
+    "line": 398,
+    "sha256": "fe8fb8a09e5e565014cecabbe591028df70870f2d68c6337362691a454ede263",
+    "bytes": 144,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getLastCharMessage",
+    "line": 408,
+    "sha256": "79b698580bfa4b28d614d3fb2558d3c758c480358e48bf0e2f237763a45dbcaf",
+    "bytes": 145,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getFirstIncludedMessageId",
+    "line": 364,
+    "sha256": "ee3710966ddfeb609072aab7c05b1337cc223819193f791d27a62be42e575439",
+    "bytes": 89,
+    "lines": 3
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getFirstDisplayedMessageId",
+    "line": 373,
+    "sha256": "53a102e8d9c9ed6e1ef7491c4c4ddd6b4234037acfcac45a986df81bd9d8e08e",
+    "bytes": 214,
+    "lines": 9
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getLastSwipeId",
+    "line": 418,
+    "sha256": "723849ea732befe168969c6d509649a64c85479c90537fc943ee160ce02a2236",
+    "bytes": 256,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getCurrentSwipeId",
+    "line": 430,
+    "sha256": "05db06c9d7d3b74da1aa51db3ed9b795d81c2b2a476b0905f5d6b8ff109d423e",
+    "bytes": 285,
+    "lines": 6
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getBannedWordsMacro",
+    "line": 442,
+    "sha256": "8519f78fa560bd9435064f5d97391ee195ec0554bcdb721154f14b596f8927aa",
+    "bytes": 407,
+    "lines": 12
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getTimeSinceLastMessage",
+    "line": 455,
+    "sha256": "c76ceab45c8591bd50249f98f1fb26317b07a67086e5b2c660cff519a01ad8bb",
+    "bytes": 773,
+    "lines": 31
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getRandomReplaceMacro",
+    "line": 491,
+    "sha256": "ca445be3483d3cb96b46672187592536fd4e71a215ff602b9768d5a8d86314a9",
+    "bytes": 851,
+    "lines": 19
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getPickReplaceMacro",
+    "line": 516,
+    "sha256": "290ae7c29a31f84bf54457b8a20f13dfcd03b92b6f7af9c1e3c2ae4ad8c2c844",
+    "bytes": 1582,
+    "lines": 30
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getDiceRollMacro",
+    "line": 550,
+    "sha256": "24f2a56bcd3821ec83877c832c383de7ae03318d90a73575b106e67de84b42ce",
+    "bytes": 616,
+    "lines": 23
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getTimeDiffMacro",
+    "line": 579,
+    "sha256": "9ee3e8b360d26906a8ca58ef4735faf401acbdd3314aa66b6913ccd7633c2d66",
+    "bytes": 428,
+    "lines": 12
+  },
+  {
+    "file": "public/scripts/macros.js",
+    "name": "getOutletPrompt",
+    "line": 597,
+    "sha256": "ceec42fc19bf050431a215d6849ebd5efe98efc1bd93035fa938987bc14c69d5",
+    "bytes": 135,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "escapeRegex",
+    "line": 1377,
+    "sha256": "dfb1df078dc638b2a194e4ae474bf2018c5bfea04662bead6e002985fbb10002",
+    "bytes": 93,
+    "lines": 3
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "getStringHash",
+    "line": 522,
+    "sha256": "cb58aca21c86d5873fc6e52d37f9afd30c9069352afc174b4465bb2866d2b695",
+    "bytes": 579,
+    "lines": 18
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "isTrueBoolean",
+    "line": 1010,
+    "sha256": "1cec0d91b913b9b80a4170e44766af59ec56d05132fc10d4424960b19a2275d0",
+    "bytes": 100,
+    "lines": 3
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "isFalseBoolean",
+    "line": 1019,
+    "sha256": "509d5e8ed79c19308659de521e7d0324f1eff3911ad7651d19eff08d7db91735",
+    "bytes": 103,
+    "lines": 3
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "onlyUnique",
+    "line": 308,
+    "sha256": "a9bce9c631425431145afff86d7440dfc6c64fa78390c226bc10d02aedece7ea",
+    "bytes": 87,
+    "lines": 3
+  },
+  {
+    "file": "public/scripts/utils.js",
+    "name": "stringFormat",
+    "line": 756,
+    "sha256": "6a2bc5497792c4cf7541fce27250dee053f095f9c51bcc9569377a51ef2408ac",
+    "bytes": 263,
+    "lines": 8
+  },
+  {
+    "file": "src/prompt-converters.js",
+    "name": "embedOpenRouterMedia",
+    "line": 1336,
+    "sha256": "4b0e6c1e80d2faeb6b43099ba0a991ddf7722204de5e0fc5a36160ec4c9ffc44",
+    "bytes": 1216,
+    "lines": 35
+  },
+  {
+    "file": "public/scripts/constants.js",
+    "name": "MEDIA_TYPE",
+    "line": 103,
+    "sha256": "79f6f3bae52ed16fa558b70bccda57cc3c5c0ee8e1da797a8acec0c0b1648afb",
+    "bytes": 435,
+    "lines": 17
+  },
+  {
+    "file": "public/scripts/constants.js",
+    "name": "MEDIA_DISPLAY",
+    "line": 86,
+    "sha256": "994b7839e42d467caffad6ca6525b7d9a2fe99c0d3ae71ee2d966e241cf7de00",
+    "bytes": 61,
+    "lines": 4
+  },
+  {
+    "file": "public/scripts/constants.js",
+    "name": "inject_ids",
+    "line": 48,
+    "sha256": "84625f79cab5d6aa590ed1c09c7610d108e29b9fcdcaef9fe5deee0c3e41995a",
+    "bytes": 353,
+    "lines": 9
+  }
+]

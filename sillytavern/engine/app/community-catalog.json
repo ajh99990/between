@@ -1,0 +1,58 @@
+{
+  "status": "verified-local-source",
+  "libraryFileId": "libfile_4bf9fe86a5ac8191a9227d3963311bdd",
+  "source": "https://github.com/foreverse-app/character-card-skills",
+  "license": "角色卡 CC BY 4.0；归因 Foreverse Team。ST转换器 AGPL-3.0。仓库代码MIT不替代内容许可。",
+  "evidenceDate": "2026-10-10",
+  "heatEvidence": "仓库 21 stars / 1 fork；小众候选，非单卡使用量证据",
+  "verification": "作者公开仓库原始JSON与许可已本地校验；静态内容结论来自父线程调研，本环境完成字段核验和合成回归。未跑真实模型。",
+  "items": [
+    {
+      "id": "peiyu",
+      "name": "裴聿",
+      "type": "角色卡＋独立世界书（从character_book提取）",
+      "language": "中文",
+      "scenarios": "状态一致性、角色与世界书冲突",
+      "quality": "静态实读指出开场信任15/100与世界书25/100冲突。保留原文并提示，不自动修正。",
+      "packaging": "已内置原始JSON、许可与归因；导入产生独立角色与绑定世界书，新会话生效。",
+      "entryCount": 5,
+      "sourceURL": "https://github.com/foreverse-app/character-card-skills/blob/dab0da437810b2ea4b5eec414c10c8fa35e779f8/cards/zh/peiyu/peiyu.v2.json"
+    },
+    {
+      "id": "tangtuantuan",
+      "name": "唐团团",
+      "type": "角色卡＋独立世界书（从character_book提取）",
+      "language": "中文",
+      "scenarios": "日常对话、常驻与关键词混合",
+      "quality": "调研摘要：7条世界书、2条常驻。静态结论，未跑真实模型。",
+      "packaging": "已内置原始JSON、许可与归因；导入产生独立角色与绑定世界书，新会话生效。",
+      "entryCount": 7,
+      "sourceURL": "https://github.com/foreverse-app/character-card-skills/blob/dab0da437810b2ea4b5eec414c10c8fa35e779f8/cards/zh/tangtuantuan/tangtuantuan.v2.json"
+    },
+    {
+      "id": "wangushi",
+      "name": "晚孤市",
+      "type": "角色卡＋独立世界书（从character_book提取）",
+      "language": "中文",
+      "scenarios": "多NPC口癖、常驻设定一致性",
+      "quality": "调研摘要：4条世界书、2条常驻。多NPC口癖需后续模型验证。",
+      "packaging": "已内置原始JSON、许可与归因；导入产生独立角色与绑定世界书，新会话生效。",
+      "entryCount": 4,
+      "sourceURL": "https://github.com/foreverse-app/character-card-skills/blob/dab0da437810b2ea4b5eec414c10c8fa35e779f8/cards/zh/wangushi/wangushi.v2.json"
+    },
+    {
+      "id": "huoyushen",
+      "name": "霍聿深",
+      "type": "角色卡＋独立世界书（从character_book提取）",
+      "language": "中文",
+      "scenarios": "二级关键词、selective、概率边界",
+      "quality": "调研摘要：含 secondary_keys / selective 与60–90概率触发。需固定随机做真实导入回归。",
+      "packaging": "已内置原始JSON、许可与归因；导入产生独立角色与绑定世界书，新会话生效。",
+      "entryCount": 9,
+      "sourceURL": "https://github.com/foreverse-app/character-card-skills/blob/dab0da437810b2ea4b5eec414c10c8fa35e779f8/cards/zh/huoyushen/huoyushen.v2.json"
+    }
+  ],
+  "excluded": "未展示年龄不明师徒恋候选。许可覆盖不清的候选不打包。",
+  "importBlocker": "",
+  "sourceCommit": "dab0da437810b2ea4b5eec414c10c8fa35e779f8"
+}

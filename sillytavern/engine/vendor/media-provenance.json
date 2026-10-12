@@ -1,0 +1,116 @@
+[
+  {
+    "file": "src/endpoints/speech.js",
+    "line": 19,
+    "bytes": 654,
+    "sha256": "b26ff051e05d8334e2b61f727cf8f0b37bb263288752b643bd99398b78882561"
+  },
+  {
+    "file": "src/endpoints/speech.js",
+    "line": 42,
+    "bytes": 699,
+    "sha256": "9ae3d1ca453e5a7d2bc939ebd67ddd5602bd24b5efa5bd1e805e315ef8999a08"
+  },
+  {
+    "file": "src/endpoints/speech.js",
+    "line": 61,
+    "bytes": 992,
+    "sha256": "de1cf8f026ef4f2abfcc67ae2f1f8dd3c10de1f22f3fb6add414f3e9b467b474"
+  },
+  {
+    "file": "src/endpoints/caption.js",
+    "line": 8,
+    "bytes": 606,
+    "sha256": "451d6a4eb89829151298aaeb856f7dea4eb2b8283bf2d4197e5eff221fc1ea8f"
+  },
+  {
+    "file": "src/endpoints/openai.js",
+    "line": 756,
+    "bytes": 1445,
+    "sha256": "5883979447d23882f226f21c75c0a6016d9ce77ce457df9d9d5d7666bae09103"
+  },
+  {
+    "file": "public/scripts/extensions/tts/openai-compatible.js",
+    "line": 7,
+    "bytes": 6712,
+    "sha256": "16617e3d0c3815b3e3f8ce41fc9d6afde34384903fdd42d6b648c349de2cdaee"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 73,
+    "bytes": 584,
+    "sha256": "5eb44d5a689477a92554ad6f1932d063c185ea1784869f56741b1ad04a456015"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 99,
+    "bytes": 93,
+    "sha256": "19009f47fb456bd3c8dca7bfcee78313da1714e1db56f9f8253605719062a377"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 113,
+    "bytes": 281,
+    "sha256": "51ae674ec3274bb7443c4bbba12356dddf2119f061736fab0d84a49b1e1cade8"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 174,
+    "bytes": 6442,
+    "sha256": "b382218aed7be506a17af60f91071625ad3f9b82f8e7a67381c499685dd59272"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 220,
+    "bytes": 60,
+    "sha256": "ffef487b8c36cf73dd5b714e03a1ae53fbfb0d818daa1fca4c2027576657e537"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 221,
+    "bytes": 179,
+    "sha256": "04cc4cf746eedc2781c9dab55bba093b56898f6becb55edc065f8534449b039a"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 223,
+    "bytes": 130,
+    "sha256": "e0e95024551c446e1f6552cbc944d7bef2c8772ac011d2f9299dbf32cb342bc3"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 231,
+    "bytes": 35,
+    "sha256": "fc4802e01998784adf2b2da80ddadfa40bf7f260117d53f27f52d26906751db4"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 233,
+    "bytes": 2762,
+    "sha256": "a5ad43c9df68b75e63909621d1850a7c925368d422763d0cf288da853aee0c9f"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 438,
+    "bytes": 545,
+    "sha256": "c823d400a4c7ae89a26802618f7d742c03236566585ff4bcbee52048a8419bdd"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 2896,
+    "bytes": 1001,
+    "sha256": "6077971adbe4ade60c3e1628b156dfd789b4d6bf244e3251bcbfd89021b42c5d"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 3292,
+    "bytes": 535,
+    "sha256": "e8a89dc323e6a32136b89d2153f6a699717fcab3b7bf724beec9fb07cadbae16"
+  },
+  {
+    "file": "public/scripts/extensions/stable-diffusion/index.js",
+    "line": 3797,
+    "bytes": 2578,
+    "sha256": "5cdf76c672cdd163efe8d5e299130beeb1f9bcb4ab02cd1f3a1107fe93fcddc7"
+  }
+]

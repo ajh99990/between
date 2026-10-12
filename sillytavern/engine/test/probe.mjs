@@ -1,0 +1,6 @@
+import {createCore} from '../core.mjs';
+import fs from 'node:fs';
+const baseline=JSON.parse(fs.readFileSync(new URL('../../research/baseline.json',import.meta.url)));
+const fixture={id:'test',persona:{name:'Lin',description:'PERSONA: Lin is a mapmaker.'},character:{name:'Mira',description:'DESCRIPTION: {{char}} is a patient lighthouse keeper.',personality:'PERSONALITY: curious and concise.',scenario:'SCENARIO: {{user}} visits the island.',mes_example:'<START>\n{{user}}: Example question?\n{{char}}: EXAMPLE: Watch the sea.',first_mes:'Welcome.',data:{name:'Mira',system_prompt:'SYSTEM: Play {{char}} in a fictional scene.',post_history_instructions:'POST: Keep the reply brief.',extensions:{depth_prompt:{prompt:'DEPTH: Stay in character.',depth:1,role:'system'}}}},chat:[{name:'Mira',is_user:false,mes:'HISTORY: Welcome to the island.',extra:{}},{name:'Lin',is_user:true,mes:'INPUT: Tell me about the harbor.',extra:{}}],entries:[],preset:{openai_max_context:1024,openai_max_tokens:64,custom_model:'gpt-4o-mini'},random:.42};
+export {fixture};
+if(process.argv[1]===new URL(import.meta.url).pathname){const result=await createCore(fixture).run();console.log(JSON.stringify(result,null,2));console.log('BASE',JSON.stringify(baseline[0].captured[0].messages));}

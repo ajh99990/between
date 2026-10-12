@@ -1,0 +1,250 @@
+[
+  {
+    "path": "between",
+    "head": "e00c2876ab30b14566bc3748676fa8201e777e4b",
+    "branch": "work",
+    "status": ""
+  },
+  {
+    "path": "st-research/app-community-verify-92f303",
+    "git": false,
+    "same_as_current": 898,
+    "different": 9,
+    "missing": 46,
+    "changed_files": [
+      "engine/APP-README.zh-CN.md",
+      "engine/APP-REPORT.zh-CN.md",
+      "engine/app/evidence/cleanup.json",
+      "engine/app/public/admin.js",
+      "engine/app/public/app.js",
+      "engine/app/server.mjs",
+      "engine/evidence/integration.json",
+      "engine/index.mjs",
+      "engine/package.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": [
+      "engine/evidence/integration.json"
+    ]
+  },
+  {
+    "path": "st-research/app-verify-66ad09b46",
+    "git": false,
+    "same_as_current": 867,
+    "different": 13,
+    "missing": 73,
+    "changed_files": [
+      "engine/APP-README.zh-CN.md",
+      "engine/app/community-catalog.json",
+      "engine/app/evidence/app-admin-desktop.png",
+      "engine/app/evidence/app-chat-desktop.png",
+      "engine/app/public/admin.js",
+      "engine/app/public/app.js",
+      "engine/app/public/index.html",
+      "engine/app/roles.mjs",
+      "engine/app/server.mjs",
+      "engine/app/test/metrics.mjs",
+      "engine/evidence/integration.json",
+      "engine/index.mjs",
+      "engine/package.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": [
+      "engine/app/evidence/app-admin-desktop.png",
+      "engine/app/evidence/app-chat-desktop.png",
+      "engine/evidence/integration.json"
+    ]
+  },
+  {
+    "path": "st-research/baseline",
+    "head": "06bde939fb1e9c4c8d8641d810f0a916b5bce127",
+    "branch": "",
+    "status": ""
+  },
+  {
+    "path": "st-research/community-upstream",
+    "head": "dab0da437810b2ea4b5eec414c10c8fa35e779f8",
+    "branch": "",
+    "status": ""
+  },
+  {
+    "path": "st-research/engine",
+    "head": "e1cbb9fb33be6b6d789a6187cebebe8359ae08a5",
+    "branch": "research/between-oauth-ready",
+    "status": ""
+  },
+  {
+    "path": "st-research/engine-verify-2e254aac2",
+    "git": false,
+    "same_as_current": 842,
+    "different": 5,
+    "missing": 106,
+    "changed_files": [
+      "engine/evidence/integration.json",
+      "engine/index.mjs",
+      "engine/package.json",
+      "engine/test/core-regression.mjs",
+      "engine/test/media-core.mjs"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": [
+      "engine/evidence/integration.json"
+    ]
+  },
+  {
+    "path": "st-research/engine-verify-final",
+    "git": false,
+    "same_as_current": 845,
+    "different": 3,
+    "missing": 105,
+    "changed_files": [
+      "engine/evidence/integration.json",
+      "engine/index.mjs",
+      "engine/package.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  },
+  {
+    "path": "st-research/harness",
+    "git": false,
+    "same_as_current": 0,
+    "different": 2,
+    "missing": 951,
+    "changed_files": [
+      "package-lock.json",
+      "package.json"
+    ],
+    "extra_files": [
+      "fixtures.mjs",
+      "measure.py",
+      "explore.mjs",
+      "run.mjs",
+      "compare.mjs",
+      "merge-extra.mjs",
+      "prune-stage2.mjs",
+      "prune-stage3.py",
+      "graph.py",
+      "browser-check.mjs",
+      "config.mjs",
+      "prune-stage1.py",
+      "run-single.mjs"
+    ],
+    "not_in_research_git_history": [
+      "package-lock.json",
+      "package.json",
+      "measure.py",
+      "explore.mjs",
+      "run.mjs",
+      "browser-check.mjs",
+      "config.mjs",
+      "run-single.mjs"
+    ]
+  },
+  {
+    "path": "st-research/minimal",
+    "head": "b357a7bf91d3bb5efda00c7ea633528619051090",
+    "branch": "research/multimodal-voice-core",
+    "status": ""
+  },
+  {
+    "path": "st-research/oauth-verify-80de9afce",
+    "git": false,
+    "same_as_current": 945,
+    "different": 4,
+    "missing": 4,
+    "changed_files": [
+      "engine/CHATGPT-PLAN.zh-CN.md",
+      "engine/OAuth实现与离线验证报告.md",
+      "engine/app/test/plan-oauth.mjs",
+      "engine/app/test/plan-shared.mjs"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  },
+  {
+    "path": "st-research/plan-verify-44fa1e992",
+    "git": false,
+    "same_as_current": 907,
+    "different": 12,
+    "missing": 34,
+    "changed_files": [
+      "engine/APP-README.zh-CN.md",
+      "engine/CHATGPT-PLAN.zh-CN.md",
+      "engine/app/chatgpt-plan.mjs",
+      "engine/app/public/admin.js",
+      "engine/app/public/app.js",
+      "engine/app/public/index.html",
+      "engine/app/public/style.css",
+      "engine/app/server.mjs",
+      "engine/app/test/chatgpt-plan.mjs",
+      "engine/app/test/plan-browser.mjs",
+      "engine/evidence/integration.json",
+      "engine/package.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  },
+  {
+    "path": "st-research/shared-plan-verify-565925bdb",
+    "git": false,
+    "same_as_current": 923,
+    "different": 11,
+    "missing": 19,
+    "changed_files": [
+      "engine/CHATGPT-PLAN.zh-CN.md",
+      "engine/app/chatgpt-plan.mjs",
+      "engine/app/evidence/plan-shared-unbound.png",
+      "engine/app/plan-credentials.mjs",
+      "engine/app/plan-service-main.mjs",
+      "engine/app/plan-service.mjs",
+      "engine/app/public/admin.js",
+      "engine/app/test/plan-browser.mjs",
+      "engine/app/test/plan-shared.mjs",
+      "engine/evidence/integration.json",
+      "engine/package.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  },
+  {
+    "path": "st-research/slice",
+    "head": "8138ce3c3a5601f932c404f13c0329e1d4815f82",
+    "branch": "research/minimal-character",
+    "status": "?? node_modules"
+  },
+  {
+    "path": "st-research/verify-copy",
+    "git": false,
+    "same_as_current": 693,
+    "different": 8,
+    "missing": 252,
+    "changed_files": [
+      "default/content/index.json",
+      "package-lock.json",
+      "package.json",
+      "public/script.js",
+      "research/run.mjs",
+      "research/verify.mjs",
+      "src/endpoints/backends/chat-completions.js",
+      "src/server-startup.js"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  },
+  {
+    "path": "st-research/verify-media-copy",
+    "git": false,
+    "same_as_current": 809,
+    "different": 4,
+    "missing": 140,
+    "changed_files": [
+      "research/FINAL-VERIFICATION.md",
+      "research/REPORT.zh-CN.md",
+      "research/SOURCE.md",
+      "research/evidence/metrics-media.json"
+    ],
+    "extra_files": [],
+    "not_in_research_git_history": []
+  }
+]

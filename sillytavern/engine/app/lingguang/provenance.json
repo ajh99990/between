@@ -1,0 +1,15 @@
+{
+  "reportedSourceRepository": "用户自有灵光源码仓库（本机路径已移除）",
+  "reportedSourceCommit": "d7ee73e",
+  "sourceDelivery": "父会话提供的完整源码文本；HTML实体解码；未独立核对原仓库字节",
+  "files": [
+    {
+      "file": "compat.mjs",
+      "sha256": "ed9e313530390b849c532cc7f2d13f62416f6290533ee317b15f94eafc8ed302"
+    },
+    {
+      "file": "credentials.mjs",
+      "sha256": "5806345046472abd5fcb9229905003c10c05530f2ba2b0cd0ee025cbee64c19d"
+    }
+  ]
+}

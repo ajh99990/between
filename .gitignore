@@ -44,3 +44,11 @@ packages/*/package-test-result.json
 
 # Regenerable local focused-test outputs.
 .focused-tests/
+
+# 酒馆版运行产物；测试 fixtures 与源码应正常入库。
+sillytavern/**/node_modules/
+sillytavern/**/evidence/
+sillytavern/**/data/
+sillytavern/**/cache/
+sillytavern/**/dist/
+sillytavern/**/test-results/

@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-12",
+  "sourceCommit": "e1cbb9fb33be6b6d789a6187cebebe8359ae08a5",
+  "node": "v24.19.0",
+  "install": {
+    "command": "npm ci --prefix sillytavern/engine --ignore-scripts --no-audit --no-fund --cache /tmp/between-handoff-npm-cache",
+    "exitCode": 0,
+    "packages": 94,
+    "firstAttempt": "默认缓存路径不可写；未改变锁文件；改用临时缓存重试成功"
+  },
+  "tests": [
+    {
+      "command": "npm test --prefix sillytavern/engine",
+      "exitCode": 0,
+      "checks": {
+        "text": 15,
+        "media": 6,
+        "integration": 34,
+        "lifecycle": 7
+      },
+      "localLogSha256": "762303810ff4c8f01cd5cbb8fea4c8128c34ff6887ed3ed896d62e589f254240"
+    },
+    {
+      "command": "npm run test:app --prefix sillytavern/engine",
+      "exitCode": 0,
+      "checks": {
+        "app": 32,
+        "connection": 8,
+        "independent": 10,
+        "community": 60,
+        "communityIndependent": 17
+      },
+      "localLogSha256": "f5057220527731a16ec5387b0fa8098b7a1243603613d026fe3bd4ebdaa0bb90"
+    },
+    {
+      "command": "npm run test:plan --prefix sillytavern/engine",
+      "exitCode": 0,
+      "checks": {
+        "provider": 32,
+        "shared": 43,
+        "oauth": 52
+      },
+      "localLogSha256": "7b94eb4aca72f1d13c3dba572fe8c3c8a50714796d319269dcb4fef2df009b39"
+    }
+  ],
+  "boundaries": [
+    "只用虚构 fixtures、临时回环 mock；未访问真实模型/真实凭据",
+    "未重新运行浏览器测试",
+    "未启动用户应用或部署",
+    "目标本机接收及复测待完成"
+  ],
+  "audit": {
+    "sourceManifestFiles": 874,
+    "documentOnlyAdaptations": 2,
+    "secretShapeFindings": 0,
+    "forbiddenArtifactPaths": 0,
+    "workspaceUserPaths": 0,
+    "whitespaceCheck": "完整新增快照含原有空白格式告警；保留来源字节，不修改运行源码",
+    "whitespaceFiles": [
+      "sillytavern/.github/pr-auto-comments.yml",
+      "sillytavern/.github/readme-de_de.md",
+      "sillytavern/.github/readme-ja_jp.md",
+      "sillytavern/.github/readme-ru_ru.md",
+      "sillytavern/.github/readme-zh_cn.md",
+      "sillytavern/.github/readme-zh_tw.md",
+      "sillytavern/.replit",
+      "sillytavern/public/css/toastr.min.css",
+      "sillytavern/public/lib/pagination.js",
+      "sillytavern/public/lib/structured-clone/serialize.js",
+      "sillytavern/public/lib/toolcool-color-picker.js",
+      "sillytavern/public/manifest.json",
+      "sillytavern/public/scripts/extensions/gallery/jquery.nanogallery2.min.js",
+      "sillytavern/public/scripts/extensions/tts/edge.js",
+      "sillytavern/public/scripts/extensions/tts/lib/pcm-processor.js",
+      "sillytavern/public/scripts/horde.js",
+      "sillytavern/public/scripts/tokenizers.js",
+      "sillytavern/research/CORE-MAP.md",
+      "sillytavern/src/character-card-parser.js",
+      "sillytavern/src/endpoints/backends/chat-completions.js",
+      "sillytavern/src/endpoints/tokenizers.js"
+    ],
+    "scope": "形态扫描及路径审查，不等同保证不存在任何未知秘密；合成 fixtures 和公开素材来源另经人工核对",
+    "runtime": "检查时无存活 node/chromium 服务；未启动用户应用",
+    "ci": "保留既有根 .github/workflows/ci.yml，push 会触发旧代际 CI；无部署步骤。子目录上游 workflows 不作为 GitHub 根 workflow 执行。"
+  }
+}

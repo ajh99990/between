@@ -1,0 +1,2 @@
+import fs from 'node:fs';import {parse} from 'acorn';
+const source=fs.readFileSync('public/scripts/sse-stream.js','utf8');const node=parse(source,{ecmaVersion:'latest',sourceType:'module'}).body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='EventSourceStream');fs.writeFileSync('engine/vendor/stream.mjs','// Original SillyTavern 06bde939f EventSourceStream, AGPL-3.0.\n'+source.slice(node.start,node.end)+'\nexport {EventSourceStream};\n');
