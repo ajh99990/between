@@ -1,14 +1,196 @@
-import { ProTable, type ProColumns } from '@ant-design/pro-components';
+import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { App, Button, Card, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import { date, Workspace } from '@/components/Workspace';
 import { api } from '@/services/admin';
 import type { Conversation, Task } from '@/services/types';
-type SessionRow=Conversation&{userId:string};
-export default function Sessions(){
- const {data,busy,mutate}=useModel('admin');const {modal}=App.useApp();const [query,setQuery]=useState('');
- const columns:ProColumns<SessionRow>[]=[{title:'会话',dataIndex:'title',render:(_,r)=><div><div className="font-medium">{r.title}</div><div className="mt-1 break-all text-xs text-muted">{r.id}</div></div>},{title:'角色',dataIndex:'name',width:120},{title:'配置版本',dataIndex:'configVersion',width:120,render:(_,r)=><Tag>v{r.configVersion}</Tag>},{title:'创建时间',dataIndex:'createdAt',width:180,render:(_,r)=>date(r.createdAt)},{title:'所属用户',dataIndex:'userId',width:220,render:(_,r)=><span className="break-all text-xs text-muted">{r.userId}</span>},{title:'操作',valueType:'option',width:110,render:(_,r)=>[<Button key="delete" type="link" danger disabled={busy} onClick={()=>modal.confirm({title:'永久删除此会话？',content:<div className="break-all leading-7">{r.title}<br/>{r.id}<br/>会停止它的任务并删除本机保存的数据，无法撤销；不删除外部服务数据。</div>,okText:'删除会话',cancelText:'取消',okButtonProps:{danger:true},onOk:()=>mutate(()=>api('/conversation','DELETE',{userId:r.userId,conversation:r.id,confirm:true}),'会话已删除。')})}>删除会话</Button>]}];
- const tasks:ProColumns<Task>[]=[{title:'会话 ID',dataIndex:'conversation',ellipsis:true},{title:'模式',dataIndex:'mode',width:110},{title:'开始时间',dataIndex:'startedAt',width:190,render:(_,t)=>date(t.startedAt)},{title:'操作',valueType:'option',width:120,render:(_,t)=>[<Button key="stop" disabled={busy} onClick={()=>modal.confirm({title:'停止此生成任务？',content:'未完成的轮次不会保存。',okText:'停止任务',cancelText:'取消',onOk:()=>mutate(()=>api('/stop','POST',{taskId:t.id}),'停止请求已发送。')})}>停止任务</Button>]}];
- return <Workspace title="会话与任务" description="查看已保存的会话与正在执行的任务，管理对话的运行状态。">{data&&<div className="space-y-6"><Card title={<div className="flex items-center gap-2">运行任务<Tag color={data.tasks.length?'processing':'default'}>{data.tasks.length}</Tag></div>}>{data.tasks.length?<ProTable<Task> rowKey="id" columns={tasks} dataSource={data.tasks} search={false} options={false} pagination={false} scroll={{x:720}}/>:<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="当前没有运行任务"/>}</Card><ProTable<SessionRow> rowKey="id" headerTitle="已保存会话" columns={columns} dataSource={data.users.flatMap(u=>u.conversations.map(c=>({...c,userId:u.id}))).filter(c=>`${c.title} ${c.name} ${c.id} ${c.userId}`.includes(query))} search={false} options={false} toolBarRender={()=>[<Input.Search key="search" placeholder="搜索会话、角色或用户 ID" aria-label="搜索会话" allowClear value={query} onChange={e=>setQuery(e.target.value)}/>]} pagination={{pageSize:10,showSizeChanger:true}} scroll={{x:1000}} locale={{emptyText:<Empty description={query?'没有匹配的会话':'还没有保存的会话'}/>}}/></div>}</Workspace>
+
+type SessionRow = Conversation & { userId: string };
+export default function Sessions() {
+  const { data, busy, mutate } = useModel('admin');
+  const { modal } = App.useApp();
+  const [query, setQuery] = useState('');
+  const columns: ProColumns<SessionRow>[] = [
+    {
+      title: '会话',
+      dataIndex: 'title',
+      render: (_, r) => (
+        <div>
+          <div className="font-medium">{r.title}</div>
+          <div className="mt-1 break-all text-xs text-muted">{r.id}</div>
+        </div>
+      ),
+    },
+    { title: '角色', dataIndex: 'name', width: 120 },
+    {
+      title: '配置版本',
+      dataIndex: 'configVersion',
+      width: 120,
+      render: (_, r) => <Tag>v{r.configVersion}</Tag>,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      width: 180,
+      render: (_, r) => date(r.createdAt),
+    },
+    {
+      title: '所属用户',
+      dataIndex: 'userId',
+      width: 220,
+      render: (_, r) => (
+        <span className="break-all text-xs text-muted">{r.userId}</span>
+      ),
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 110,
+      render: (_, r) => [
+        <Button
+          key="delete"
+          type="link"
+          danger
+          disabled={busy}
+          onClick={() =>
+            modal.confirm({
+              title: '永久删除此会话？',
+              content: (
+                <div className="break-all leading-7">
+                  {r.title}
+                  <br />
+                  {r.id}
+                  <br />
+                  会停止它的任务并删除本机保存的数据，无法撤销；不删除外部服务数据。
+                </div>
+              ),
+              okText: '删除会话',
+              cancelText: '取消',
+              okButtonProps: { danger: true },
+              onOk: () =>
+                mutate(
+                  () =>
+                    api('/conversation', 'DELETE', {
+                      userId: r.userId,
+                      conversation: r.id,
+                      confirm: true,
+                    }),
+                  '会话已删除。',
+                ),
+            })
+          }
+        >
+          删除会话
+        </Button>,
+      ],
+    },
+  ];
+  const tasks: ProColumns<Task>[] = [
+    { title: '会话 ID', dataIndex: 'conversation', ellipsis: true },
+    { title: '模式', dataIndex: 'mode', width: 110 },
+    {
+      title: '开始时间',
+      dataIndex: 'startedAt',
+      width: 190,
+      render: (_, t) => date(t.startedAt),
+    },
+    {
+      title: '操作',
+      valueType: 'option',
+      width: 120,
+      render: (_, t) => [
+        <Button
+          key="stop"
+          disabled={busy}
+          onClick={() =>
+            modal.confirm({
+              title: '停止此生成任务？',
+              content: '未完成的轮次不会保存。',
+              okText: '停止任务',
+              cancelText: '取消',
+              onOk: () =>
+                mutate(
+                  () => api('/stop', 'POST', { taskId: t.id }),
+                  '停止请求已发送。',
+                ),
+            })
+          }
+        >
+          停止任务
+        </Button>,
+      ],
+    },
+  ];
+  return (
+    <Workspace
+      title="会话与任务"
+      description="查看已保存的会话与正在执行的任务，管理对话的运行状态。"
+    >
+      {data && (
+        <div className="space-y-6">
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                运行任务
+                <Tag color={data.tasks.length ? 'processing' : 'default'}>
+                  {data.tasks.length}
+                </Tag>
+              </div>
+            }
+          >
+            {data.tasks.length ? (
+              <ProTable<Task>
+                rowKey="id"
+                columns={tasks}
+                dataSource={data.tasks}
+                search={false}
+                options={false}
+                pagination={false}
+                scroll={{ x: 720 }}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="当前没有运行任务"
+              />
+            )}
+          </Card>
+          <ProTable<SessionRow>
+            rowKey="id"
+            headerTitle="已保存会话"
+            columns={columns}
+            dataSource={data.users
+              .flatMap((u) =>
+                u.conversations.map((c) => ({ ...c, userId: u.id })),
+              )
+              .filter((c) =>
+                `${c.title} ${c.name} ${c.id} ${c.userId}`.includes(query),
+              )}
+            search={false}
+            options={false}
+            toolBarRender={() => [
+              <Input.Search
+                key="search"
+                placeholder="搜索会话、角色或用户 ID"
+                aria-label="搜索会话"
+                allowClear
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />,
+            ]}
+            pagination={{ pageSize: 10, showSizeChanger: true }}
+            scroll={{ x: 1000 }}
+            locale={{
+              emptyText: (
+                <Empty
+                  description={query ? '没有匹配的会话' : '还没有保存的会话'}
+                />
+              ),
+            }}
+          />
+        </div>
+      )}
+    </Workspace>
+  );
 }
