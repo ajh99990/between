@@ -16,11 +16,17 @@
 
 ```sh
 npm ci --prefix sillytavern/engine --ignore-scripts --no-audit --no-fund
+npm ci --prefix sillytavern/admin --ignore-scripts --no-audit --no-fund
+npm run setup --prefix sillytavern/admin
+npm run build --prefix sillytavern/admin
+npm test --prefix sillytavern/admin
 npm test --prefix sillytavern/engine
 npm run test:app --prefix sillytavern/engine
 npm run test:plan --prefix sillytavern/engine
 npm run test:local --prefix sillytavern/engine
 ```
+
+管理员页面从源文件构建，必须先完成 admin build，再运行 test:local 或本机启动健康检查；不能并行于尚未完成的构建。构建产物不入库。
 
 `npm ci` 按现有锁文件安装；不得为躲过失败更新依赖版本。需要浏览器测试时另按酒馆版说明安装锁定的研究依赖，保留 Chromium sandbox，不启动真实模型请求。报告测试实际范围，不把 mock 测试当作自然度或真实授权验证。
 
