@@ -52,3 +52,12 @@ sillytavern/**/data/
 sillytavern/**/cache/
 sillytavern/**/dist/
 sillytavern/**/test-results/
+
+# 本机独有凭据、调试记录和旧交付不得入库。
+*.zip
+sillytavern/**/role-app-data/
+sillytavern/**/reasoning-benchmark/
+sillytavern/**/reasoning-change-originals/
+sillytavern/**/local-patch-originals/
+sillytavern/**/local-live-evidence/
+sillytavern/**/local-model-catalog.json

@@ -2,6 +2,25 @@
 
 本轮按用户最新批准，改为**管理员管理一份独立 Between 套餐授权、兼容服务统一刷新、业务用户和会话仍隔离**。不要求每位内测用户分别登录。默认关闭；管理员明确选择后才作为应用后端。此架构选择不等于官方已确认个人套餐供多人远程托管的适用性。
 
+## 当前模型默认与本机启动
+
+套餐默认模型为用户已确认的 `gpt-6.1-sol`，默认思考档位为 `medium`。管理员「提示词与模型」可选择 `medium` / `high`；`reasoningEffort` 映射为出站 `reasoning.effort`，其他值在本地拒绝。普通 `npm start` 仍须管理员显式启用套餐后端；既有持久配置保留原模型与选择。上下文、输出预留、计数器和世界书预算未修改。
+
+本次入库只保留模型与档位配置、离线合成验证。原本机测试的请求、对话、账户模型目录及原始报告不入库；没有新增真实模型测试。下文“本轮未运行”等描述属于前期 OAuth 研究阶段。
+
+已获本机启动授权时，先完成 GitHub 推送及干净 Git 接收，使用 Node 24+ 在仓库根执行：
+
+```sh
+npm ci --prefix sillytavern/engine --ignore-scripts --no-audit --no-fund
+npm run start:local --prefix sillytavern/engine
+```
+
+`app/local-start.mjs` 默认在 macOS 用户的 `Library/Application Support/Between` 下存放 `runtime` 与 `app-data`，仅沿用 `siwc/between.json` 的既有独立授权。可用 `BETWEEN_LOCAL_ROOT` 指定运行目录、`BETWEEN_PLAN_CREDENTIALS` 指定已有凭据的绝对路径；凭据必须位于仓库外。启动不登录、不复制授权、不发现模型、不刷新令牌、不推理。
+
+应用固定监听 `127.0.0.1:8787`，管理入口为 `/admin`，兼容服务固定监听 `127.0.0.1:8766`。首次启动经应用管理接口初始化 `gpt-6.1-sol / medium`；以后保留已有设置和管理员口令。口令只保存在运行目录的 `runtime/admin-password.txt`（0600），不会回显。`runtime/status.json` 记录 PID、入口及 HTTP 验收结果，不含 token 或管理员口令。停止时向该 PID 发送 SIGTERM；退出释放凭据、引擎和启动器的所有权锁。现有锁或端口占用会拒绝启动，不能靠删除原文件来绕过。
+
+启动器脱离终端后持续运行，不是开机自启服务。离线验收命令为 `npm run test:local --prefix sillytavern/engine`，使用独立临时目录与合成授权，验证启动、用户与管理 HTTP、重启保留设置、端口冲突和清理，不访问真实模型。
+
 ## 当前能做什么
 
 已实现可运行的独立loopback套餐兼容服务、配置入口与离线验证；**独立 Between OAuth 模块与离线全流程已实现；真实授权及真实模型测试未执行**。没有读取或搬运灵光/Codex凭据，没有部署、推送、代理或安全设置修改。之前的个人连接选择只是上一阶段设计，本版已被新的管理员后端选择替代；Git与旧测试证据保留该历史。

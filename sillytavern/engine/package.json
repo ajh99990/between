@@ -13,7 +13,9 @@
     "start": "node app/server.mjs",
     "start:demo": "node app/server.mjs --demo",
     "test:app": "node app/test/app.mjs && node app/test/connection.mjs && node ../research/app-independent-review.mjs && node app/test/community.mjs && node ../research/community-independent-review.mjs",
-    "test:plan": "node app/test/chatgpt-plan.mjs && node app/test/plan-shared.mjs && node app/test/plan-oauth.mjs"
+    "test:plan": "node app/test/chatgpt-plan.mjs && node app/test/plan-shared.mjs && node app/test/plan-oauth.mjs && node app/test/plan-reasoning.mjs",
+    "start:local": "node app/local-start.mjs",
+    "test:local": "node app/test/local-start.mjs"
   },
   "dependencies": {
     "tiktoken": "1.0.22",

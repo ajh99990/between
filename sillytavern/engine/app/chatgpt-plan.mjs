@@ -1,8 +1,10 @@
 import {adaptRequest,ResponsesFrames} from './lingguang/compat.mjs';
 import {EventSourceStream} from '../vendor/stream.mjs';
+import {validReasoningEffort} from './plan-config.mjs';
 
 export const PLAN_ENDPOINT = 'https://api.openai.com/v1/responses';
 const keyOf = p => JSON.stringify([p.tenant, p.user]);
+const configurationKey = (model, effort) => JSON.stringify([model, effort ?? null]);
 const capabilities = Object.freeze({imageInput:false,audioInput:false,voice:false,tts:false,image:false,caption:false});
 const messages = {
   authorization_required:'ChatGPT 套餐：尚未授权；请由管理员运行本机 Between 授权助手。',
@@ -44,22 +46,22 @@ export function createPlanProvider({getSession=async()=>null,fetchImpl=fetch,now
     return s;
   };
   return {
-    async status(p,model='') {
+    async status(p,model='',reasoningEffort) {
       let code;
-      try{await session(p);code=states.get(keyOf(p))||'ready';if(code==='completed'&&completedModels.get(keyOf(p))!==model||code==='unsupported'&&requestedModels.get(keyOf(p))!==model)code='ready';}catch(e){code=e instanceof PlanError?e.code:'authorization_required'}
-      return {mode:'chatgpt-plan',model,connection:code,authorization:!['authorization_required','scope_missing','expired','disconnected','auth_rejected'].includes(code)?'bound':'required',canGenerate:!!model&&['ready','completed','unavailable','rate_limited','incomplete','cancelled','failed'].includes(code),description:messages[code],capabilities};
+      try{await session(p);code=states.get(keyOf(p))||'ready';if(code==='completed'&&completedModels.get(keyOf(p))!==configurationKey(model,reasoningEffort)||code==='unsupported'&&requestedModels.get(keyOf(p))!==configurationKey(model,reasoningEffort))code='ready';}catch(e){code=e instanceof PlanError?e.code:'authorization_required'}
+      return {mode:'chatgpt-plan',model,reasoningEffort,connection:code,authorization:!['authorization_required','scope_missing','expired','disconnected','auth_rejected'].includes(code)?'bound':'required',canGenerate:!!model&&['ready','completed','unavailable','rate_limited','incomplete','cancelled','failed'].includes(code),description:messages[code],capabilities};
     },
     disconnect(p) {blocked.add(keyOf(p));set(p,'disconnected');for(const c of controllers.get(keyOf(p))||[])c.abort();},
     resume(p) {if(states.get(keyOf(p))==='usage_limit')set(p,'ready');},
-    async generate({principal,messages:compiled,model,signal,onDelta}) {
+    async generate({principal,messages:compiled,model,reasoningEffort,signal,onDelta}) {
       const local=new AbortController(),k=keyOf(principal);const active=controllers.get(k)||new Set();controllers.set(k,active);active.add(local);
       const combined=AbortSignal.any([local.signal,AbortSignal.timeout(120000),...(signal?[signal]:[])]);
       try {
         combined.throwIfAborted();const s=await session(principal);
-        if(states.get(k)==='unsupported'&&requestedModels.get(k)!==model)states.delete(k);
-        requestedModels.set(k,model);
+        if(states.get(k)==='unsupported'&&requestedModels.get(k)!==configurationKey(model,reasoningEffort))states.delete(k);
+        requestedModels.set(k,configurationKey(model,reasoningEffort));
         if(['usage_limit','forbidden','auth_rejected','unsupported'].includes(states.get(k)))throw new PlanError(states.get(k));
-        const body=toResponses(compiled,model);
+        const body=toResponses(compiled,model,reasoningEffort);
         const response=await fetchImpl(PLAN_ENDPOINT,{method:'POST',headers:{Authorization:'Bearer '+s.accessToken,'Content-Type':'application/json'},body:JSON.stringify(body),signal:combined,redirect:'error'});
         if(!response.ok){let payload;try{payload=await response.json()}catch{}throw mappedError(response.status,payload,response.headers.get('x-request-id'));}
         if(!response.headers.get('content-type')?.includes('text/event-stream')||!response.body)throw new PlanError('incomplete');
@@ -74,7 +76,7 @@ export function createPlanProvider({getSession=async()=>null,fetchImpl=fetch,now
           if(e.type==='response.output_text.delta') {if(typeof e.delta!=='string')throw new PlanError('incomplete');text+=e.delta;if(onDelta)await onDelta(e.delta);}
           if(e.type==='response.completed') {
             if(e.response?.status!=='completed'||!text)throw new PlanError('incomplete');
-            combined.throwIfAborted();set(principal,'completed');completedModels.set(k,model);return text;
+            combined.throwIfAborted();set(principal,'completed');completedModels.set(k,configurationKey(model,reasoningEffort));return text;
           }
         }
         throw new PlanError('incomplete');
@@ -86,8 +88,9 @@ export function createPlanProvider({getSession=async()=>null,fetchImpl=fetch,now
   };
 }
 
-export function toResponses(compiled,model) {
+export function toResponses(compiled,model,reasoningEffort) {
   if(typeof model!=='string'||!model.trim()||model.length>200||!Array.isArray(compiled)||!compiled.length)throw new PlanError('unsupported');
+  if(reasoningEffort!==undefined&&!validReasoningEffort(reasoningEffort))throw new PlanError('unsupported');
   const input=compiled.map(m=>{
     if(!['system','developer','user','assistant'].includes(m.role)||typeof m.content!=='string'||Object.keys(m).some(k=>!['role','content','name'].includes(k)))throw new PlanError('unsupported');
     // Keep original item order (including in-history WI) and exact content.
@@ -98,7 +101,7 @@ export function toResponses(compiled,model) {
   });
   // Allowlist construction intentionally excludes all sampling/output caps,
   // previous_response_id, metadata, tools and caller-supplied URLs.
-  return adaptRequest({model,input,store:false,stream:true}).body;
+  return adaptRequest({model,input,store:false,stream:true,...(reasoningEffort===undefined?{}:{reasoning:{effort:reasoningEffort}})}).body;
 }
 
 function mappedError(status,payload,requestId) {

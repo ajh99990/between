@@ -19,6 +19,7 @@ npm ci --prefix sillytavern/engine --ignore-scripts --no-audit --no-fund
 npm test --prefix sillytavern/engine
 npm run test:app --prefix sillytavern/engine
 npm run test:plan --prefix sillytavern/engine
+npm run test:local --prefix sillytavern/engine
 ```
 
 `npm ci` 按现有锁文件安装；不得为躲过失败更新依赖版本。需要浏览器测试时另按酒馆版说明安装锁定的研究依赖，保留 Chromium sandbox，不启动真实模型请求。报告测试实际范围，不把 mock 测试当作自然度或真实授权验证。
@@ -65,3 +66,7 @@ git rev-parse HEAD
 - 排除的凭据/个人数据/产物类别，不列出秘密值。
 - 目标端 fetch SHA、锁文件依赖复测结果、继续开发分支；尚未接收须标记待完成。
 - 服务启动与清理状态、未解决阻塞和下一负责人。入库不自动授权启动应用。
+
+## 6. 已授权的本机启动验收
+
+本次本机启动已获用户授权。先把本机有效修改中文提交并推送独立分支，核验远端完整 SHA，再从 GitHub 创建干净接收工作区并检出同一 SHA。锁文件安装和四组离线测试通过后，运行 `npm run start:local --prefix sillytavern/engine`。验证用户页、管理页、用户会话状态及管理员登录后的状态接口，报告真实 HTTP 状态；不能把授权元数据可用等同于真实模型推理验证。默认模型 `gpt-6.1-sol`、思考档位 `medium`。服务仅绑定 localhost，保留运行并交付访问地址、停止方式和管理员口令文件位置；不要把口令写入报告。

@@ -9,6 +9,7 @@ import {importCommunity,bookEntries,validateBook} from './community.mjs';
 import {provider} from './provider.mjs';
 import {createCompatibilityPlanProvider} from './plan-service.mjs';
 import {createPlanProvider,PlanError} from './chatgpt-plan.mjs';
+import {DEFAULT_PLAN_MODEL,DEFAULT_PLAN_REASONING,validReasoningEffort} from './plan-config.mjs';
 const community=JSON.parse(await fs.readFile(new URL('./community-catalog.json',import.meta.url),'utf8'));
 const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
 const uuid=()=>crypto.randomUUID();
@@ -25,15 +26,16 @@ export async function createApp(options={}){
   const bridge=await provider({...options,modelUrl:options.demo?'':options.modelUrl||config.model?.url||'',modelName:options.modelName||config.model?.name||'gpt-4o-mini'});
   const plan=options.planProvider||createPlanProvider();
   const planPrincipal=Object.freeze({tenant:'local',user:'between-plan-backend'});
-  config.planBackend??={enabled:false,model:''};let planChanging=false;
-  let engine;try{engine=await RoleEngine.open({root:path.join(root,'engine'),...bridge.engineConfig,generate:async request=>{if(config.planBackend.enabled)return plan.generate({...request,principal:planPrincipal,model:config.planBackend.model});}})}catch(e){await bridge.close();throw e;}
+  config.planBackend??={enabled:false,model:DEFAULT_PLAN_MODEL,reasoningEffort:DEFAULT_PLAN_REASONING};
+  config.planBackend.reasoningEffort??=DEFAULT_PLAN_REASONING;let planChanging=false;
+  let engine;try{engine=await RoleEngine.open({root:path.join(root,'engine'),...bridge.engineConfig,generate:async request=>{if(config.planBackend.enabled)return plan.generate({...request,principal:planPrincipal,model:config.planBackend.model,reasoningEffort:config.planBackend.reasoningEffort});}})}catch(e){await bridge.close();throw e;}
   const userRoot=path.join(root,'users');await fs.mkdir(userRoot,{recursive:true,mode:0o700});
   const users=new Map();for(const file of await fs.readdir(userRoot)){if(/^[a-f0-9]{64}\.json$/.test(file)){const u=JSON.parse(await fs.readFile(path.join(userRoot,file),'utf8'));users.set(file.slice(0,-5),u);}}
   const admins=new Map(),attempts=new Map(),tasks=new Map(),deleting=new Set(),audit=[];let auditSeq=0;let stopping=false;
   const passwordHash=options.adminPassword?hash(options.adminPassword):null;
   const log=(actor,action,target,result='ok')=>{audit.push({sequence:++auditSeq,at:new Date().toISOString(),actor,action,target,result});if(audit.length>200)audit.shift();};
   const saveUser=async(key,u)=>atomic(path.join(userRoot,key+'.json'),u);
-  const modelState=()=>config.planBackend.enabled?plan.status(planPrincipal,config.planBackend.model):Promise.resolve(bridge.status);
+  const modelState=()=>config.planBackend.enabled?plan.status(planPrincipal,config.planBackend.model,config.planBackend.reasoningEffort):Promise.resolve(bridge.status);
   const client=u=>engine.forPrincipal({tenant:'local',user:u.id});
   const cookie=(req,name)=>{const part=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(name+'='));return part?.slice(name.length+1);};
   const getUser=req=>{const token=cookie(req,'between_user');const key=token&&hash(token);const u=key&&users.get(key);if(!u)throw httpError(401,'请先初始化浏览器会话');if(u.disabled)throw httpError(403,'此用户已停用');return {u,key};};
@@ -69,7 +71,7 @@ export async function createApp(options={}){
       if(p.startsWith('/api/admin/')){
         const a=getAdmin(req);if(req.method!=='GET'&&req.headers['x-csrf-token']!==a.csrf)throw httpError(403,'管理员请求校验失败');const b=req.method==='GET'?{}:await readBody();
         if(p==='/api/admin/logout'&&req.method==='POST'){admins.delete(hash(cookie(req,'between_admin')));res.setHeader('Set-Cookie','between_admin=; HttpOnly; SameSite=Strict; Path=/api/admin; Max-Age=0');send(200,{ok:true});return;}
-        if(p==='/api/admin/state'&&req.method==='GET'){send(200,{csrf:a.csrf,config,community,model:{...bridge.status,credentialConfigured:!!options.key},plan:await plan.status(planPrincipal,config.planBackend.model),users:[...users.values()].map(u=>({id:u.id,createdAt:u.createdAt,disabled:u.disabled,conversations:u.conversations})),tasks:[...tasks.values()].map(t=>({id:t.id,userId:t.userId,conversation:t.conversation,mode:t.mode,startedAt:t.startedAt})),audit,diagnostics:{langfuse:'未接入',audit:'仅本进程最近200条操作记录，非不可篡改审计',storage:'本机私有目录；按用户隔离',plan:'管理员显式选择的独立 Between 授权；业务会话隔离不代表独立模型额度。官方多人托管适用性未确认。',modelVerified:bridge.status.connection==='connected',version:'role-chat-app-v1'}});return;}
+        if(p==='/api/admin/state'&&req.method==='GET'){send(200,{csrf:a.csrf,config,community,model:{...bridge.status,credentialConfigured:!!options.key},plan:await plan.status(planPrincipal,config.planBackend.model,config.planBackend.reasoningEffort),users:[...users.values()].map(u=>({id:u.id,createdAt:u.createdAt,disabled:u.disabled,conversations:u.conversations})),tasks:[...tasks.values()].map(t=>({id:t.id,userId:t.userId,conversation:t.conversation,mode:t.mode,startedAt:t.startedAt})),audit,diagnostics:{langfuse:'未接入',audit:'仅本进程最近200条操作记录，非不可篡改审计',storage:'本机私有目录；按用户隔离',plan:'管理员显式选择的独立 Between 授权；业务会话隔离不代表独立模型额度。官方多人托管适用性未确认。',modelVerified:bridge.status.connection==='connected',version:'role-chat-app-v1'}});return;}
         if(p==='/api/admin/community/import'&&req.method==='POST'){confirm(b);if(b.expectedVersion!==config.version)throw httpError(409,'配置已变更，请刷新');if(config.roles.length>=20)throw httpError(400,'角色库已满');const imported=await importCommunity(b.id);if(config.roles.some(r=>r.id===imported.role.id))throw httpError(409,'此素材已导入');if(imported.book&&config.books.some(x=>x.id===imported.book.id))throw httpError(409,'此世界书ID已存在，请先处理现有书；不会覆盖或重复绑定');if(imported.book&&config.books.length>=100)throw httpError(400,'世界书库已满');const updated={...config,roles:[...config.roles,imported.role],books:imported.book?[...config.books,imported.book]:config.books,version:config.version+1};await atomic(path.join(root,'settings.json'),updated);config=updated;log('admin','community.import',b.id);send(201,{roleId:imported.role.id,bookId:imported.book?.id,version:config.version});return;}
         if(p==='/api/admin/config'&&req.method==='PUT'){
           confirm(b);if(b.expectedVersion!==config.version)throw httpError(409,'配置已变更，请刷新后重试');const next=b.config;
@@ -80,13 +82,15 @@ export async function createApp(options={}){
           const updated={...config,roles:next.roles,books:next.books,preset:next.preset,acceptNew:!!next.acceptNew,paused:!!next.paused,version:config.version+1};await atomic(path.join(root,'settings.json'),updated);config=updated;log('admin','config.update','new-conversations');send(200,{version:config.version});return;
         }
         if(p==='/api/admin/plan'&&req.method==='PUT'){
-          confirm(b);if(Object.keys(b).some(k=>!['enabled','model','action','confirm','expectedVersion'].includes(k)))throw httpError(400,'不接受凭据字段');
+          confirm(b);if(Object.keys(b).some(k=>!['enabled','model','reasoningEffort','action','confirm','expectedVersion'].includes(k)))throw httpError(400,'不接受凭据字段');
           if(b.action==='disconnect'){plan.disconnect(planPrincipal);for(const t of tasks.values())t.controller.abort();send(200,{ok:true});return;}
           if(b.action==='resume'){plan.resume(planPrincipal);send(200,{ok:true});return;}
           if(b.expectedVersion!==config.version)throw httpError(409,'配置已变更，请刷新');
           if(typeof b.enabled!=='boolean'||typeof b.model!=='string'||b.model.length>200||b.enabled&&!b.model.trim())throw httpError(400,'套餐后端设置无效');
+          const reasoningEffort=b.reasoningEffort===undefined?(config.planBackend.reasoningEffort??DEFAULT_PLAN_REASONING):b.reasoningEffort;
+          if(!validReasoningEffort(reasoningEffort))throw httpError(400,'思考档位须为 medium 或 high');
           if(tasks.size)throw httpError(409,'先停止正在运行的任务再切换后端');
-          planChanging=true;try{const updated={...config,planBackend:{enabled:b.enabled,model:b.model.trim()},version:config.version+1};await atomic(path.join(root,'settings.json'),updated);config=updated;}finally{planChanging=false}
+          planChanging=true;try{const updated={...config,planBackend:{enabled:b.enabled,model:b.model.trim(),reasoningEffort},version:config.version+1};await atomic(path.join(root,'settings.json'),updated);config=updated;}finally{planChanging=false}
           log('admin','plan.backend.update','future-requests');send(200,{ok:true});return;
         }
         if(p==='/api/admin/model'&&req.method==='PUT'){confirm(b);if(typeof b.url!=='string'||typeof b.name!=='string'||!b.name.trim()||b.name.length>200)throw httpError(400,'模型地址或名称无效');bridge.configure(b,true);const updated={...config,model:{url:b.url,name:b.name},version:config.version+1};await atomic(path.join(root,'settings.json'),updated);bridge.configure(b);config=updated;log('admin','model.update','future-requests');send(200,{ok:true});return;}
@@ -110,7 +114,7 @@ export async function createApp(options={}){
       throw httpError(405,'请求方式不受支持');
     }catch(e){send(e.status||400,{error:e.status?e.message:'配置或操作无效，请检查输入'});}finally{releaseMutation?.();}
   });
-  await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(options.port??8787,'127.0.0.1',resolve)});
+  try{await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(options.port??8787,'127.0.0.1',resolve)});}catch(e){await engine.close();await bridge.close();throw e;}
   return {url:`http://127.0.0.1:${server.address().port}`,async close(){if(stopping)return;stopping=true;for(const t of tasks.values())t.controller.abort();await Promise.all([...tasks.values()].map(t=>t.finished));server.closeAllConnections();await new Promise(r=>server.close(r));await engine.close();await bridge.close();}};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
