@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {serveAdmin} from './admin-static.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -58,7 +59,8 @@ export async function createApp(options={}){
       if(!['GET','HEAD'].includes(req.method)&&!hosts.some(h=>origin==='http://'+h))throw httpError(403,'请求缺少有效 Origin');
       const url=new URL(req.url,'http://'+req.headers.host),p=url.pathname;
       if(req.method!=='GET'&&(p==='/api/conversations'||['/api/admin/plan','/api/admin/community/import','/api/admin/config','/api/admin/model','/api/admin/user','/api/admin/conversation'].includes(p))){const identity=p.startsWith('/api/admin/')?getAdmin(req):getUser(req).u;if(req.headers['x-csrf-token']!==identity.csrf)throw httpError(403,'请求校验失败');parsedBody=await jsonBody(req);releaseMutation=await acquireMutation();}
-      if(!p.startsWith('/api/')){const files={'/':'index.html','/admin':'admin.html','/app.js':'app.js','/admin.js':'admin.js','/style.css':'style.css'};const file=files[p];if(!file||req.method!=='GET')throw httpError(404,'页面不存在');res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript; charset=utf-8':file.endsWith('.css')?'text/css; charset=utf-8':'text/html; charset=utf-8');res.end(await fs.readFile(path.join(publicRoot,file)));return;}
+      if(await serveAdmin(req,res,p))return;
+      if(!p.startsWith('/api/')){const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css'};const file=files[p];if(!file||req.method!=='GET')throw httpError(404,'页面不存在');res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript; charset=utf-8':file.endsWith('.css')?'text/css; charset=utf-8':'text/html; charset=utf-8');res.end(await fs.readFile(path.join(publicRoot,file)));return;}
       if(p==='/api/session'&&req.method==='POST'){
         const token=cookie(req,'between_user'),existing=token&&users.get(hash(token));if(existing){if(existing.disabled)throw httpError(403,'此用户已停用');send(200,{csrf:existing.csrf});return;}
         if(!config.acceptNew)throw httpError(403,'管理员已暂停新用户进入');const value=crypto.randomBytes(32).toString('hex'),key=hash(value),u={id:uuid(),csrf:crypto.randomBytes(24).toString('hex'),createdAt:new Date().toISOString(),disabled:false,conversations:[]};await saveUser(key,u);users.set(key,u);res.setHeader('Set-Cookie',`between_user=${value}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000`);send(200,{csrf:u.csrf});return;

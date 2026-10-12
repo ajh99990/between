@@ -1,0 +1,24 @@
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f3f5f3; }
+* { box-sizing: border-box; }
+button, input, textarea, select { font-family: inherit; }
+.ant-pro-page-container-children-content { min-width: 0; }
+.ant-pro-layout .ant-pro-sider-logo { padding: 24px 20px; }
+.ant-pro-layout .ant-pro-sider-logo h1 { font-size: 25px; letter-spacing: -.8px; }
+.ant-pro-layout .ant-pro-sider { box-shadow: none; }
+.ant-pro-layout .ant-pro-sider-menu { padding-inline: 10px; }
+.ant-pro-layout .ant-pro-base-menu-inline-item-icon { font-size: 18px; }
+.ant-pro-page-container .ant-page-header-heading-title { font-size: 28px; letter-spacing: -.6px; }
+.ant-pro-page-container .ant-page-header { padding-top: 30px; }
+.ant-pro-table .ant-pro-card { border: 1px solid #e3e9e4; border-radius: 12px; }
+.ant-pro-table .ant-table-cell { vertical-align: top; }
+.ant-pro-table .ant-table-thead > tr > th { color: #6c7e74; font-weight: 500; }
+.ant-pro-layout-content { min-width: 0; }
+.reading-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.95; letter-spacing: .015em; color: #34483e; }
+.reading-section { scroll-margin-top: 90px; }
+.reading-section + .reading-section { border-top: 1px solid #e7ebe7; }
+.reading-nav button { width: 100%; text-align: left; white-space: normal; line-height: 1.6; height: auto; padding-block: 9px; }
+.ant-form-item-label > label { font-weight: 500; }
+.ant-input-textarea textarea { line-height: 1.8; }
+@media (max-width: 767px) { .ant-pro-page-container .ant-page-header { padding-inline: 16px; } .ant-pro-page-container-children-container { padding-inline: 16px; } .ant-pro-page-container .ant-page-header-heading-title { font-size: 24px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
