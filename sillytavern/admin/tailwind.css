@@ -1,13 +1,6 @@
-/* Preflight is deliberately omitted: Ant Design owns component resets. */
-@layer theme, base, antd, components, utilities;
+/* Component resets belong to Ant Design; utilities share Prism semantic colors. */
+@layer theme,base,antd,components,utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @source './src';
-@theme {
-  --color-forest-50: #edf5f0;
-  --color-forest-100: #dcebe1;
-  --color-forest-600: #316a5b;
-  --color-forest-900: #183a2f;
-  --color-ink: #20322b;
-  --color-muted: #53655e;
-}
+@theme {--color-ink:#f1f4ff;--color-muted:#b4c0db;--color-accent:#b9a9ff;}

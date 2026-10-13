@@ -128,8 +128,8 @@ export default function Sessions() {
       description="查看已保存的会话与正在执行的任务，管理对话的运行状态。"
     >
       {data && (
-        <div className="space-y-6">
-          <Card
+        <div className="session-console">
+          <aside className="task-console"><div className="control-section-label"><span>01</span><h2>执行队列</h2></div>          <Card
             title={
               <div className="flex items-center gap-2">
                 运行任务
@@ -156,7 +156,7 @@ export default function Sessions() {
               />
             )}
           </Card>
-          <ProTable<SessionRow>
+          </aside><section className="saved-console"><div className="control-section-label"><span>02</span><h2>对话档案</h2></div>          <ProTable<SessionRow>
             rowKey="id"
             headerTitle="已保存会话"
             columns={columns}
@@ -188,7 +188,7 @@ export default function Sessions() {
                 />
               ),
             }}
-          />
+          /></section>
         </div>
       )}
     </Workspace>

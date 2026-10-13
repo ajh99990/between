@@ -7,7 +7,8 @@ import type { User } from '@/services/types';
 export default function Users() {
   const { data, busy, mutate } = useModel('admin');
   const { modal } = App.useApp();
-  const global = (key: 'acceptNew' | 'paused', value: boolean) =>
+  const global = (key: 'acceptNew' | 'paused', value: boolean) => {
+    if (!data) return; const config = data.config;
     modal.confirm({
       title:
         key === 'acceptNew'
@@ -25,10 +26,11 @@ export default function Users() {
       cancelText: '取消',
       onOk: () =>
         mutate(
-          () => saveConfig({ ...data!.config, [key]: value }),
+          () => saveConfig({ ...config, [key]: value }),
           '全局开关已更新。',
         ),
     });
+  };
   const columns: ProColumns<User>[] = [
     {
       title: '用户 ID',
@@ -95,8 +97,8 @@ export default function Users() {
       description="控制新用户访问和生成状态，管理本机匿名浏览器身份。"
     >
       {data && (
-        <div className="space-y-6">
-          <div className="grid gap-5 md:grid-cols-2">
+        <div className="access-console">
+          <div className="operations-banner glass-panel"><div><span className="eyebrow">ACCESS / WORKSPACE IDENTITIES</span><h2>让访问，始终可控。</h2><p>工作室入口与生成权限分别管理，已有内容独立保留。</p></div><div className="operations-count">{data.users.length}<span className="small-note"> 位用户</span></div></div><div className="control-section-label"><span>01</span><h2>全局访问策略</h2></div><div className="access-switches">
             <Card>
               <div className="flex items-start justify-between gap-6">
                 <div>
@@ -134,7 +136,7 @@ export default function Users() {
               </div>
             </Card>
           </div>
-          <ProTable<User>
+          <div className="control-section-label"><span>02</span><h2>身份档案</h2></div><ProTable<User>
             rowKey="id"
             headerTitle="浏览器用户"
             columns={columns}

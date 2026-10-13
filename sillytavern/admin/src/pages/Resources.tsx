@@ -29,7 +29,8 @@ const actions: Record<string, string> = {
 export default function Resources() {
   const { data, busy, mutate } = useModel('admin');
   const { modal } = App.useApp();
-  const importItem = (item: CommunityItem) =>
+  const importItem = (item: CommunityItem) => {
+    if (!data) return; const version=data.config.version;
     modal.confirm({
       title: `导入「${item.name}」？`,
       content: `包含角色卡和 ${item.entryCount} 条世界书。保留原始内容、冲突与 Foreverse Team / CC BY 4.0 归因。导入后对新会话生效。`,
@@ -41,11 +42,12 @@ export default function Resources() {
             api('/community/import', 'POST', {
               id: item.id,
               confirm: true,
-              expectedVersion: data!.config.version,
+              expectedVersion: version,
             }),
           '社区角色及世界书已导入。',
         ),
     });
+  };
   const columns: ProColumns<Audit>[] = [
     {
       title: '时间',
@@ -86,12 +88,12 @@ export default function Resources() {
               label: '社区素材',
               children: (
                 <>
-                  <div className="mb-5 rounded-xl bg-forest-50 p-5 text-sm leading-7 text-muted">
-                    {data.community.verification}
+                  <div className="resource-intro glass-panel">
+                    <h2>为灵感，开启新的入口。</h2><p>{data.community.verification}
                     <br />
-                    {data.community.license}
+                    {data.community.license}</p>
                   </div>
-                  <div className="grid gap-5 md:grid-cols-2">
+                  <div className="resource-grid">
                     {data.community.items.map((item) => {
                       const imported = data.config.roles.some(
                         (r) => r.id === `community-${item.id}`,
@@ -108,7 +110,7 @@ export default function Resources() {
                             </Tag>
                           }
                         >
-                          <div className="mb-4 text-sm font-medium text-forest-600">
+                          <div className="resource-scenario">
                             {item.scenarios}
                           </div>
                           <p className="text-sm leading-7 text-muted">
@@ -163,7 +165,7 @@ export default function Resources() {
               key: 'diagnostics',
               label: '运行诊断',
               children: (
-                <div className="space-y-6">
+                <div className="diagnostic-grid">
                   <Card title="服务状态">
                     <Descriptions
                       column={1}

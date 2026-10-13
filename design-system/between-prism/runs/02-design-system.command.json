@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-13T02:15:36.323998+00:00",
+  "argv": [
+    "python3",
+    "/workspace/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py",
+    "operations dashboard glassmorphism",
+    "--design-system",
+    "--motion",
+    "6",
+    "--density",
+    "6",
+    "-p",
+    "Between Prism",
+    "-f",
+    "markdown"
+  ],
+  "exitCode": 0,
+  "stdoutSHA256": "69899dc21da52a0c938994913debf3b1d6950c47216d6fe8566042c27235e806"
+}

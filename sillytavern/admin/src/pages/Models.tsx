@@ -7,7 +7,7 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { Alert, App, Button, Card, Descriptions, Form, Space, Tag } from 'antd';
+import { Alert, App, Button, Card, Descriptions, Form, Space, Tag, Segmented } from 'antd';
 import { useState } from 'react';
 import Editor from '@/components/Editor';
 import { Workspace } from '@/components/Workspace';
@@ -21,16 +21,18 @@ type ModelEdit =
 export default function Models() {
   const { data, busy, mutate, clearFeedback } = useModel('admin');
   const { modal } = App.useApp();
+  const [connectionTab,setConnectionTab]=useState('plan');
   const [editing, setEditing] = useState<ModelEdit>();
   const [planForm] = Form.useForm<PlanConfig>();
   const [modelForm] = Form.useForm<{ url: string; name: string }>();
   const [presetForm] = Form.useForm<Preset>();
   const edit = (kind: ModelEdit['kind']) => {
+    if (!data) return;
     clearFeedback();
     planForm.resetFields();
     modelForm.resetFields();
     presetForm.resetFields();
-    setEditing({ kind, config: structuredClone(data!.config) });
+    setEditing({ kind, config: structuredClone(data.config) });
   };
   return (
     <Workspace
@@ -38,13 +40,13 @@ export default function Models() {
       description="管理对话所使用的模型连接与生成参数，清楚了解每一项设置的生效范围。"
     >
       {data && (
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-solid border-[#dce7de] bg-forest-50 px-6 py-5">
+        <div className="model-studio">
+          <div className="control-status glass-panel">
             <div>
-              <div className="mb-1 text-xs font-semibold text-muted">
-                当前模型后端
+              <div className="eyebrow">
+                MODEL ROUTING / 当前模型后端
               </div>
-              <div className="text-lg font-semibold">
+              <div className="active-model-name">
                 {data.config.planBackend.enabled
                   ? 'ChatGPT 套餐'
                   : 'Chat Completions'}
@@ -70,7 +72,8 @@ export default function Models() {
                   : '尚未验证真实模型'}
             </Tag>
           </div>
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="model-console-grid"><section className="connection-console"><div className="control-section-label"><span>01</span><h2>连接控制</h2></div><Segmented block value={connectionTab} onChange={setConnectionTab} options={[{label:'ChatGPT 套餐',value:'plan'},{label:'Chat Completions',value:'model'}]}/><div className="connection-body">
+            {connectionTab==='plan' && (
             <Card
               title="ChatGPT 套餐"
               extra={
@@ -175,7 +178,8 @@ export default function Models() {
                 title="授权由本机助手管理"
                 description="此页面不接收或展示凭据。需要登录时，请使用既有本机授权助手；多人托管的官方适用性尚未确认。"
               />
-            </Card>
+            </Card>)}
+            {connectionTab==='model' && (
             <Card
               title="Chat Completions"
               extra={
@@ -228,8 +232,8 @@ export default function Models() {
                   title="当前为合成演示模式，不能切换模型连接"
                 />
               )}
-            </Card>
-          </div>
+            </Card>)}
+          </div></section><section className="preset-console"><div className="control-section-label"><span>02</span><h2>生成与提示词</h2></div>
           <Card
             title="提示词与生成参数"
             extra={
@@ -242,7 +246,7 @@ export default function Models() {
             }
           >
             <Descriptions
-              column={{ xs: 1, sm: 2, lg: 4 }}
+              column={{ xs: 1, sm: 2 }}
               items={[
                 {
                   key: 'context',
@@ -266,7 +270,7 @@ export default function Models() {
                 },
               ]}
             />
-            <div className="mt-5 rounded-lg bg-[#f6f8f6] p-5">
+            <div className="prompt-display">
               <div className="mb-3 text-xs font-semibold text-muted">
                 全局历史后指令
               </div>
@@ -277,7 +281,7 @@ export default function Models() {
             <p className="mb-0 text-sm leading-7 text-muted">
               预设用于新会话；已有会话保留创建时的参数。
             </p>
-          </Card>
+          </Card></section></div>
         </div>
       )}
       {editing?.kind === 'plan' && (

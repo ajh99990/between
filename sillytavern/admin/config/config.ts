@@ -20,12 +20,9 @@ export default defineConfig({
     configProvider: {
       theme: {
         token: {
-          colorPrimary: '#316a5b',
-          borderRadius: 8,
-          colorBgLayout: '#f3f5f3',
-          colorText: '#20322b',
-          fontFamily: '"PingFang SC", "Microsoft YaHei", sans-serif',
-          controlHeight: 38,
+          colorPrimary:'#a999ff', colorInfo:'#a999ff', colorSuccess:'#60deb1', colorWarning:'#ffd180', colorError:'#ff879e',
+          colorBgLayout:'#080c1b', colorBgContainer:'#151c30', colorBgElevated:'#1c2540', colorText:'#f1f4ff', colorTextSecondary:'#b4c0db', colorTextTertiary:'#a6b4d0', colorTextPlaceholder:'#95a3bf', colorBorder:'#526180', colorSplit:'rgba(160,177,220,.18)', borderRadius:12, controlHeight:44,
+          fontFamily:'"Fira Sans", "PingFang SC", "Microsoft YaHei", sans-serif',
         },
       },
     },

@@ -1,19 +1,18 @@
 import { StyleProvider } from '@ant-design/cssinjs';
-import { ExportOutlined, LogoutOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link, useModel } from '@umijs/max';
+import { history, useModel } from '@umijs/max';
 import {
-  App,
   Button,
   ConfigProvider,
   type ConfigProviderProps,
   Result,
-  Tag,
+  theme,
 } from 'antd';
 import type { ReactNode } from 'react';
-import { ApiError, api, getState, logout } from '@/services/admin';
+import { ApiError, api, getState } from '@/services/admin';
 import type { AdminState } from '@/services/types';
 import defaultSettings from '../config/defaultSettings';
+import { PrismHeader } from '@/components/PrismHeader';
 
 const nonce =
   typeof document === 'undefined'
@@ -25,6 +24,7 @@ export const antd = (config: ConfigProviderProps) => ({
   csp: { nonce },
   theme: {
     ...config.theme,
+    algorithm: theme.darkAlgorithm,
     token: {
       ...config.theme?.token,
       motion: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -71,53 +71,9 @@ function SessionBoundary({ children }: { children: ReactNode }) {
     );
   return children;
 }
-function AccountActions() {
-  const { modal, message } = App.useApp();
-  return (
-    <div className="flex items-center gap-3">
-      <a
-        href="/"
-        target="_blank"
-        rel="noreferrer"
-        className="text-muted text-sm"
-      >
-        <ExportOutlined aria-hidden /> 打开聊天
-      </a>
-      <Button
-        type="text"
-        icon={<LogoutOutlined aria-hidden />}
-        onClick={() =>
-          modal.confirm({
-            title: '退出管理控制台？',
-            content: '已保存的配置会保留。',
-            okText: '退出登录',
-            cancelText: '取消',
-            onOk: async () => {
-              try {
-                await logout();
-                window.location.reload();
-              } catch (e) {
-                message.error((e as Error).message);
-              }
-            },
-          })
-        }
-      >
-        退出
-      </Button>
-    </div>
-  );
-}
 export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
   ...defaultSettings,
-  menuItemRender: (item, dom) =>
-    item.path ? <Link to={item.path}>{dom}</Link> : dom,
-  actionsRender: () => [
-    <Tag key="mode" variant="filled" color="green">
-      本机管理
-    </Tag>,
-    <AccountActions key="account" />,
-  ],
+  headerRender: () => <PrismHeader />,
   onPageChange: () => {
     if (
       !initialState?.authenticated &&
@@ -126,15 +82,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
     )
       history.replace('/login');
   },
-  menuFooterRender: (collapsed) =>
-    collapsed ? null : (
-      <div className="px-4 pb-5 text-xs leading-6 text-[#a9bdb6]">
-        <div className="font-semibold text-[#e1ebe5]">
-          让每一个角色，拥有自己的世界
-        </div>
-        <div className="mt-2 opacity-65">BETWEEN / WORKSPACE</div>
-      </div>
-    ),
   childrenRender: (children) => <SessionBoundary>{children}</SessionBoundary>,
 });
 export function rootContainer(container: ReactNode) {

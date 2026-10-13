@@ -1,12 +1,10 @@
 import { PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import {
-  type ProColumns,
   ProFormDigit,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
   ProFormTextArea,
-  ProTable,
 } from '@ant-design/pro-components';
 import { history, useModel, useParams } from '@umijs/max';
 import { App, Button, Collapse, Empty, Form, Input, Tag } from 'antd';
@@ -33,94 +31,7 @@ export default function Books() {
       config: structuredClone(data.config),
     });
   };
-  const columns: ProColumns<Book>[] = [
-    {
-      title: '世界书',
-      dataIndex: 'name',
-      width: 280,
-      render: (_, book) => (
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#f3eee2] text-xl text-[#8c7145]">
-            <ReadOutlined aria-hidden />
-          </div>
-          <Button
-            type="link"
-            className="h-auto whitespace-normal p-0 text-left font-semibold"
-            onClick={() => history.push(`/books/${book.id}`)}
-          >
-            {book.name}
-          </Button>
-        </div>
-      ),
-    },
-    {
-      title: '条目',
-      width: 100,
-      render: (_, book) => (
-        <Tag variant="filled">{book.entries?.length ?? 1} 条</Tag>
-      ),
-    },
-    {
-      title: '绑定角色',
-      render: (_, book) => (
-        <div className="flex flex-wrap gap-1">
-          {data?.config.roles
-            .filter((r) => r.bookIds.includes(book.id))
-            .map((r) => (
-              <Tag key={r.id}>{r.name}</Tag>
-            ))}
-        </div>
-      ),
-    },
-    {
-      title: '来源',
-      width: 140,
-      render: (_, book) => (
-        <span className="text-sm text-muted">
-          {book.source ? 'Foreverse Team' : '本地创建'}
-        </span>
-      ),
-    },
-    {
-      title: '操作',
-      valueType: 'option',
-      width: 200,
-      render: (_, book) => [
-        <Button
-          key="read"
-          type="link"
-          onClick={() => history.push(`/books/${book.id}`)}
-        >
-          阅读全文
-        </Button>,
-        <Button key="edit" type="link" onClick={() => edit(book)}>
-          编辑
-        </Button>,
-        <Button
-          key="remove"
-          danger
-          type="link"
-          disabled={busy}
-          onClick={() =>
-            modal.confirm({
-              title: `移除「${book.name}」？`,
-              content: '将解除所有角色与此世界书的绑定，仅影响新会话。',
-              okText: '移除世界书',
-              cancelText: '取消',
-              okButtonProps: { danger: true },
-              onOk: () =>
-                mutate(
-                  () => saveConfig(removeBook(data!.config, book.id)),
-                  '世界书已移除，角色绑定已解除。',
-                ),
-            })
-          }
-        >
-          移除
-        </Button>,
-      ],
-    },
-  ];
+  const remove=(book:Book)=>{if(!data)return;const config=data.config;modal.confirm({title:`移除「${book.name}」？`,content:'将解除所有角色与此世界书的绑定，仅影响新会话。',okText:'移除世界书',cancelText:'取消',okButtonProps:{danger:true},onOk:()=>mutate(()=>saveConfig(removeBook(config,book.id)),'世界书已移除，角色绑定已解除。')})};
   const selected = data?.config.books.find((b) => b.id === id);
   return (
     <Workspace
@@ -154,39 +65,7 @@ export default function Books() {
             </Empty>
           )
         ) : (
-          <ProTable<Book>
-            rowKey="id"
-            headerTitle={`资源库 · ${data.config.books.length} 本`}
-            columns={columns}
-            dataSource={data.config.books.filter((b) =>
-              `${b.name} ${b.keys.join(' ')}`.includes(query),
-            )}
-            search={false}
-            toolBarRender={() => [
-              <Input.Search
-                key="search"
-                placeholder="搜索世界书或关键词"
-                aria-label="搜索世界书"
-                allowClear
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />,
-            ]}
-            options={false}
-            pagination={{ pageSize: 10, hideOnSinglePage: true }}
-            scroll={{ x: 850 }}
-            locale={{
-              emptyText: (
-                <Empty
-                  description={
-                    query
-                      ? '没有匹配的世界书'
-                      : '还没有世界书，创建第一份世界设定'
-                  }
-                />
-              ),
-            }}
-          />
+          <div className="archive-layout"><aside className="archive-intro glass-panel"><span className="eyebrow">WORLD ARCHIVE</span><div className="archive-glyph" aria-hidden="true"><ReadOutlined/></div><h2>每个世界，<br/>都有自己的规则。</h2><p>背景、地点、关系与线索。将设定编入世界书，让不同角色共享同一片宇宙。</p><div className="archive-total"><strong>{data.config.books.length}</strong><span>本世界书</span></div><p className="small-note">完整保留条目与触发条件。<br/>更新配置用于新会话。</p></aside><div className="archive-shelf"><div className="collection-toolbar"><h2>设定档案</h2><Input.Search placeholder="搜索世界书或关键词" aria-label="搜索世界书" allowClear value={query} onChange={e=>setQuery(e.target.value)}/></div>{data.config.books.filter(b=>`${b.name} ${b.keys.join(' ')}`.includes(query)).map((book,i)=><article key={book.id} className="world-volume glass-panel"><div className="volume-spine" aria-hidden="true">{String(i+1).padStart(2,'0')}<ReadOutlined/></div><div className="volume-body"><span className="eyebrow">{book.source?'COMMUNITY ARCHIVE':'LOCAL ARCHIVE'}</span><h3>{book.name}</h3><div className="volume-bindings"><Tag>{book.entries?.length??1} 条设定</Tag>{data.config.roles.filter(r=>r.bookIds.includes(book.id)).map(r=><Tag key={r.id}>{r.name}</Tag>)}</div><p>{book.source?book.source.attribution:'本地创建'} · 完整内容与独立触发规则</p><div className="volume-actions"><Button onClick={()=>history.push(`/books/${book.id}`)}>阅读全文</Button><Button type="text" onClick={()=>edit(book)}>编辑</Button><Button danger type="text" disabled={busy} onClick={()=>remove(book)}>移除</Button></div></div></article>)}{!data.config.books.some(b=>`${b.name} ${b.keys.join(' ')}`.includes(query))&&<Empty description={query?'没有匹配的世界书':'还没有世界书，创建第一份世界设定'}>{query&&<Button onClick={()=>setQuery('')}>清空搜索</Button>}</Empty>}</div></div>
         ))}
       {editor && (
         <Editor<Book>

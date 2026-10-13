@@ -75,13 +75,14 @@ export default function Editor<T extends object>({
     <Drawer
       open
       title={title}
-      size={760}
+      className="prism-editor"
+      size={1040}
       onClose={close}
       mask={{ closable: false }}
       keyboard={!busy}
       destroyOnHidden
       footer={
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="editor-footer">
           <span className="text-sm text-muted">
             {dirty ? '有尚未保存的修改' : '编辑后保存到服务器'}
           </span>
@@ -96,13 +97,7 @@ export default function Editor<T extends object>({
         </div>
       }
     >
-      <div className="mb-6 rounded-lg bg-forest-50 p-4">
-        {scope ? (
-          <p className="m-0 text-sm leading-7 text-muted">{scope}</p>
-        ) : (
-          <ScopeNote />
-        )}
-      </div>
+      <div className="editor-layout"><aside className="editor-context"><span className="eyebrow">STUDIO / EDITOR</span><h3>雕琢每个细节。</h3>{scope?<p>{scope}</p>:<ScopeNote/>}<div className="editor-step"><span>01</span>编辑设定</div><div className="editor-step"><span>02</span>确认影响范围</div><div className="editor-step"><span>03</span>保存到工作室</div><p>修改仅在确认保存后生效。<br/>取消可返回完整档案。</p></aside><div className="editor-form">
       {error && (
         <Alert
           className="mb-5"
@@ -131,7 +126,7 @@ export default function Editor<T extends object>({
         }}
       >
         {children}
-      </Form>
+      </Form></div></div>
     </Drawer>
   );
 }

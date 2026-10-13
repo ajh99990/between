@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-13T02:15:36.449125+00:00",
+  "argv": [
+    "python3",
+    "/workspace/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max/scripts/search.py",
+    "focus not obscured",
+    "--domain",
+    "ux"
+  ],
+  "exitCode": 0,
+  "stdoutSHA256": "a4fc6cd79d43951d19883ffdbf9613ea57babeeba945923c276bb578ddbed011"
+}

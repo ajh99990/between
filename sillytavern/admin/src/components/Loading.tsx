@@ -1,7 +1,1 @@
-export default function Loading() {
-  return (
-    <div role="status" className="p-8">
-      正在读取管理控制台…
-    </div>
-  );
-}
+export default function Loading(){return <div className="startup-loader" role="status"><img src="/admin/logo.svg" width="48" height="48" alt=""/><span className="eyebrow">BETWEEN / CHARACTER STUDIO</span><p>正在读取管理控制台…</p><div className="loading-line"/></div>}
