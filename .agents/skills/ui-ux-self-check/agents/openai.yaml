@@ -1,0 +1,6 @@
+# Reconstructed portable UI metadata, not a byte-for-byte copy of the upload's YAML.
+# The original YAML and referenced icon are unavailable in this cloud environment.
+interface:
+  display_name: "UI/UX 七项自查"
+  short_description: "用实际视觉与交互证据验收七项质量并迭代修复"
+  default_prompt: "使用 $ui-ux-self-check 对当前界面进行七项自查；实际运行页面、查看截图，修复本次范围内的问题并复验，明确未验证边界。"
