@@ -1,4 +1,4 @@
-> **当前酒馆版协作入口：** [sillytavern/engine](sillytavern/engine/APP-README.zh-CN.md)。本分支保留下面旧 Electron/Qwen 说明和源码以保护历史，旧根目录启动流程不适用于酒馆版。开工先读 [AGENTS.md](AGENTS.md) 与 [双向 Git 交接流程](docs/Git双向开发与交接流程.md)。本次仅源码入库与交接，尚未授权启动用户应用。
+> **当前酒馆版协作入口：** [sillytavern/engine](sillytavern/engine/APP-README.zh-CN.md)。仓库固定使用 `dev` 开发、验收后合入默认分支 `main`；不再按日期或环境创建分支。开工先读 [AGENTS.md](AGENTS.md)、[双向 Git 交接流程](docs/Git双向开发与交接流程.md) 与[分支及本机目录](docs/分支与本机目录.md)。下面旧 Electron/Qwen 说明和源码仅保留历史，其根目录启动流程不适用于酒馆版。运行与模型调用按具体任务授权执行，合入 main 不等于公开部署。
 
 # Between
 
