@@ -1,14 +1,6 @@
 import { history, useModel } from '@umijs/max';
-import {
-  Alert,
-  App,
-  Button,
-  Drawer,
-  Form,
-  type FormInstance,
-  Space,
-} from 'antd';
-import { type ReactNode, useEffect, useState } from 'react';
+import { Alert, App, Button, Drawer, Form, Space } from 'antd';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { ScopeNote } from './Workspace';
 export default function Editor<T extends object>({
   title,
@@ -16,7 +8,6 @@ export default function Editor<T extends object>({
   children,
   onSave,
   onClose,
-  form,
   scope,
   confirmText,
 }: {
@@ -25,19 +16,44 @@ export default function Editor<T extends object>({
   children: ReactNode;
   onSave: (values: T) => Promise<boolean>;
   onClose: () => void;
-  form: FormInstance<T>;
   scope?: string;
   confirmText?: string;
 }) {
+  const [form] = Form.useForm<T>();
   const { modal } = App.useApp();
   const { busy, error } = useModel('admin');
   const [dirty, setDirty] = useState(false);
-  useEffect(() => {
-    form.setFieldsValue(initialValues);
-  }, [form, initialValues]);
+  const snapshot = useRef(structuredClone(initialValues));
+  const returnFocus = useRef(
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null,
+  );
+  const originPath = useRef(history.location.pathname);
+  useEffect(
+    () => () => {
+      // Return to the opening control after the portal leaves the document.
+      // Navigation (including an expired login) owns its own focus destination.
+      setTimeout(() => {
+        if (
+          history.location.pathname === originPath.current &&
+          returnFocus.current?.isConnected &&
+          !document.querySelector('.orbit-editor')
+        ) {
+          returnFocus.current.focus({ preventScroll: true });
+        }
+      }, 0);
+    },
+    [],
+  );
   useEffect(() => {
     if (!dirty && !busy) return;
-    const unblock = history.block(({ retry }) => {
+    const unblock = history.block(({ retry, location }) => {
+      if (location.pathname === '/login') {
+        unblock();
+        retry();
+        return;
+      }
       if (busy) return;
       modal.confirm({
         title: '离开并放弃未保存的修改？',
@@ -74,6 +90,8 @@ export default function Editor<T extends object>({
   return (
     <Drawer
       open
+      data-testid="admin-editor"
+      rootClassName="orbit-editor"
       title={title}
       size={760}
       onClose={close}
@@ -96,7 +114,7 @@ export default function Editor<T extends object>({
         </div>
       }
     >
-      <div className="mb-6 rounded-lg bg-forest-50 p-4">
+      <div className="editor-context">
         {scope ? (
           <p className="m-0 text-sm leading-7 text-muted">{scope}</p>
         ) : (
@@ -109,14 +127,14 @@ export default function Editor<T extends object>({
           type="error"
           showIcon
           title={error}
-          description="修改仍保留在编辑器中。若版本冲突，请取消返回并刷新最新配置后再编辑。"
+          description="修改仍保留在编辑器中。若配置被其他操作修改，请取消返回并刷新最新配置后再编辑。"
         />
       )}
       <Form<T>
         form={form}
         layout="vertical"
         scrollToFirstError={{ focus: true }}
-        initialValues={initialValues}
+        initialValues={snapshot.current}
         onValuesChange={() => setDirty(true)}
         onFinish={(values) => {
           modal.confirm({

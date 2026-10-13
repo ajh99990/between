@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "node": "v24.18.0",
+  "scope": "独立虚构数据、临时回环 fixture 与合成 provider；不代表真实模型或真实授权验证。",
+  "rounds": [
+    {
+      "stage": "本轮首次完整引擎验收",
+      "tests": [
+        { "command": "npm test --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "subSuites": 4, "log": "engine-core.log" },
+        { "command": "npm run test:app --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "subSuites": 5, "log": "engine-app.log" },
+        { "command": "npm run test:plan --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "checksBySubSuite": [32, 43, 52, 18], "log": "engine-plan.log" },
+        { "command": "npm run test:local --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "checks": 16, "log": "engine-local.log" }
+      ]
+    },
+    {
+      "stage": "UTF-8 跨流分块修复后受影响测试复验",
+      "tests": [
+        { "command": "npm run test:app --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "subSuites": 6, "newUtf8Checks": 10, "log": "engine-app-after-utf8.log" },
+        { "command": "npm run test:plan --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "checksBySubSuite": [32, 43, 52, 18], "log": "engine-plan-after-utf8.log" }
+      ],
+      "notRerun": ["test", "test:local"]
+    },
+    {
+      "stage": "最终管理页构建后的本机启动复验",
+      "buildAssetsPresent": ["umi.6a4217c8.js", "umi.ad72559f.css"],
+      "tests": [
+        { "command": "npm run test:local --prefix sillytavern/engine", "exitCode": 0, "status": "PASS", "checks": 16, "stdout": "engine-local-final.stdout.txt", "stderr": "engine-local-final.stderr.txt" }
+      ],
+      "notRerun": ["test", "test:app", "test:plan"],
+      "safety": {
+        "realModelCalls": 0,
+        "externalNetworkCalls": 0,
+        "accessTokenReads": 0,
+        "counterEvidence": "realModelCalls 由测试 JSON 输出；network === 0 与 tokenReads === 0 由通过的测试断言确认。",
+        "legacy8787ServiceAccessed": false,
+        "realCredentialsAccessed": false,
+        "cleanup": "测试正常退出；通过 owner 开闭平衡及锁释放断言，finally 关闭临时服务并删除虚构数据目录。"
+      }
+    }
+  ],
+  "initialSandboxAttempts": {
+    "status": "BLOCKED_THEN_PASSED_WITH_APPROVED_ESCALATION",
+    "reason": "前三组初次尝试被沙箱禁止监听 127.0.0.1，错误为 listen EPERM；相同测试获准升级后全部通过。",
+    "logs": ["engine-core.sandbox.log", "engine-app.sandbox.log", "engine-plan.sandbox.log"]
+  },
+  "nonBlockingStderr": "npm 提示现有用户配置 python 将在未来主版本停止支持；测试退出码为 0。",
+  "limitations": "最终轮仅重跑 test:local；核心与 UTF-8 修复后应用、套餐测试的通过记录分别来自上述对应轮次，不声称最终轮重跑全部测试。"
+}

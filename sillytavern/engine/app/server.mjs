@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {readUtf8Body} from './read-body.mjs';
 import {serveAdmin} from './admin-static.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -17,7 +18,7 @@ const uuid=()=>crypto.randomUUID();
 const safeId=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(x);
 const publicRoot=fileURLToPath(new URL('./public/',import.meta.url));
 const httpError=(status,message)=>Object.assign(new Error(message),{status});
-async function jsonBody(req){let raw='';for await(const part of req){raw+=part;if(Buffer.byteLength(raw)>16*1024*1024)throw httpError(413,'附件或请求过大');}try{return JSON.parse(raw||'{}')}catch{throw httpError(400,'无效 JSON')}}
+async function jsonBody(req){const raw=await readUtf8Body(req,16*1024*1024);try{return JSON.parse(raw||'{}')}catch{throw httpError(400,'无效 JSON')}}
 async function atomic(file,value){const tmp=file+'.'+uuid()+'.tmp';await fs.writeFile(tmp,JSON.stringify(value),{mode:0o600});await fs.rename(tmp,file);}
 export async function createApp(options={}){
   const root=path.resolve(options.root||'/tmp/between-role-app');await fs.mkdir(root,{recursive:true,mode:0o700});

@@ -1,13 +1,16 @@
-import { PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import {
-  type ProColumns,
+  ArrowRightOutlined,
+  BookOutlined,
+  PlusOutlined,
+  ReadOutlined,
+} from '@ant-design/icons';
+import {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  ProTable,
 } from '@ant-design/pro-components';
 import { history, useModel, useParams } from '@umijs/max';
-import { App, Button, Empty, Form, Input, Tag } from 'antd';
+import { App, Button, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import Editor from '@/components/Editor';
 import Reader, { roleFields } from '@/components/Reader';
@@ -21,17 +24,17 @@ export default function Roles() {
   const { id } = useParams<{ id: string }>();
   const [query, setQuery] = useState('');
   const [editor, setEditor] = useState<{ role: Role; config: Config }>();
-  const [form] = Form.useForm<Role>();
   const edit = (role: Role) => {
     if (!data) return;
     clearFeedback();
-    form.resetFields();
     setEditor({
       role: structuredClone(role),
       config: structuredClone(data.config),
     });
   };
-  const remove = (role: Role) =>
+  const remove = (role: Role) => {
+    if (!data) return;
+    const config = data.config;
     modal.confirm({
       title: `移除「${role.name}」？`,
       content: '从新会话的角色库移除，已有会话不删除。',
@@ -42,105 +45,13 @@ export default function Roles() {
         mutate(
           () =>
             saveConfig({
-              ...data!.config,
-              roles: data!.config.roles.filter((r) => r.id !== role.id),
+              ...config,
+              roles: config.roles.filter((r) => r.id !== role.id),
             }),
           '角色已移除。',
         ),
     });
-  const columns: ProColumns<Role>[] = [
-    {
-      title: '角色',
-      dataIndex: 'name',
-      width: 280,
-      render: (_, role) => (
-        <div className="flex items-start gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-forest-50 text-xl text-forest-600">
-            {role.icon || '◇'}
-          </div>
-          <div className="min-w-0">
-            <Button
-              type="link"
-              className="h-auto max-w-full whitespace-normal p-0 text-left font-semibold"
-              onClick={() => history.push(`/roles/${role.id}`)}
-            >
-              {role.name}
-            </Button>
-            <div className="mt-1 text-xs leading-5 text-muted">
-              {role.tag || '未设置标签'}
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: '简介',
-      dataIndex: 'description',
-      search: false,
-      render: (_, role) => (
-        <div className="line-clamp-2 max-w-md text-sm leading-6 text-muted">
-          {role.description || '暂无简介'}
-        </div>
-      ),
-    },
-    {
-      title: '世界书',
-      dataIndex: 'bookIds',
-      search: false,
-      width: 180,
-      render: (_, role) => (
-        <div className="flex flex-wrap gap-1">
-          {role.bookIds.length ? (
-            role.bookIds.map((bookId) => (
-              <Tag key={bookId}>
-                {data?.config.books.find((b) => b.id === bookId)?.name}
-              </Tag>
-            ))
-          ) : (
-            <span className="text-muted">未绑定</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: '来源',
-      dataIndex: 'source',
-      search: false,
-      width: 130,
-      render: (_, role) => (
-        <Tag variant="filled" color={role.source ? 'blue' : 'default'}>
-          {role.source ? '社区资源' : '本地角色'}
-        </Tag>
-      ),
-    },
-    {
-      title: '操作',
-      valueType: 'option',
-      width: 200,
-      render: (_, role) => [
-        <Button
-          key="read"
-          type="link"
-          icon={<ReadOutlined aria-hidden />}
-          onClick={() => history.push(`/roles/${role.id}`)}
-        >
-          阅读
-        </Button>,
-        <Button key="edit" type="link" onClick={() => edit(role)}>
-          编辑
-        </Button>,
-        <Button
-          key="remove"
-          type="link"
-          danger
-          disabled={busy || data!.config.roles.length <= 1}
-          onClick={() => remove(role)}
-        >
-          移除
-        </Button>,
-      ],
-    },
-  ];
+  };
   const selected = data?.config.roles.find((r) => r.id === id);
   return (
     <Workspace
@@ -175,48 +86,135 @@ export default function Roles() {
           )
         ) : (
           <>
-            <div className="mb-6 grid gap-4 sm:grid-cols-3">
+            <div className="metric-strip">
               <Metric
                 label="角色总数"
-                value={data.config.roles.length}
+                value={data.config.roles.length.toString().padStart(2, '0')}
                 detail="每一份设定，都是一个对话起点"
               />
               <Metric
                 label="已关联世界书"
-                value={
-                  new Set(data.config.roles.flatMap((r) => r.bookIds)).size
-                }
-                detail="为角色提供可复用的背景知识"
+                value={new Set(data.config.roles.flatMap((r) => r.bookIds)).size
+                  .toString()
+                  .padStart(2, '0')}
+                detail="跨角色复用的背景知识"
               />
               <Metric
                 label="社区角色"
-                value={data.config.roles.filter((r) => r.source).length}
-                detail="保留作者归因与原始内容"
+                value={data.config.roles
+                  .filter((r) => r.source)
+                  .length.toString()
+                  .padStart(2, '0')}
+                detail="完整保留作者归因与原文"
               />
             </div>
-            <ProTable<Role>
-              rowKey="id"
-              headerTitle="全部角色"
-              columns={columns}
-              dataSource={data.config.roles.filter((r) =>
-                `${r.name} ${r.tag} ${r.description}`.includes(query),
-              )}
-              search={false}
-              options={{ reload: false, density: true, setting: true }}
-              toolBarRender={() => [
-                <Input.Search
-                  key="search"
-                  placeholder="搜索角色名称、简介或标签"
-                  aria-label="搜索角色"
-                  allowClear
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />,
-              ]}
-              pagination={{ pageSize: 10, hideOnSinglePage: true }}
-              scroll={{ x: 900 }}
-              locale={{ emptyText: <Empty description="没有匹配的角色" /> }}
-            />
+            <div className="library-heading">
+              <div className="library-title">
+                <h2 className="section-title">角色档案</h2>
+                <span>CHARACTER COLLECTION</span>
+              </div>
+              <Input.Search
+                placeholder="搜索角色名称、简介或标签"
+                aria-label="搜索角色"
+                allowClear
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+            <div className="role-grid">
+              {data.config.roles
+                .filter((role) =>
+                  `${role.name} ${role.tag} ${role.description}`
+                    .toLocaleLowerCase()
+                    .includes(query.toLocaleLowerCase()),
+                )
+                .map((role, index) => (
+                  <article className="role-card" key={role.id}>
+                    <div className="role-card-top">
+                      <div className="role-monogram" aria-hidden>
+                        {role.name.slice(0, 1) || '角'}
+                      </div>
+                      <span className="role-card-number">
+                        CHARACTER / {String(index + 1).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <h3>
+                      <Button
+                        type="link"
+                        onClick={() =>
+                          history.push(`/roles/${encodeURIComponent(role.id)}`)
+                        }
+                      >
+                        {role.name}
+                      </Button>
+                    </h3>
+                    <div className="role-card-tags">
+                      <Tag
+                        variant="filled"
+                        color={role.source ? 'geekblue' : 'default'}
+                      >
+                        {role.source ? '社区资源' : '本地角色'}
+                      </Tag>
+                      {role.tag && <Tag>{role.tag}</Tag>}
+                    </div>
+                    <p className="role-card-description line-clamp-3">
+                      {role.description || '暂无简介，编辑角色来补全第一印象。'}
+                    </p>
+                    <div className="role-card-books">
+                      <BookOutlined aria-hidden />{' '}
+                      {role.bookIds.length
+                        ? role.bookIds
+                            .map(
+                              (bookId) =>
+                                data.config.books.find(
+                                  (book) => book.id === bookId,
+                                )?.name || bookId,
+                            )
+                            .join(' · ')
+                        : '尚未绑定世界书'}
+                    </div>
+                    <div className="role-card-actions">
+                      <Button
+                        type="link"
+                        icon={<ReadOutlined aria-hidden />}
+                        onClick={() =>
+                          history.push(`/roles/${encodeURIComponent(role.id)}`)
+                        }
+                      >
+                        阅读 <ArrowRightOutlined aria-hidden />
+                      </Button>
+                      <div>
+                        <Button
+                          type="text"
+                          disabled={busy}
+                          onClick={() => edit(role)}
+                        >
+                          编辑
+                        </Button>
+                        <Button
+                          type="text"
+                          danger
+                          disabled={busy || data.config.roles.length <= 1}
+                          onClick={() => remove(role)}
+                        >
+                          移除
+                        </Button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+            </div>
+            {!data.config.roles.some((role) =>
+              `${role.name} ${role.tag} ${role.description}`
+                .toLocaleLowerCase()
+                .includes(query.toLocaleLowerCase()),
+            ) && (
+              <div className="glass-panel">
+                <Empty description="没有匹配的角色">
+                  <Button onClick={() => setQuery('')}>清空搜索</Button>
+                </Empty>
+              </div>
+            )}
           </>
         ))}
       {editor && (
@@ -227,7 +225,6 @@ export default function Roles() {
               : '新建角色'
           }
           initialValues={editor.role}
-          form={form}
           onClose={() => setEditor(undefined)}
           onSave={(values) =>
             mutate(

@@ -1,19 +1,17 @@
 import { PlusOutlined, ReadOutlined } from '@ant-design/icons';
 import {
-  type ProColumns,
   ProFormDigit,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
   ProFormTextArea,
-  ProTable,
 } from '@ant-design/pro-components';
 import { history, useModel, useParams } from '@umijs/max';
-import { App, Button, Collapse, Empty, Form, Input, Tag } from 'antd';
+import { App, Button, Collapse, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import Editor from '@/components/Editor';
 import Reader from '@/components/Reader';
-import { Workspace } from '@/components/Workspace';
+import { Metric, Workspace } from '@/components/Workspace';
 import { saveConfig } from '@/services/admin';
 import { newBook, removeBook, replaceBook } from '@/services/config';
 import type { Book, Config } from '@/services/types';
@@ -23,104 +21,30 @@ export default function Books() {
   const { id } = useParams<{ id: string }>();
   const [query, setQuery] = useState('');
   const [editor, setEditor] = useState<{ book: Book; config: Config }>();
-  const [form] = Form.useForm<Book>();
   const edit = (book: Book) => {
     if (!data) return;
     clearFeedback();
-    form.resetFields();
     setEditor({
       book: structuredClone(book),
       config: structuredClone(data.config),
     });
   };
-  const columns: ProColumns<Book>[] = [
-    {
-      title: '世界书',
-      dataIndex: 'name',
-      width: 280,
-      render: (_, book) => (
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#f3eee2] text-xl text-[#8c7145]">
-            <ReadOutlined aria-hidden />
-          </div>
-          <Button
-            type="link"
-            className="h-auto whitespace-normal p-0 text-left font-semibold"
-            onClick={() => history.push(`/books/${book.id}`)}
-          >
-            {book.name}
-          </Button>
-        </div>
-      ),
-    },
-    {
-      title: '条目',
-      width: 100,
-      render: (_, book) => (
-        <Tag variant="filled">{book.entries?.length ?? 1} 条</Tag>
-      ),
-    },
-    {
-      title: '绑定角色',
-      render: (_, book) => (
-        <div className="flex flex-wrap gap-1">
-          {data?.config.roles
-            .filter((r) => r.bookIds.includes(book.id))
-            .map((r) => (
-              <Tag key={r.id}>{r.name}</Tag>
-            ))}
-        </div>
-      ),
-    },
-    {
-      title: '来源',
-      width: 140,
-      render: (_, book) => (
-        <span className="text-sm text-muted">
-          {book.source ? 'Foreverse Team' : '本地创建'}
-        </span>
-      ),
-    },
-    {
-      title: '操作',
-      valueType: 'option',
-      width: 200,
-      render: (_, book) => [
-        <Button
-          key="read"
-          type="link"
-          onClick={() => history.push(`/books/${book.id}`)}
-        >
-          阅读全文
-        </Button>,
-        <Button key="edit" type="link" onClick={() => edit(book)}>
-          编辑
-        </Button>,
-        <Button
-          key="remove"
-          danger
-          type="link"
-          disabled={busy}
-          onClick={() =>
-            modal.confirm({
-              title: `移除「${book.name}」？`,
-              content: '将解除所有角色与此世界书的绑定，仅影响新会话。',
-              okText: '移除世界书',
-              cancelText: '取消',
-              okButtonProps: { danger: true },
-              onOk: () =>
-                mutate(
-                  () => saveConfig(removeBook(data!.config, book.id)),
-                  '世界书已移除，角色绑定已解除。',
-                ),
-            })
-          }
-        >
-          移除
-        </Button>,
-      ],
-    },
-  ];
+  const remove = (book: Book) => {
+    if (!data) return;
+    const config = data.config;
+    modal.confirm({
+      title: `移除「${book.name}」？`,
+      content: '将解除所有角色与此世界书的绑定，仅影响新会话。',
+      okText: '移除世界书',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      onOk: () =>
+        mutate(
+          () => saveConfig(removeBook(config, book.id)),
+          '世界书已移除，角色绑定已解除。',
+        ),
+    });
+  };
   const selected = data?.config.books.find((b) => b.id === id);
   return (
     <Workspace
@@ -154,45 +78,145 @@ export default function Books() {
             </Empty>
           )
         ) : (
-          <ProTable<Book>
-            rowKey="id"
-            headerTitle={`资源库 · ${data.config.books.length} 本`}
-            columns={columns}
-            dataSource={data.config.books.filter((b) =>
-              `${b.name} ${b.keys.join(' ')}`.includes(query),
-            )}
-            search={false}
-            toolBarRender={() => [
+          <>
+            <div className="metric-strip">
+              <Metric
+                label="世界书"
+                value={data.config.books.length.toString().padStart(2, '0')}
+                detail="独立管理，可在多个角色间复用"
+              />
+              <Metric
+                label="内容条目"
+                value={data.config.books.reduce(
+                  (sum, book) => sum + (book.entries?.length ?? 1),
+                  0,
+                )}
+                detail="完整保留触发条件与注入顺序"
+              />
+              <Metric
+                label="关联角色"
+                value={data.config.roles
+                  .filter((role) => role.bookIds.length)
+                  .length.toString()
+                  .padStart(2, '0')}
+                detail="每个故事都有自己的知识网络"
+              />
+            </div>
+            <div className="library-heading">
+              <div className="library-title">
+                <h2 className="section-title">世界档案</h2>
+                <span>WORLD COLLECTION</span>
+              </div>
               <Input.Search
-                key="search"
                 placeholder="搜索世界书或关键词"
                 aria-label="搜索世界书"
                 allowClear
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-              />,
-            ]}
-            options={false}
-            pagination={{ pageSize: 10, hideOnSinglePage: true }}
-            scroll={{ x: 850 }}
-            locale={{
-              emptyText: (
+              />
+            </div>
+            <div className="book-grid">
+              {data.config.books
+                .filter((book) =>
+                  `${book.name} ${book.keys.join(' ')}`
+                    .toLocaleLowerCase()
+                    .includes(query.toLocaleLowerCase()),
+                )
+                .map((book, index) => (
+                  <article key={book.id} className="book-card">
+                    <div className="book-spine" aria-hidden>
+                      <ReadOutlined />
+                      <span>VOL.{String(index + 1).padStart(2, '0')}</span>
+                    </div>
+                    <div className="book-card-body">
+                      <h3>
+                        <Button
+                          type="link"
+                          onClick={() =>
+                            history.push(
+                              `/books/${encodeURIComponent(book.id)}`,
+                            )
+                          }
+                        >
+                          {book.name}
+                        </Button>
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        <Tag color="cyan">
+                          {book.entries?.length ?? 1} 条设定
+                        </Tag>
+                        <Tag>{book.source ? '社区资源' : '本地创建'}</Tag>
+                      </div>
+                      <p className="book-card-description line-clamp-2">
+                        {book.entries?.[0]?.content ||
+                          book.content ||
+                          '尚未写入内容，编辑世界书补全世界的细节。'}
+                      </p>
+                      <div className="text-xs text-muted mb-4">
+                        绑定角色：
+                        {data.config.roles
+                          .filter((role) => role.bookIds.includes(book.id))
+                          .map((role) => role.name)
+                          .join(' · ') || '尚未绑定'}
+                      </div>
+                      <div className="role-card-actions">
+                        <Button
+                          type="link"
+                          onClick={() =>
+                            history.push(
+                              `/books/${encodeURIComponent(book.id)}`,
+                            )
+                          }
+                        >
+                          阅读全文
+                        </Button>
+                        <div>
+                          <Button
+                            type="text"
+                            disabled={busy}
+                            onClick={() => edit(book)}
+                          >
+                            编辑
+                          </Button>
+                          <Button
+                            type="text"
+                            danger
+                            disabled={busy}
+                            onClick={() => remove(book)}
+                          >
+                            移除
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+            </div>
+            {!data.config.books.some((book) =>
+              `${book.name} ${book.keys.join(' ')}`
+                .toLocaleLowerCase()
+                .includes(query.toLocaleLowerCase()),
+            ) && (
+              <div className="glass-panel">
                 <Empty
                   description={
                     query
                       ? '没有匹配的世界书'
                       : '还没有世界书，创建第一份世界设定'
                   }
-                />
-              ),
-            }}
-          />
+                >
+                  {query && (
+                    <Button onClick={() => setQuery('')}>清空搜索</Button>
+                  )}
+                </Empty>
+              </div>
+            )}
+          </>
         ))}
       {editor && (
         <Editor<Book>
           title={`编辑世界书 · ${editor.book.name || '新资源'}`}
           initialValues={editor.book}
-          form={form}
           onClose={() => setEditor(undefined)}
           onSave={(values) =>
             mutate(
@@ -227,6 +251,10 @@ export default function Books() {
                 forceRender: true,
                 children: (
                   <>
+                    <ProFormText
+                      name={['entries', i, 'comment']}
+                      label="条目标题"
+                    />
                     <ProFormSelect
                       name={['entries', i, 'key']}
                       label="主关键词"
@@ -293,9 +321,15 @@ export default function Books() {
                         rules={[{ required: true }]}
                       />
                     </div>
+                    <ProFormDigit
+                      name={['entries', i, 'position']}
+                      label="注入位置"
+                      fieldProps={{ precision: 0 }}
+                      rules={[{ required: true }]}
+                    />
                     <p className="text-sm text-muted">
-                      注入位置 {entry.position}
-                      ；其他原始参数不变，可在阅读视图查看全部字段。
+                      原始 UID
+                      与未知扩展字段会随本次修改完整保留，可在阅读视图查看全部字段。
                     </p>
                   </>
                 ),

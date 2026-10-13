@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {readUtf8Body} from './read-body.mjs';
 import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 import Jimp from 'jimp';
@@ -11,7 +12,7 @@ export async function provider({demo=false,modelUrl='',modelName='gpt-4o-mini',k
   const status={mode:demo?'demo':target?'configured':'unconfigured',model:modelName,connection:demo?'demo':target?'unchecked':'unconfigured',description:demo?'本地合成演示 · 不代表真实模型效果':target?'真实模型已配置，尚未验证连接':'尚未配置真实模型连接',capabilities:{imageInput:demo,audioInput:demo,voice:demo||!!(pipeline&&mediaConfig.ttsEndpoint),tts:demo||!!mediaConfig.ttsEndpoint,image:demo||!!mediaConfig.sdEndpoint,caption:demo||!!(pipeline&&rawImage)}};
   const server=http.createServer(async(req,res)=>{
     if(req.url!==`/${secret}/chat/completions`&&req.url!==`/${secret}/audio/speech`&&req.url!==`/${secret}/sdapi/v1/txt2img`){res.writeHead(404);res.end();return;}
-    let raw='';for await(const c of req){raw+=c;if(raw.length>20*1024*1024){res.writeHead(413);res.end();return;}}
+    let raw;try{raw=await readUtf8Body(req,20*1024*1024)}catch(error){res.writeHead(error.status||400);res.end();return;}
     const abort=new AbortController();res.on('close',()=>{if(!res.writableEnded)abort.abort()});
     try{
       const body=JSON.parse(raw);

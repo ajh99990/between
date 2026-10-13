@@ -1,6 +1,8 @@
 import { defineConfig } from '@umijs/max';
 import defaultSettings from './defaultSettings';
 import routes from './routes';
+
+const devApi = process.env.BETWEEN_ADMIN_DEV_API;
 // Full Ant Design Pro 6 scaffold: Umi Max runtime, layout, access, model, request and Tailwind plugins.
 export default defineConfig({
   esbuildMinifyIIFE: true,
@@ -20,12 +22,20 @@ export default defineConfig({
     configProvider: {
       theme: {
         token: {
-          colorPrimary: '#316a5b',
-          borderRadius: 8,
-          colorBgLayout: '#f3f5f3',
-          colorText: '#20322b',
+          colorPrimary: '#8ea4ff',
+          colorLink: '#a4baff',
+          colorLinkHover: '#d1dcff',
+          colorLinkActive: '#c5d2ff',
+          borderRadius: 12,
+          colorBgLayout: '#080d1b',
+          colorBgContainer: '#131c32',
+          colorBgElevated: '#19243c',
+          colorBorder: '#3a4965',
+          colorTextSecondary: '#b0bdd4',
+          colorTextPlaceholder: '#8e9cb7',
+          colorText: '#eef3ff',
           fontFamily: '"PingFang SC", "Microsoft YaHei", sans-serif',
-          controlHeight: 38,
+          controlHeight: 42,
         },
       },
     },
@@ -35,13 +45,13 @@ export default defineConfig({
   mock: false,
   fastRefresh: true,
   // Preserve the backend Origin/Host checks in development; never proxy to a live user instance.
-  proxy: process.env.BETWEEN_ADMIN_DEV_API
+  proxy: devApi
     ? {
         '/api/': {
-          target: process.env.BETWEEN_ADMIN_DEV_API,
+          target: devApi,
           changeOrigin: true,
           onProxyReq(proxyReq) {
-            proxyReq.setHeader('Origin', process.env.BETWEEN_ADMIN_DEV_API!);
+            proxyReq.setHeader('Origin', devApi);
           },
         },
       }

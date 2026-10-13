@@ -1,14 +1,22 @@
+import {
+  ApiOutlined,
+  InfoCircleOutlined,
+  TeamOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { App, Button, Card, Empty, Switch, Tag } from 'antd';
+import { App, Button, Empty, Switch, Tag } from 'antd';
 import { date, Workspace } from '@/components/Workspace';
 import { api, saveConfig } from '@/services/admin';
 import type { User } from '@/services/types';
 export default function Users() {
   const { data, busy, mutate } = useModel('admin');
   const { modal } = App.useApp();
-  const global = (key: 'acceptNew' | 'paused', value: boolean) =>
-    modal.confirm({
+  const global = (key: 'acceptNew' | 'paused', value: boolean) => {
+    if (!data) return;
+    const config = data.config;
+    return modal.confirm({
       title:
         key === 'acceptNew'
           ? value
@@ -25,10 +33,11 @@ export default function Users() {
       cancelText: '取消',
       onOk: () =>
         mutate(
-          () => saveConfig({ ...data!.config, [key]: value }),
+          () => saveConfig({ ...config, [key]: value }),
           '全局开关已更新。',
         ),
     });
+  };
   const columns: ProColumns<User>[] = [
     {
       title: '用户 ID',
@@ -95,59 +104,123 @@ export default function Users() {
       description="控制新用户访问和生成状态，管理本机匿名浏览器身份。"
     >
       {data && (
-        <div className="space-y-6">
-          <div className="grid gap-5 md:grid-cols-2">
-            <Card>
-              <div className="flex items-start justify-between gap-6">
-                <div>
-                  <h3 className="m-0 text-base font-semibold">
-                    允许新用户进入
-                  </h3>
-                  <p className="mb-0 text-sm leading-7 text-muted">
-                    新浏览器可以创建身份。关闭后，已有用户仍可访问。
-                  </p>
+        <div className="page-stack">
+          <div className="ops-grid">
+            <section
+              className="glass-panel"
+              aria-labelledby="access-control-title"
+            >
+              <div className="panel-header flex-wrap gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <ApiOutlined
+                    aria-hidden
+                    className="text-2xl text-[#78bdff]"
+                  />
+                  <div>
+                    <div className="panel-kicker">ACCESS CONTROL</div>
+                    <h2 id="access-control-title" className="section-title">
+                      允许新用户进入
+                    </h2>
+                  </div>
                 </div>
                 <Switch
                   aria-label="允许新用户进入"
                   checked={data.config.acceptNew}
                   loading={busy}
+                  checkedChildren="允许"
+                  unCheckedChildren="关闭"
                   onChange={(v) => global('acceptNew', v)}
                 />
               </div>
-            </Card>
-            <Card>
-              <div className="flex items-start justify-between gap-6">
-                <div>
-                  <h3 className="m-0 text-base font-semibold">
-                    暂停新生成请求
-                  </h3>
-                  <p className="mb-0 text-sm leading-7 text-muted">
-                    暂停后不接受新的生成请求，正在运行的任务不会自动停止。
-                  </p>
+              <div className="mb-4">
+                <Tag color={data.config.acceptNew ? 'cyan' : 'default'}>
+                  {data.config.acceptNew
+                    ? '新用户接入开放'
+                    : '新用户接入已关闭'}
+                </Tag>
+              </div>
+              <p className="muted m-0 text-sm leading-7">
+                新浏览器可以创建身份。关闭后，已有用户仍可访问。
+              </p>
+            </section>
+            <section
+              className="glass-panel"
+              aria-labelledby="generation-control-title"
+            >
+              <div className="panel-header flex-wrap gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <ThunderboltOutlined
+                    aria-hidden
+                    className="text-2xl text-[#78bdff]"
+                  />
+                  <div>
+                    <div className="panel-kicker">GENERATION CONTROL</div>
+                    <h2 id="generation-control-title" className="section-title">
+                      暂停新生成请求
+                    </h2>
+                  </div>
                 </div>
                 <Switch
                   aria-label="暂停新生成请求"
                   checked={data.config.paused}
                   loading={busy}
+                  checkedChildren="暂停"
+                  unCheckedChildren="开放"
                   onChange={(v) => global('paused', v)}
                 />
               </div>
-            </Card>
+              <div className="mb-4">
+                <Tag color={data.config.paused ? 'orange' : 'cyan'}>
+                  {data.config.paused ? '新生成请求已暂停' : '新生成请求未暂停'}
+                </Tag>
+              </div>
+              <p className="muted m-0 text-sm leading-7">
+                暂停后不接受新的生成请求，正在运行的任务不会自动停止。
+              </p>
+            </section>
           </div>
-          <ProTable<User>
-            rowKey="id"
-            headerTitle="浏览器用户"
-            columns={columns}
-            dataSource={data.users}
-            search={false}
-            options={false}
-            pagination={{ pageSize: 10, hideOnSinglePage: true }}
-            scroll={{ x: 800 }}
-            locale={{ emptyText: <Empty description="还没有浏览器用户" /> }}
-          />
-          <p className="text-sm text-muted">
-            这是本机浏览器会话身份，非生产账户系统；租户由现有服务固定。
-          </p>
+          <section
+            className="glass-panel data-panel"
+            aria-labelledby="browser-users-title"
+          >
+            <div className="panel-header flex-wrap gap-4">
+              <div>
+                <div className="panel-kicker">BROWSER IDENTITIES</div>
+                <h2 id="browser-users-title" className="section-title">
+                  <TeamOutlined aria-hidden /> 浏览器用户
+                </h2>
+                <p className="muted mb-0 mt-2 text-sm">
+                  管理本机身份的访问状态与已保存会话。
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Tag>{data.users.length} 个用户</Tag>
+                <Tag color="cyan">
+                  {data.users.filter((user) => !user.disabled).length} 正常
+                </Tag>
+                <Tag>
+                  {data.users.filter((user) => user.disabled).length} 已停用
+                </Tag>
+              </div>
+            </div>
+            <ProTable<User>
+              rowKey="id"
+              columns={columns}
+              dataSource={data.users}
+              search={false}
+              options={false}
+              toolBarRender={false}
+              pagination={{ pageSize: 10, hideOnSinglePage: true }}
+              scroll={{ x: 800 }}
+              locale={{ emptyText: <Empty description="还没有浏览器用户" /> }}
+            />
+          </section>
+          <div className="status-strip">
+            <InfoCircleOutlined aria-hidden />
+            <span className="min-w-0 flex-1 text-sm leading-7">
+              这是本机浏览器会话身份，非生产账户系统；租户由现有服务固定。
+            </span>
+          </div>
         </div>
       )}
     </Workspace>

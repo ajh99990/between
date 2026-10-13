@@ -1,0 +1,27 @@
+
+> between-st-role-engine-research@0.1.0 test:local
+> node app/test/local-start.mjs
+
+{
+  "status": "PASS",
+  "checks": 16,
+  "details": [
+    "First start initializes the explicit local backend",
+    "First start uses confirmed defaults",
+    "Both pages and authenticated admin HTTP work",
+    "Grant metadata marks ready without inference",
+    "Actual user session sees the configured backend",
+    "Admin password stays in a private file",
+    "Second start cannot take existing ownership",
+    "Rejected duplicate never opens credentials",
+    "Shutdown releases supervisor ownership",
+    "Shutdown releases engine ownership",
+    "Restart preserves all existing settings byte for byte",
+    "Restart reuses the private admin password",
+    "Occupied application port fails explicitly",
+    "Failed startup cleans both locks",
+    "Every opened credential owner is closed",
+    "No startup model calls, token refreshes or external network"
+  ],
+  "realModelCalls": 0
+}

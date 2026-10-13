@@ -1,16 +1,17 @@
 import { StyleProvider } from '@ant-design/cssinjs';
 import { ExportOutlined, LogoutOutlined } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link, useModel } from '@umijs/max';
+import { history, useModel } from '@umijs/max';
 import {
   App,
   Button,
   ConfigProvider,
   type ConfigProviderProps,
   Result,
-  Tag,
+  theme,
 } from 'antd';
 import type { ReactNode } from 'react';
+import OrbitShell from '@/components/OrbitShell';
 import { ApiError, api, getState, logout } from '@/services/admin';
 import type { AdminState } from '@/services/types';
 import defaultSettings from '../config/defaultSettings';
@@ -25,6 +26,7 @@ export const antd = (config: ConfigProviderProps) => ({
   csp: { nonce },
   theme: {
     ...config.theme,
+    algorithm: theme.darkAlgorithm,
     token: {
       ...config.theme?.token,
       motion: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -110,14 +112,10 @@ function AccountActions() {
 }
 export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
   ...defaultSettings,
-  menuItemRender: (item, dom) =>
-    item.path ? <Link to={item.path}>{dom}</Link> : dom,
-  actionsRender: () => [
-    <Tag key="mode" variant="filled" color="green">
-      本机管理
-    </Tag>,
-    <AccountActions key="account" />,
-  ],
+  headerRender: false,
+  menuRender: false,
+  footerRender: false,
+  contentStyle: { padding: 0, minHeight: '100vh' },
   onPageChange: () => {
     if (
       !initialState?.authenticated &&
@@ -126,16 +124,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => ({
     )
       history.replace('/login');
   },
-  menuFooterRender: (collapsed) =>
-    collapsed ? null : (
-      <div className="px-4 pb-5 text-xs leading-6 text-[#a9bdb6]">
-        <div className="font-semibold text-[#e1ebe5]">
-          让每一个角色，拥有自己的世界
-        </div>
-        <div className="mt-2 opacity-65">BETWEEN / WORKSPACE</div>
-      </div>
-    ),
-  childrenRender: (children) => <SessionBoundary>{children}</SessionBoundary>,
+  childrenRender: (children) => (
+    <OrbitShell actions={<AccountActions />}>
+      <SessionBoundary>{children}</SessionBoundary>
+    </OrbitShell>
+  ),
 });
 export function rootContainer(container: ReactNode) {
   return (

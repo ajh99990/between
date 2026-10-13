@@ -1,0 +1,434 @@
+{
+  "status": "PASS",
+  "browser": "155.0.8059.40",
+  "sandbox": true,
+  "screenshots": [
+    {
+      "file": "users-populated-table-1440.png",
+      "route": "users",
+      "width": 1440,
+      "metrics": {
+        "documentWidth": 1440,
+        "viewportWidth": 1440,
+        "scrollContainers": []
+      }
+    },
+    {
+      "file": "sessions-populated-table-1440.png",
+      "route": "sessions",
+      "width": 1440,
+      "metrics": {
+        "documentWidth": 1440,
+        "viewportWidth": 1440,
+        "scrollContainers": []
+      }
+    },
+    {
+      "file": "users-populated-table-375.png",
+      "route": "users",
+      "width": 375,
+      "metrics": {
+        "documentWidth": 375,
+        "viewportWidth": 375,
+        "scrollContainers": [
+          {
+            "className": "ant-table-content",
+            "scrollWidth": 800,
+            "clientWidth": 301
+          }
+        ]
+      }
+    },
+    {
+      "file": "users-populated-table-actions-375.png",
+      "route": "users",
+      "width": 375,
+      "note": "Internal horizontal table scroll reveals row actions; page width remains bounded."
+    },
+    {
+      "file": "sessions-populated-table-375.png",
+      "route": "sessions",
+      "width": 375,
+      "metrics": {
+        "documentWidth": 375,
+        "viewportWidth": 375,
+        "scrollContainers": [
+          {
+            "className": "ant-table-content",
+            "scrollWidth": 1000,
+            "clientWidth": 301
+          }
+        ]
+      }
+    },
+    {
+      "file": "sessions-populated-table-actions-375.png",
+      "route": "sessions",
+      "width": 375,
+      "note": "Internal horizontal table scroll reveals row actions; page width remains bounded."
+    },
+    {
+      "file": "roles-final-first-screen-1440.png",
+      "width": 1440,
+      "note": "Final CSS first screen; targeted visual evidence, not a repeat of the 64-workflow suite."
+    },
+    {
+      "file": "roles-danger-default-1440.png",
+      "width": 1440,
+      "note": "Default danger text after transition settled."
+    },
+    {
+      "file": "books-final-first-screen-1440.png",
+      "width": 1440,
+      "note": "Final CSS first screen; targeted visual evidence, not a repeat of the 64-workflow suite."
+    },
+    {
+      "file": "books-danger-default-1440.png",
+      "width": 1440,
+      "note": "Default danger text after transition settled."
+    },
+    {
+      "file": "models-final-plan-panel-1440.png",
+      "width": 1440,
+      "note": "Final CSS plan panel including disconnect control; no connection action invoked."
+    },
+    {
+      "file": "editor-final-select-focus-1440.png",
+      "width": 1440,
+      "note": "Stable cyan group focus; nested input outline remains none."
+    },
+    {
+      "file": "roles-final-first-screen-375.png",
+      "width": 375,
+      "note": "Final CSS first screen; targeted visual evidence, not a repeat of the 64-workflow suite."
+    },
+    {
+      "file": "roles-danger-default-375.png",
+      "width": 375,
+      "note": "Default danger text after transition settled."
+    },
+    {
+      "file": "roles-danger-primary-hover-375.png",
+      "width": 375,
+      "note": "Danger confirmation hover only; operation is cancelled."
+    },
+    {
+      "file": "books-final-first-screen-375.png",
+      "width": 375,
+      "note": "Final CSS first screen; targeted visual evidence, not a repeat of the 64-workflow suite."
+    },
+    {
+      "file": "books-danger-default-375.png",
+      "width": 375,
+      "note": "Default danger text after transition settled."
+    },
+    {
+      "file": "books-danger-primary-hover-375.png",
+      "width": 375,
+      "note": "Danger confirmation hover only; operation is cancelled."
+    },
+    {
+      "file": "models-final-plan-panel-375.png",
+      "width": 375,
+      "note": "Final CSS plan panel including disconnect control; no connection action invoked."
+    },
+    {
+      "file": "editor-final-select-focus-375.png",
+      "width": 375,
+      "note": "Stable cyan group focus; nested input outline remains none."
+    }
+  ],
+  "errors": [],
+  "blockedRequests": [],
+  "planProviderCalls": {
+    "status": 14,
+    "generate": 0,
+    "resume": 0,
+    "disconnect": 0
+  },
+  "builtAssets": [
+    "/admin/umi.d1d700bb.css",
+    "/admin/preload_helper.e6013a5a.js",
+    "/admin/umi.6a4217c8.js"
+  ],
+  "scope": "Targeted browser visual checks only, following final CSS-only danger/focus adjustments; not a repeat of the 64-workflow suite.",
+  "visualMetrics": [
+    {
+      "name": "roles-danger-default-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "roles-danger-hover-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 208, 214)",
+      "backgroundColor": "rgb(44, 22, 24)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 208, 214)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "books-danger-default-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "books-danger-hover-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 208, 214)",
+      "backgroundColor": "rgb(44, 22, 24)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 208, 214)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "models-disconnect-danger-default-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-default ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-outlined",
+      "text": "断开连接",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgb(19, 28, 50)",
+      "borderColor": "rgb(220, 68, 70)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "rgba(67, 16, 0, 0.52) 0px 2px 0px 0px"
+    },
+    {
+      "name": "select-focused-input-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-select-input",
+      "text": null,
+      "color": "rgb(238, 243, 255)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(238, 243, 255)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(238, 243, 255)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "select-focused-root-1440",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-select ant-select-outlined ant-select-in-form-item ant-pro-filed-search-select css-var-_r_7_ ant-select-css-var css-12q6fii ant-select-focused ant-select-multiple ant-select-allow-clear ant-select-show-arrow ant-select-show-search",
+      "text": "米拉的虚构世界",
+      "color": "rgb(238, 243, 255)",
+      "backgroundColor": "rgb(19, 28, 50)",
+      "borderColor": "rgb(156, 245, 239)",
+      "outlineStyle": "none",
+      "outlineWidth": "0px",
+      "outlineColor": "rgb(238, 243, 255)",
+      "boxShadow": "rgb(156, 245, 239) 0px 0px 0px 1px"
+    },
+    {
+      "name": "roles-danger-default-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "roles-danger-hover-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 208, 214)",
+      "backgroundColor": "rgb(44, 22, 24)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 208, 214)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "roles-danger-primary-hover-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_0_ ant-btn-primary ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-solid",
+      "text": "移除角色",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgb(179, 63, 86)",
+      "borderColor": "rgb(244, 144, 162)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 255, 255)",
+      "boxShadow": "rgba(86, 106, 179, 0.133) 0px 4px 18px 0px"
+    },
+    {
+      "name": "books-danger-default-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "books-danger-hover-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-text ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-text",
+      "text": "移除",
+      "color": "rgb(255, 208, 214)",
+      "backgroundColor": "rgb(44, 22, 24)",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 208, 214)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "books-danger-primary-hover-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_0_ ant-btn-primary ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-solid",
+      "text": "移除世界书",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgb(179, 63, 86)",
+      "borderColor": "rgb(244, 144, 162)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 255, 255)",
+      "boxShadow": "rgba(86, 106, 179, 0.133) 0px 4px 18px 0px"
+    },
+    {
+      "name": "models-disconnect-danger-default-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-btn css-12q6fii css-var-_r_7_ ant-btn-default ant-btn-dangerous ant-btn-color-dangerous ant-btn-variant-outlined",
+      "text": "断开连接",
+      "color": "rgb(255, 159, 170)",
+      "backgroundColor": "rgb(19, 28, 50)",
+      "borderColor": "rgb(220, 68, 70)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(255, 159, 170)",
+      "boxShadow": "rgba(67, 16, 0, 0.52) 0px 2px 0px 0px"
+    },
+    {
+      "name": "select-focused-input-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-select-input",
+      "text": null,
+      "color": "rgb(238, 243, 255)",
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(238, 243, 255)",
+      "outlineStyle": "none",
+      "outlineWidth": "3px",
+      "outlineColor": "rgb(238, 243, 255)",
+      "boxShadow": "none"
+    },
+    {
+      "name": "select-focused-root-375",
+      "viewport": {
+        "width": 375,
+        "height": 1000
+      },
+      "settledMilliseconds": 400,
+      "className": "ant-select ant-select-outlined ant-select-in-form-item ant-pro-filed-search-select css-var-_r_7_ ant-select-css-var css-12q6fii ant-select-focused ant-select-multiple ant-select-allow-clear ant-select-show-arrow ant-select-show-search",
+      "text": "米拉的虚构世界",
+      "color": "rgb(238, 243, 255)",
+      "backgroundColor": "rgb(19, 28, 50)",
+      "borderColor": "rgb(156, 245, 239)",
+      "outlineStyle": "none",
+      "outlineWidth": "0px",
+      "outlineColor": "rgb(238, 243, 255)",
+      "boxShadow": "rgb(156, 245, 239) 0px 0px 0px 1px"
+    }
+  ],
+  "build": {
+    "javascript": "umi.6a4217c8.js",
+    "stylesheet": "umi.d1d700bb.css"
+  },
+  "sourceEvidence": "design-system/between-orbit/evidence/targeted-2026-10-13T03-37-30-574Z"
+}

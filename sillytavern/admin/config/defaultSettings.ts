@@ -1,29 +1,19 @@
 import type { ProLayoutProps } from '@ant-design/pro-components';
 
 const settings: ProLayoutProps = {
-  title: 'between',
+  title: 'Between · Orbit',
   logo: '/admin/logo.svg',
-  layout: 'mix',
-  navTheme: 'light',
+  layout: 'top',
+  navTheme: 'realDark',
   bgLayoutImgList: [],
-  colorPrimary: '#316a5b',
+  colorPrimary: '#8ea4ff',
   contentWidth: 'Fluid',
-  fixedHeader: true,
-  fixSiderbar: true,
-  siderWidth: 224,
+  fixedHeader: false,
   token: {
-    sider: {
-      colorMenuBackground: '#142a27',
-      colorTextMenu: '#a9bdb6',
-      colorTextMenuSelected: '#ffffff',
-      colorBgMenuItemSelected: '#2c4b41',
-      colorTextMenuActive: '#ffffff',
-      colorBgMenuItemHover: '#223d35',
-    },
-    header: { colorBgHeader: '#ffffff', colorTextRightActionsItem: '#53655e' },
+    bgLayout: '#080d1b',
     pageContainer: {
-      paddingInlinePageContainerContent: 32,
-      paddingBlockPageContainerContent: 24,
+      paddingInlinePageContainerContent: 0,
+      paddingBlockPageContainerContent: 0,
     },
   },
 };
