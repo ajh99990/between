@@ -9,7 +9,16 @@ import {
 } from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import { history, useModel } from '@umijs/max';
-import { App, Button, Card, Descriptions, Empty, Tabs, Tag } from 'antd';
+import {
+  App,
+  Button,
+  Card,
+  Collapse,
+  Descriptions,
+  Empty,
+  Tabs,
+  Tag,
+} from 'antd';
 import { date, Workspace } from '@/components/Workspace';
 import { api } from '@/services/admin';
 import type { Audit, CommunityItem } from '@/services/types';
@@ -114,34 +123,6 @@ export default function Resources() {
               label: '社区素材',
               children: (
                 <div className="page-stack">
-                  <section
-                    className="glass-panel"
-                    aria-labelledby="community-library-title"
-                  >
-                    <div className="panel-header flex-wrap gap-4">
-                      <div>
-                        <div className="panel-kicker">CURATED LIBRARY</div>
-                        <h2
-                          id="community-library-title"
-                          className="section-title"
-                        >
-                          精选社区素材
-                        </h2>
-                      </div>
-                      <Tag
-                        icon={<SafetyCertificateOutlined aria-hidden />}
-                        color="cyan"
-                      >
-                        {data.community.items.length} 份内置资源
-                      </Tag>
-                    </div>
-                    <p className="muted mb-3 mt-0 text-sm leading-7">
-                      {data.community.verification}
-                    </p>
-                    <p className="muted m-0 text-sm leading-7">
-                      {data.community.license}
-                    </p>
-                  </section>
                   <div className="ops-grid">
                     {data.community.items.map((item) => {
                       const imported = data.config.roles.some(
@@ -162,9 +143,6 @@ export default function Resources() {
                                   className="text-2xl text-[#78bdff]"
                                 />
                                 <div>
-                                  <div className="panel-kicker">
-                                    COMMUNITY CARD
-                                  </div>
                                   <h3 className="m-0 break-all text-xl font-semibold">
                                     {item.name}
                                   </h3>
@@ -181,24 +159,17 @@ export default function Resources() {
                                 {imported ? '已导入' : '待导入'}
                               </Tag>
                             </div>
-                            <p className="mb-3 mt-5 text-sm leading-7 text-[#b9d9ff]">
+                            <p className="mb-2 mt-3 text-sm leading-6 text-[#b9d9ff]">
                               {item.scenarios}
                             </p>
-                            <div className="mb-5 flex flex-wrap gap-2">
+                            <div className="mb-3 flex flex-wrap gap-2">
                               <Tag>{item.entryCount} 条世界书</Tag>
                               {item.language && <Tag>{item.language}</Tag>}
                             </div>
-                            <dl className="m-0 flex-1 text-sm leading-7">
-                              <dt className="mb-1 font-medium">内容质量</dt>
-                              <dd className="muted mb-4 ml-0 break-words">
-                                {item.quality}
-                              </dd>
-                              <dt className="mb-1 font-medium">封装说明</dt>
-                              <dd className="muted m-0 break-words">
-                                {item.packaging}
-                              </dd>
-                            </dl>
-                            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-0 border-t border-solid border-white/10 pt-5">
+                            <p className="muted m-0 flex-1 text-sm leading-6 break-words">
+                              {item.quality}
+                            </p>
+                            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-0 border-t border-solid border-white/10 pt-3">
                               <a
                                 href={item.sourceURL}
                                 target="_blank"
@@ -238,21 +209,38 @@ export default function Resources() {
                       <Empty description="暂无内置社区素材" />
                     </div>
                   )}
-                  <div className="glass-panel">
-                    <div className="panel-kicker">SOURCE & EVIDENCE</div>
-                    <p className="muted mb-2 mt-0 text-sm leading-7">
-                      {data.community.heatEvidence} · 记录日期{' '}
-                      {data.community.evidenceDate}
+                  <Collapse
+                    items={[
+                      {
+                        key: 'source',
+                        label: '来源与许可',
+                        children: (
+                          <div className="text-sm leading-7 text-muted">
+                            <p>{data.community.license}</p>
+                            {[
+                              ...new Set(
+                                data.community.items.map(
+                                  (item) => item.packaging,
+                                ),
+                              ),
+                            ].map((text) => (
+                              <p key={text}>{text}</p>
+                            ))}
+                            <p>{data.community.verification}</p>
+                            <p>
+                              {data.community.heatEvidence} ·{' '}
+                              {data.community.evidenceDate}
+                            </p>
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
+                  {data.config.roles.length >= 20 && (
+                    <p className="text-sm text-muted">
+                      当前角色已达到 20 个上限，导入前请先整理现有角色。
                     </p>
-                    <p className="muted m-0 text-sm leading-7">
-                      只导入已校验的内置资源，不接受远程地址或任意文件。静态内容质量不等于真实模型表现。
-                    </p>
-                    {data.config.roles.length >= 20 && (
-                      <p className="mb-0 mt-3 text-sm text-[#ffd594]">
-                        当前角色已达到 20 个上限，导入前请先整理现有角色。
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </div>
               ),
             },
@@ -268,7 +256,6 @@ export default function Resources() {
                     >
                       <div className="panel-header">
                         <div>
-                          <div className="panel-kicker">SERVICE STATUS</div>
                           <h2
                             id="service-status-title"
                             className="section-title"
@@ -285,7 +272,6 @@ export default function Resources() {
                     >
                       <div className="panel-header">
                         <div>
-                          <div className="panel-kicker">DIAGNOSTIC SCOPE</div>
                           <h2
                             id="diagnostic-scope-title"
                             className="section-title"
@@ -309,7 +295,6 @@ export default function Resources() {
                   >
                     <div className="panel-header flex-wrap gap-4">
                       <div>
-                        <div className="panel-kicker">ACTIVITY LOG</div>
                         <h2 id="audit-log-title" className="section-title">
                           <AuditOutlined aria-hidden /> 最近操作记录
                         </h2>

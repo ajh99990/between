@@ -35,7 +35,7 @@ export default defineConfig({
           colorTextPlaceholder: '#8e9cb7',
           colorText: '#eef3ff',
           fontFamily: '"PingFang SC", "Microsoft YaHei", sans-serif',
-          controlHeight: 42,
+          controlHeight: 36,
         },
       },
     },

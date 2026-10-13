@@ -4,17 +4,14 @@ import {
   PlusOutlined,
   ReadOutlined,
 } from '@ant-design/icons';
-import {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { history, useModel, useParams } from '@umijs/max';
 import { App, Button, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import Editor from '@/components/Editor';
+import LongTextField from '@/components/LongTextField';
 import Reader, { roleFields } from '@/components/Reader';
-import { Metric, Workspace } from '@/components/Workspace';
+import { Workspace } from '@/components/Workspace';
 import { saveConfig } from '@/services/admin';
 import { newRole, replaceRole } from '@/services/config';
 import type { Config, Role } from '@/services/types';
@@ -86,32 +83,9 @@ export default function Roles() {
           )
         ) : (
           <>
-            <div className="metric-strip">
-              <Metric
-                label="角色总数"
-                value={data.config.roles.length.toString().padStart(2, '0')}
-                detail="每一份设定，都是一个对话起点"
-              />
-              <Metric
-                label="已关联世界书"
-                value={new Set(data.config.roles.flatMap((r) => r.bookIds)).size
-                  .toString()
-                  .padStart(2, '0')}
-                detail="跨角色复用的背景知识"
-              />
-              <Metric
-                label="社区角色"
-                value={data.config.roles
-                  .filter((r) => r.source)
-                  .length.toString()
-                  .padStart(2, '0')}
-                detail="完整保留作者归因与原文"
-              />
-            </div>
             <div className="library-heading">
               <div className="library-title">
-                <h2 className="section-title">角色档案</h2>
-                <span>CHARACTER COLLECTION</span>
+                <span className="muted">{data.config.roles.length} 个角色</span>
               </div>
               <Input.Search
                 placeholder="搜索角色名称、简介或标签"
@@ -128,16 +102,8 @@ export default function Roles() {
                     .toLocaleLowerCase()
                     .includes(query.toLocaleLowerCase()),
                 )
-                .map((role, index) => (
+                .map((role) => (
                   <article className="role-card" key={role.id}>
-                    <div className="role-card-top">
-                      <div className="role-monogram" aria-hidden>
-                        {role.name.slice(0, 1) || '角'}
-                      </div>
-                      <span className="role-card-number">
-                        CHARACTER / {String(index + 1).padStart(2, '0')}
-                      </span>
-                    </div>
                     <h3>
                       <Button
                         type="link"
@@ -149,16 +115,10 @@ export default function Roles() {
                       </Button>
                     </h3>
                     <div className="role-card-tags">
-                      <Tag
-                        variant="filled"
-                        color={role.source ? 'geekblue' : 'default'}
-                      >
-                        {role.source ? '社区资源' : '本地角色'}
-                      </Tag>
                       {role.tag && <Tag>{role.tag}</Tag>}
                     </div>
                     <p className="role-card-description line-clamp-3">
-                      {role.description || '暂无简介，编辑角色来补全第一印象。'}
+                      {role.description || '未设置简介'}
                     </p>
                     <div className="role-card-books">
                       <BookOutlined aria-hidden />{' '}
@@ -272,23 +232,23 @@ export default function Roles() {
             placeholder="选择可复用的世界书"
           />
           {roleFields.map((f) => (
-            <ProFormTextArea
+            <LongTextField
               key={f.key}
               name={f.key}
               label={f.label}
+              tooltip={
+                f.key === 'description'
+                  ? editor.role.source
+                    ? '社区角色在用户端使用固定公开简介，此字段保留为管理员原始档案。'
+                    : '用户端会展示这段简介，请勿填写内部提示词。'
+                  : f.hint
+              }
               fieldProps={{
                 autoSize: {
                   minRows: f.key === 'description' ? 2 : 4,
                   maxRows: 18,
                 },
-                maxLength: [
-                  'personality',
-                  'scenario',
-                  'creatorNotes',
-                  'postHistory',
-                ].includes(f.key)
-                  ? 24000
-                  : 10000,
+                maxLength: 24000,
                 showCount: true,
               }}
             />

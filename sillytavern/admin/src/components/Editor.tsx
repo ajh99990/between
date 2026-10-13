@@ -93,7 +93,7 @@ export default function Editor<T extends object>({
       data-testid="admin-editor"
       rootClassName="orbit-editor"
       title={title}
-      size={760}
+      size="min(1040px, 100vw)"
       onClose={close}
       mask={{ closable: false }}
       keyboard={!busy}

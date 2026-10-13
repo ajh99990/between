@@ -13,36 +13,13 @@ export default function Login() {
   }, [initialState?.authenticated]);
   return (
     <div className="login-shell">
-      <section className="login-story">
+      <main className="login-entry">
         <div className="orbit-brand">
           <Brand />
         </div>
-        <div>
-          <div className="panel-kicker">WHERE CHARACTERS COME ALIVE</div>
-          <h1>
-            所有相遇，
-            <br />
-            始于一个<em>完整的世界。</em>
-          </h1>
-          <p>
-            为角色赋予个性，为故事构建记忆。
-            <br />
-            从这里，开启 Between 的下一段对话。
-          </p>
-        </div>
-        <div className="panel-kicker">CHARACTER / WORLD / INTELLIGENCE</div>
-        <div className="orbit-scene" aria-hidden>
-          <div className="orbit-orb" />
-          <div className="orbit-ring ring-one" />
-          <div className="orbit-ring ring-two" />
-          <div className="orbit-satellite" />
-        </div>
-      </section>
-      <main className="login-entry">
-        <span className="login-eyebrow">ADMIN ACCESS / 管理员入口</span>
         <LoginForm
-          title="欢迎回来"
-          subTitle="登录 Between 管理控制台"
+          title="管理控制台"
+          subTitle=""
           submitter={{
             searchConfig: { submitText: '登录控制台' },
             submitButtonProps: {
@@ -94,11 +71,6 @@ export default function Login() {
             rules={[{ required: true, message: '请输入管理员口令' }]}
           />
         </LoginForm>
-        <p>
-          使用本机服务的现有口令登录。
-          <br />
-          此入口不登录模型账号，也不显示模型密钥。
-        </p>
       </main>
     </div>
   );

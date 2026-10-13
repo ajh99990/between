@@ -1,9 +1,4 @@
-import {
-  ApiOutlined,
-  EditOutlined,
-  SafetyCertificateOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import {
   ProFormDigit,
   ProFormSelect,
@@ -34,7 +29,6 @@ export default function Models() {
   };
   const planActive = data?.config.planBackend.enabled;
   const demoActive = !planActive && data?.model.mode === 'demo';
-  const planCompleted = data?.plan.connection === 'completed';
   const planStatus =
     (
       {
@@ -68,94 +62,30 @@ export default function Models() {
     >
       {data && (
         <div className="page-stack">
-          <section
-            className="glass-panel"
-            aria-labelledby="active-backend-title"
-          >
-            <div className="panel-header">
-              <div className="flex min-w-0 items-center gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-solid border-cyan-300/20 bg-cyan-300/10 text-2xl text-cyan-200">
-                  {planActive ? (
-                    <ThunderboltOutlined aria-hidden />
-                  ) : (
-                    <ApiOutlined aria-hidden />
-                  )}
-                </span>
-                <div className="min-w-0">
-                  <div className="panel-kicker">当前模型后端</div>
-                  <h2 id="active-backend-title" className="section-title">
-                    {planActive
-                      ? 'ChatGPT 套餐'
-                      : demoActive
-                        ? '本地合成演示'
-                        : 'Chat Completions'}
-                  </h2>
-                </div>
-              </div>
-              <Tag
-                color={
-                  planActive
-                    ? planCompleted
-                      ? 'green'
-                      : data.plan.canGenerate
-                        ? 'blue'
-                        : 'orange'
-                    : data.model.connection === 'connected'
-                      ? 'green'
-                      : 'default'
-                }
-              >
-                {planActive ? planStatus : modelStatus}
-              </Tag>
-            </div>
-            <div className="mt-6 grid gap-6 lg:grid-cols-3">
-              <div className="min-w-0 lg:col-span-2">
-                <div className="muted text-sm">当前选择的模型</div>
-                <div className="mt-2 break-all font-mono text-2xl font-semibold tracking-tight sm:text-3xl">
-                  {planActive
-                    ? data.config.planBackend.model
-                    : data.config.model?.name || data.model.model || '尚未配置'}
-                </div>
-                <p className="muted mb-0 mt-3 text-sm leading-7">
-                  {planActive
-                    ? '后续请求共用本机 Between 授权与额度，不会自动切换账单来源。'
-                    : demoActive
-                      ? '当前使用本地合成响应，未连接真实模型，不代表模型推理效果。'
-                      : '后续请求使用已配置的兼容服务，服务商可能按请求计费。'}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-solid border-white/10 bg-white/5 p-5">
-                <div className="muted text-sm">
-                  {planActive ? '思考档位' : '运行时密钥'}
-                </div>
-                <div className="mt-2 text-xl font-semibold">
-                  {planActive
-                    ? data.config.planBackend.reasoningEffort === 'high'
-                      ? 'high · 高'
-                      : 'medium · 中等'
-                    : data.model.credentialConfigured
-                      ? '已配置（不展示）'
-                      : '未配置'}
-                </div>
-                <div className="muted mt-2 text-sm leading-6">
-                  {planActive
-                    ? '切换模型或档位后，需要新的请求验证。'
-                    : '密钥由服务端管理，此页面不接收凭据。'}
-                </div>
-              </div>
-            </div>
-            <div className="status-strip mt-6 model-scope-note">
-              <SafetyCertificateOutlined aria-hidden />
-              <span>
-                连接配置影响所有用户之后发出的请求；保存设置不会发送模型生成请求。
-              </span>
-            </div>
-          </section>
+          <div className="backend-summary">
+            <span>
+              当前后端：
+              <strong>
+                {planActive
+                  ? 'ChatGPT 套餐'
+                  : demoActive
+                    ? '本地合成演示'
+                    : 'Chat Completions'}
+              </strong>
+            </span>
+            <span>
+              {planActive
+                ? data.config.planBackend.model
+                : data.config.model?.name || data.model.model}
+            </span>
+            <span className="muted">
+              {planActive ? planStatus : modelStatus}
+            </span>
+          </div>
           <div className="ops-grid">
             <section className="glass-panel" aria-labelledby="plan-title">
               <div className="panel-header">
                 <div>
-                  <div className="panel-kicker">01 / 套餐后端</div>
                   <h2 id="plan-title" className="section-title">
                     ChatGPT 套餐
                   </h2>
@@ -260,7 +190,6 @@ export default function Models() {
             <section className="glass-panel" aria-labelledby="model-title">
               <div className="panel-header">
                 <div>
-                  <div className="panel-kicker">02 / 兼容服务</div>
                   <h2 id="model-title" className="section-title">
                     Chat Completions
                   </h2>
@@ -327,7 +256,6 @@ export default function Models() {
           <section className="glass-panel" aria-labelledby="preset-title">
             <div className="panel-header">
               <div>
-                <div className="panel-kicker">03 / 新会话预设</div>
                 <h2 id="preset-title" className="section-title">
                   提示词与生成参数
                 </h2>

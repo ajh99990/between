@@ -2,12 +2,14 @@ import {
   AppstoreOutlined,
   BookOutlined,
   ControlOutlined,
+  MenuOutlined,
   MessageOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Link, useLocation } from '@umijs/max';
-import type { ReactNode } from 'react';
+import { Button, Drawer } from 'antd';
+import { type ReactNode, useState } from 'react';
 
 const destinations = [
   { path: '/roles', label: '角色库', icon: <TeamOutlined aria-hidden /> },
@@ -36,9 +38,7 @@ export function Brand() {
         <i />
         <i />
       </span>
-      <span>
-        between<span className="brand-caption">ORBIT CONSOLE</span>
-      </span>
+      <span>between</span>
     </>
   );
 }
@@ -50,6 +50,24 @@ export default function OrbitShell({
   actions: ReactNode;
 }) {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const navigation = (
+    <nav className="orbit-nav" aria-label="管理导航">
+      {destinations.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          onClick={() => setOpen(false)}
+          aria-current={
+            location.pathname.startsWith(item.path) ? 'page' : undefined
+          }
+        >
+          {item.icon}
+          <span>{item.label}</span>
+        </Link>
+      ))}
+    </nav>
+  );
   return (
     <div className="orbit-shell">
       <a
@@ -63,40 +81,43 @@ export default function OrbitShell({
       >
         跳到主要内容
       </a>
-      <header className="orbit-header">
-        <div className="orbit-topbar">
-          <Link to="/roles" className="orbit-brand" aria-label="Between 角色库">
-            <Brand />
-          </Link>
-          <div className="orbit-account">
-            <span className="local-indicator">
-              <i /> 本机工作空间
-            </span>
-            {actions}
-          </div>
+      <aside className="admin-sidebar">
+        <Link to="/roles" className="orbit-brand" aria-label="Between 角色库">
+          <Brand />
+        </Link>
+        {navigation}
+      </aside>
+      <header className="admin-topbar">
+        <div className="topbar-location">
+          <Button
+            className="mobile-menu"
+            type="text"
+            icon={<MenuOutlined />}
+            aria-label="打开管理导航"
+            onClick={() => setOpen(true)}
+          />
+          <span>管理控制台</span>
+          <span className="topbar-divider">/</span>
+          <span>
+            {destinations.find((item) =>
+              location.pathname.startsWith(item.path),
+            )?.label || 'Between'}
+          </span>
         </div>
-        <nav className="orbit-nav" aria-label="管理导航">
-          {destinations.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              aria-current={
-                location.pathname.startsWith(item.path) ? 'page' : undefined
-              }
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        <div className="orbit-account">{actions}</div>
       </header>
+      <Drawer
+        title="Between 管理导航"
+        placement="left"
+        size={260}
+        open={open}
+        onClose={() => setOpen(false)}
+      >
+        {open && navigation}
+      </Drawer>
       <main id="workspace-main" tabIndex={-1} className="orbit-main">
         {children}
       </main>
-      <footer className="orbit-footer">
-        <span>BETWEEN / 让设定生长，让对话发生。</span>
-        <span>角色 · 世界 · 连接</span>
-      </footer>
     </div>
   );
 }

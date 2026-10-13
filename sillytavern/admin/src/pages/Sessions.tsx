@@ -129,7 +129,6 @@ export default function Sessions() {
           >
             <div className="panel-header flex-wrap gap-4">
               <div>
-                <div className="panel-kicker">TASK CONTROL</div>
                 <h2 id="running-tasks-title" className="section-title">
                   <ThunderboltOutlined aria-hidden /> 运行任务
                 </h2>
@@ -194,10 +193,7 @@ export default function Sessions() {
                 })}
               </ul>
             ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="当前没有运行任务"
-              />
+              <p className="muted my-3 text-sm">当前没有运行任务</p>
             )}
           </section>
           <section
@@ -206,7 +202,6 @@ export default function Sessions() {
           >
             <div className="panel-header flex-wrap gap-4">
               <div>
-                <div className="panel-kicker">SESSION ARCHIVE</div>
                 <h2 id="saved-sessions-title" className="section-title">
                   <DatabaseOutlined aria-hidden /> 已保存会话
                 </h2>
@@ -235,6 +230,7 @@ export default function Sessions() {
               locale={{
                 emptyText: (
                   <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description={query ? '没有匹配的会话' : '还没有保存的会话'}
                   />
                 ),

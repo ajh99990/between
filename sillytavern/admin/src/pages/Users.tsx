@@ -117,7 +117,6 @@ export default function Users() {
                     className="text-2xl text-[#78bdff]"
                   />
                   <div>
-                    <div className="panel-kicker">ACCESS CONTROL</div>
                     <h2 id="access-control-title" className="section-title">
                       允许新用户进入
                     </h2>
@@ -154,7 +153,6 @@ export default function Users() {
                     className="text-2xl text-[#78bdff]"
                   />
                   <div>
-                    <div className="panel-kicker">GENERATION CONTROL</div>
                     <h2 id="generation-control-title" className="section-title">
                       暂停新生成请求
                     </h2>
@@ -185,7 +183,6 @@ export default function Users() {
           >
             <div className="panel-header flex-wrap gap-4">
               <div>
-                <div className="panel-kicker">BROWSER IDENTITIES</div>
                 <h2 id="browser-users-title" className="section-title">
                   <TeamOutlined aria-hidden /> 浏览器用户
                 </h2>
@@ -212,7 +209,14 @@ export default function Users() {
               toolBarRender={false}
               pagination={{ pageSize: 10, hideOnSinglePage: true }}
               scroll={{ x: 800 }}
-              locale={{ emptyText: <Empty description="还没有浏览器用户" /> }}
+              locale={{
+                emptyText: (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="还没有浏览器用户"
+                  />
+                ),
+              }}
             />
           </section>
           <div className="status-strip">

@@ -8,7 +8,11 @@ import { Button, Collapse, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import type { Book, Role } from '@/services/types';
 export const roleFields: { key: keyof Role; label: string; hint?: string }[] = [
-  { key: 'description', label: '角色简介' },
+  {
+    key: 'description',
+    label: '角色简介',
+    hint: '这段简介会显示在用户端角色列表，请勿填写内部提示词。',
+  },
   { key: 'detail', label: '角色描述' },
   { key: 'personality', label: '性格' },
   { key: 'scenario', label: '场景' },
@@ -24,8 +28,11 @@ export const roleFields: { key: keyof Role; label: string; hint?: string }[] = [
     hint: '原始角色字段；实际注入来自绑定的独立世界书。',
   },
 ];
-const jump = (id: string) =>
-  document.getElementById(id)?.scrollIntoView({ block: 'start' });
+const jump = (id: string) => {
+  const target = document.getElementById(id);
+  target?.focus({ preventScroll: true });
+  target?.scrollIntoView({ block: 'start' });
+};
 export default function Reader({
   role,
   book,
@@ -67,7 +74,10 @@ export default function Reader({
         id: `field-${f.key}`,
         title: f.label,
         text: String(role[f.key] ?? ''),
-        hint: f.hint,
+        hint:
+          f.key === 'description' && role.source
+            ? '社区角色在用户端使用固定公开简介；此处为管理员保留的原始档案。'
+            : f.hint,
       }))
     : entries.map((e, i) => ({
         id: `entry-${e.uid}`,
@@ -101,35 +111,13 @@ export default function Reader({
       </div>
       <section className="reader-cover">
         <div>
-          <div className="panel-kicker">
-            {role ? 'CHARACTER DOSSIER' : 'WORLD MANUSCRIPT'} / 完整档案
-          </div>
           <h2>{item.name}</h2>
-          <p>
-            {role
-              ? '从背景到开场白，完整阅读角色的设定。这里的内容仅用于管理员查看与配置。'
-              : '按资源中的原始条目顺序完整展示。排序、注入位置和触发条件独立保留。'}
-          </p>
           <div className="reader-cover-id">{item.id}</div>
-        </div>
-        <div className="reader-count">
-          <div>
-            <strong>{String(sections.length).padStart(2, '0')}</strong>
-            <span>{role ? '正文字段' : '原始条目'}</span>
-          </div>
-          <div>
-            <strong>
-              {sections
-                .reduce((n, section) => n + section.text.length, 0)
-                .toLocaleString()}
-            </strong>
-            <span>全文字符</span>
-          </div>
         </div>
       </section>
       <div className="reader-layout">
         <aside className="reading-nav">
-          <div className="panel-kicker mb-4">READING INDEX / 目录</div>
+          <div className="panel-kicker mb-4">目录</div>
           <Input.Search
             allowClear
             placeholder="搜索正文或标题"
@@ -138,7 +126,7 @@ export default function Reader({
             onChange={(event) => setQuery(event.target.value)}
           />
           <div className="my-4 text-xs text-muted" aria-live="polite">
-            显示 {filtered.length} / {sections.length} 项 · 全文不截断
+            显示 {filtered.length} / {sections.length} 项
           </div>
           <Button
             className="directory-toggle mb-3"
@@ -185,6 +173,7 @@ export default function Reader({
               <section
                 key={section.id}
                 id={section.id}
+                tabIndex={-1}
                 className="reading-section"
               >
                 <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -253,8 +242,11 @@ export default function Reader({
               </section>
             );
           })}
-          <section id="resource-metadata" className="reading-section">
-            <div className="panel-kicker mb-3">PROVENANCE / 资源谱系</div>
+          <section
+            tabIndex={-1}
+            id="resource-metadata"
+            className="reading-section"
+          >
             <h3 className="m-0 mb-4 text-lg font-semibold">来源与关联信息</h3>
             {role && (
               <>

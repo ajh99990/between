@@ -1,143 +1,42 @@
 import { ReloadOutlined } from '@ant-design/icons';
-import { useLocation, useModel } from '@umijs/max';
+import { useModel } from '@umijs/max';
 import { Alert, Button, Skeleton } from 'antd';
 import type { ReactNode } from 'react';
-
-const pageIdentity: Record<
-  string,
-  { code: string; title: ReactNode; accent: string }
-> = {
-  roles: {
-    code: '01 / CHARACTER STUDIO',
-    title: (
-      <>
-        每个角色，
-        <br />
-        <em>都是一个世界。</em>
-      </>
-    ),
-    accent: 'violet',
-  },
-  books: {
-    code: '02 / WORLD ARCHIVE',
-    title: (
-      <>
-        把想象，
-        <br />
-        <em>写进世界的细节。</em>
-      </>
-    ),
-    accent: 'cyan',
-  },
-  models: {
-    code: '03 / INTELLIGENCE ENGINE',
-    title: (
-      <>
-        连接智能，
-        <br />
-        <em>定义对话的深度。</em>
-      </>
-    ),
-    accent: 'blue',
-  },
-  sessions: {
-    code: '04 / LIVE OPERATIONS',
-    title: (
-      <>
-        每一次对话，
-        <br />
-        <em>都在此刻发生。</em>
-      </>
-    ),
-    accent: 'cyan',
-  },
-  users: {
-    code: '05 / ACCESS CONTROL',
-    title: (
-      <>
-        掌握全局，
-        <br />
-        <em>守护每一份连接。</em>
-      </>
-    ),
-    accent: 'violet',
-  },
-  resources: {
-    code: '06 / DISCOVERY & SYSTEM',
-    title: (
-      <>
-        探索新世界，
-        <br />
-        <em>洞察系统脉搏。</em>
-      </>
-    ),
-    accent: 'blue',
-  },
-};
 export function Workspace({
   title,
-  description,
   children,
   extra,
 }: {
   title: string;
-  description: string;
+  description?: string;
   children: ReactNode;
   extra?: ReactNode;
 }) {
   const { data, reload, busy, error, notice } = useModel('admin');
-  const [section, id] = useLocation().pathname.split('/').filter(Boolean);
-  const identity = pageIdentity[section] || pageIdentity.roles;
   return (
     <div
-      className={`workspace workspace-${identity.accent}`}
+      className="workspace"
       data-testid={data ? 'workspace-ready' : 'workspace-loading'}
     >
-      <section
-        className={`workspace-hero ${id ? 'workspace-hero-compact' : ''}`}
-        aria-labelledby="page-title"
-      >
-        <div className="hero-copy">
-          <div className="panel-kicker">
-            {identity.code}
-            <span className="hero-line" />
-          </div>
-          <h1 id="page-title">{id ? title : identity.title}</h1>
-          <p>{description}</p>
-          <div className="hero-actions">
-            {extra}
-            <Button
-              icon={<ReloadOutlined aria-hidden />}
-              loading={busy}
-              onClick={() => void reload().catch(() => {})}
-            >
-              刷新状态
-            </Button>
-            <span className="version-label">
-              配置 v{data?.config.version ?? '—'}
-            </span>
-          </div>
+      <section className="workspace-heading" aria-labelledby="page-title">
+        <h1 id="page-title">{title}</h1>
+        <div className="workspace-actions">
+          {extra}
+          <Button
+            icon={<ReloadOutlined aria-hidden />}
+            loading={busy}
+            onClick={() => void reload().catch(() => {})}
+          >
+            刷新状态
+          </Button>
         </div>
-        {!id && (
-          <div className="orbit-scene" aria-hidden>
-            <div className="orbit-orb" />
-            <div className="orbit-ring ring-one" />
-            <div className="orbit-ring ring-two" />
-            <div className="orbit-satellite" />
-            <div className="orb-label">
-              BETWEEN
-              <br />
-              <strong>{title}</strong>
-            </div>
-          </div>
-        )}
       </section>
       <div className="workspace-content">
         {error && (
-          <Alert className="mb-5" type="error" title={error} showIcon />
+          <Alert className="mb-4" type="error" title={error} showIcon />
         )}
         {notice && (
-          <Alert className="mb-5" type="success" title={notice} showIcon />
+          <Alert className="mb-4" type="success" title={notice} showIcon />
         )}
         {!data ? (
           <div className="glass-panel" role="status">

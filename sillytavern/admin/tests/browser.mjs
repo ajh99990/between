@@ -277,6 +277,60 @@ try {
     assert.deepEqual((await state()).config.books.find((item) => item.id === book.id), expected);
   });
 
+  await step('expanded-longtext-apply-cancel-and-unsaved-protection', async () => {
+    await nav(`/roles/${role.id}`);
+    await page.getByRole('button', { name: /编辑\s*角色/ }).click();
+    await page.getByRole('button', { name: '展开编辑 角色描述', exact: true }).click();
+    const expanded = page.getByRole('textbox', { name: '全文编辑内容', exact: true });
+    await expanded.fill(role.detail + '\n展开编辑验收草稿');
+    await page.getByText('有尚未保存的修改', { exact: true }).waitFor();
+    assert.equal((await state()).config.roles.find((item) => item.id === role.id).detail, role.detail);
+    const beforeUnload = await page.evaluate(() => {
+      const event = new Event('beforeunload', { cancelable: true });
+      return !window.dispatchEvent(event);
+    });
+    assert(beforeUnload, 'Expanded changes must participate in the editor unload guard');
+    await shot('expanded-longtext-desktop');
+    await page.getByRole('button', { name: '放弃本次展开编辑', exact: true }).click();
+    await page.getByRole('button', { name: '继续编辑', exact: true }).click();
+    assert.equal(await expanded.inputValue(), role.detail + '\n展开编辑验收草稿');
+    await page.getByRole('button', { name: '放弃本次展开编辑', exact: true }).click();
+    await page.getByRole('button', { name: '放弃展开修改', exact: true }).click();
+    await expanded.waitFor({ state: 'hidden' });
+    assert.equal(await page.getByRole('textbox', { name: '角色描述', exact: true }).inputValue(), role.detail);
+    await page.getByRole('button', { name: '展开编辑 角色描述', exact: true }).click();
+    await expanded.fill(role.detail + '\n应用到表单验收');
+    await page.getByRole('button', { name: '应用到表单', exact: true }).click();
+    await expanded.waitFor({ state: 'hidden' });
+    assert.equal(await page.getByRole('textbox', { name: '角色描述', exact: true }).inputValue(), role.detail + '\n应用到表单验收');
+    await discard();
+    assert.equal((await state()).config.roles.find((item) => item.id === role.id).detail, role.detail);
+  });
+  await step('worldbook-advanced-json-validation-edit-and-clear', async () => {
+    const saved = (await state()).config.books.find((item) => item.id === book.id);
+    await nav(`/books/${book.id}`);
+    await page.getByRole('button', { name: /编辑\s*世界书/ }).click();
+    const advanced = page.getByLabel('扩展配置（JSON）', { exact: true }).first();
+    const previous = JSON.parse(await advanced.inputValue());
+    await advanced.fill('{invalid');
+    await page.getByRole('button', { name: '保存修改', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: '确认保存', exact: true }).count(), 0);
+    await advanced.fill(JSON.stringify({ ...previous, acceptanceExtension: { depth: 7, enabled: true } }, null, 2));
+    await shot('worldbook-advanced-json');
+    await confirmSave(); await waitSaved();
+    const changed = (await state()).config.books.find((item) => item.id === book.id);
+    assert.deepEqual(changed.entries[0].acceptanceExtension, { depth: 7, enabled: true });
+    await page.getByRole('button', { name: /编辑\s*世界书/ }).click();
+    await advanced.fill('{}');
+    await confirmSave(); await waitSaved();
+    const cleared = (await state()).config.books.find((item) => item.id === book.id);
+    assert(!('acceptanceExtension' in cleared.entries[0]));
+    assert.equal(cleared.entries[0].content, saved.entries[0].content);
+    const restore = (await state()).config;
+    restore.books = restore.books.map((item) => item.id === book.id ? saved : item);
+    await save(restore);
+  });
+
   await step('form-required-validation-and-draft-cancel', async () => {
     await nav(`/roles/${role.id}`);
     await page.getByRole('button', { name: /编辑\s*角色/ }).click();

@@ -75,7 +75,6 @@ try {
   assert.equal(previewURL.hostname, '127.0.0.1');
   assert(!forbiddenServicePorts.has(previewURL.port));
   console.log(`QA 虚构离线预览（不连接真实模型）：${app.url}/admin/`);
-  console.log(`QA 专用虚构口令：${syntheticPassword}`);
 } catch (error) {
   await shutdown();
   throw error;

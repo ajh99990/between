@@ -1,20 +1,63 @@
-import { PlusOutlined, ReadOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   ProFormDigit,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
-  ProFormTextArea,
 } from '@ant-design/pro-components';
 import { history, useModel, useParams } from '@umijs/max';
 import { App, Button, Collapse, Empty, Input, Tag } from 'antd';
 import { useState } from 'react';
 import Editor from '@/components/Editor';
+import LongTextField from '@/components/LongTextField';
 import Reader from '@/components/Reader';
-import { Metric, Workspace } from '@/components/Workspace';
+import { Workspace } from '@/components/Workspace';
 import { saveConfig } from '@/services/admin';
 import { newBook, removeBook, replaceBook } from '@/services/config';
-import type { Book, Config } from '@/services/types';
+import type { Book, BookEntry, Config } from '@/services/types';
+
+const entryFields = new Set([
+  'uid',
+  'comment',
+  'key',
+  'keysecondary',
+  'content',
+  'constant',
+  'selective',
+  'useProbability',
+  'disable',
+  'selectiveLogic',
+  'probability',
+  'order',
+  'position',
+]);
+type BookDraft = Omit<Book, 'entries'> & {
+  entries?: (BookEntry & { advanced: string })[];
+};
+function extraFields(entry: BookEntry) {
+  return JSON.stringify(
+    Object.fromEntries(
+      Object.entries(entry).filter(([key]) => !entryFields.has(key)),
+    ),
+    null,
+    2,
+  );
+}
+function parseExtra(value: string) {
+  const extra = JSON.parse(value);
+  if (
+    !extra ||
+    Array.isArray(extra) ||
+    typeof extra !== 'object' ||
+    Object.keys(extra).some(
+      (key) =>
+        entryFields.has(key) ||
+        ['__proto__', 'constructor', 'prototype'].includes(key),
+    )
+  )
+    throw new Error('请输入配置对象；常用字段请在上方编辑，不能覆盖 UID。');
+  return extra;
+}
 export default function Books() {
   const { data, busy, mutate, clearFeedback } = useModel('admin');
   const { modal } = App.useApp();
@@ -79,33 +122,11 @@ export default function Books() {
           )
         ) : (
           <>
-            <div className="metric-strip">
-              <Metric
-                label="世界书"
-                value={data.config.books.length.toString().padStart(2, '0')}
-                detail="独立管理，可在多个角色间复用"
-              />
-              <Metric
-                label="内容条目"
-                value={data.config.books.reduce(
-                  (sum, book) => sum + (book.entries?.length ?? 1),
-                  0,
-                )}
-                detail="完整保留触发条件与注入顺序"
-              />
-              <Metric
-                label="关联角色"
-                value={data.config.roles
-                  .filter((role) => role.bookIds.length)
-                  .length.toString()
-                  .padStart(2, '0')}
-                detail="每个故事都有自己的知识网络"
-              />
-            </div>
             <div className="library-heading">
               <div className="library-title">
-                <h2 className="section-title">世界档案</h2>
-                <span>WORLD COLLECTION</span>
+                <span className="muted">
+                  {data.config.books.length} 本世界书
+                </span>
               </div>
               <Input.Search
                 placeholder="搜索世界书或关键词"
@@ -122,12 +143,8 @@ export default function Books() {
                     .toLocaleLowerCase()
                     .includes(query.toLocaleLowerCase()),
                 )
-                .map((book, index) => (
+                .map((book) => (
                   <article key={book.id} className="book-card">
-                    <div className="book-spine" aria-hidden>
-                      <ReadOutlined />
-                      <span>VOL.{String(index + 1).padStart(2, '0')}</span>
-                    </div>
                     <div className="book-card-body">
                       <h3>
                         <Button
@@ -145,12 +162,11 @@ export default function Books() {
                         <Tag color="cyan">
                           {book.entries?.length ?? 1} 条设定
                         </Tag>
-                        <Tag>{book.source ? '社区资源' : '本地创建'}</Tag>
                       </div>
                       <p className="book-card-description line-clamp-2">
                         {book.entries?.[0]?.content ||
                           book.content ||
-                          '尚未写入内容，编辑世界书补全世界的细节。'}
+                          '未设置内容'}
                       </p>
                       <div className="text-xs text-muted mb-4">
                         绑定角色：
@@ -214,9 +230,15 @@ export default function Books() {
           </>
         ))}
       {editor && (
-        <Editor<Book>
+        <Editor<BookDraft>
           title={`编辑世界书 · ${editor.book.name || '新资源'}`}
-          initialValues={editor.book}
+          initialValues={{
+            ...editor.book,
+            entries: editor.book.entries?.map((entry) => ({
+              ...entry,
+              advanced: extraFields(entry),
+            })),
+          }}
           onClose={() => setEditor(undefined)}
           onSave={(values) =>
             mutate(
@@ -225,10 +247,15 @@ export default function Books() {
                   replaceBook(editor.config, {
                     ...editor.book,
                     ...values,
-                    entries: editor.book.entries?.map((entry, i) => ({
-                      ...entry,
-                      ...values.entries?.[i],
-                    })),
+                    entries:
+                      editor.book.entries === undefined
+                        ? undefined
+                        : (values.entries ?? []).map(
+                            ({ advanced, ...entry }) => ({
+                              ...entry,
+                              ...parseExtra(advanced),
+                            }),
+                          ),
                   }),
                 ),
               '世界书已保存，全文与条目条件已保留。',
@@ -251,6 +278,7 @@ export default function Books() {
                 forceRender: true,
                 children: (
                   <>
+                    <ProFormDigit name={['entries', i, 'uid']} hidden />
                     <ProFormText
                       name={['entries', i, 'comment']}
                       label="条目标题"
@@ -267,7 +295,7 @@ export default function Books() {
                       mode="tags"
                       fieldProps={{ tokenSeparators: ['，'] }}
                     />
-                    <ProFormTextArea
+                    <LongTextField
                       name={['entries', i, 'content']}
                       label="条目内容"
                       fieldProps={{
@@ -327,10 +355,30 @@ export default function Books() {
                       fieldProps={{ precision: 0 }}
                       rules={[{ required: true }]}
                     />
-                    <p className="text-sm text-muted">
-                      原始 UID
-                      与未知扩展字段会随本次修改完整保留，可在阅读视图查看全部字段。
-                    </p>
+                    <LongTextField
+                      name={['entries', i, 'advanced']}
+                      label="扩展配置（JSON）"
+                      tooltip="深度、角色、扫描范围、分组、延迟等原始字段。修改后按原字段保存；空对象会移除这些扩展字段。"
+                      rules={[
+                        {
+                          validator: async (_: unknown, value: string) => {
+                            try {
+                              parseExtra(value);
+                            } catch (error) {
+                              throw new Error(
+                                error instanceof Error
+                                  ? error.message
+                                  : '请输入有效的 JSON 对象',
+                              );
+                            }
+                          },
+                        },
+                      ]}
+                      fieldProps={{
+                        autoSize: { minRows: 6, maxRows: 20 },
+                        spellCheck: false,
+                      }}
+                    />
                   </>
                 ),
               }))}
@@ -343,7 +391,7 @@ export default function Books() {
                 mode="tags"
                 fieldProps={{ tokenSeparators: ['，'] }}
               />
-              <ProFormTextArea
+              <LongTextField
                 name="content"
                 label="条目内容"
                 fieldProps={{

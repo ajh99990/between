@@ -1,9 +1,9 @@
 import type { ProLayoutProps } from '@ant-design/pro-components';
 
 const settings: ProLayoutProps = {
-  title: 'Between · Orbit',
+  title: 'Between 管理控制台',
   logo: '/admin/logo.svg',
-  layout: 'top',
+  layout: 'side',
   navTheme: 'realDark',
   bgLayoutImgList: [],
   colorPrimary: '#8ea4ff',
