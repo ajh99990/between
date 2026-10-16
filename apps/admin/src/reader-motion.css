@@ -1,0 +1,4 @@
+/* Keep the scroll container and its glass treatment outside the fading layer. */
+.reader-transition-content {
+  min-width: 0;
+}

@@ -1,10 +1,10 @@
 {
   "source": "glass-workbench-ui",
-  "scope": "Packaged neutral assets; React adapters own lifecycle and business state.",
+  "scope": "Packaged neutral assets with local surface-motion lifecycle adaptations; material and typography recipes preserved. React adapters own business state.",
   "files": [
     {
       "path": "ASSET-SOURCES.md",
-      "sha256": "4d895e4cea56d9c52542506cd437c9a78091e86354ef43623926449a3a80a217"
+      "sha256": "002aec05ddc597d7868e7a5146d54eee9f5cc3edb04d3ec0596668f6f7264af6"
     },
     {
       "path": "Geist-Variable.woff2",
@@ -60,7 +60,7 @@
     },
     {
       "path": "admin/primitives.js",
-      "sha256": "d81147aa9f8c95fc68c5ba4d084415b52862fa15bbe21e41cf954f26b75a383b"
+      "sha256": "e093043fe26f016b9cc5db11f02ed5040c88fa9bcec383ad3f5d4767147b04c2"
     },
     {
       "path": "admin/ui.js",
@@ -148,7 +148,7 @@
     },
     {
       "path": "components/select-core.js",
-      "sha256": "b584046cf47da73b80a3ccbb9f7f98f884df1117ec0b1abd0a9b519179831a7a"
+      "sha256": "8d8cf598c87b8764ac11fdf30f358fd2cf1b55b4882805321c95db6dcd21eaec"
     },
     {
       "path": "components/select-demo.html",
@@ -265,6 +265,10 @@
     {
       "path": "zoned-glass.js",
       "sha256": "f3da0d8ca73458ae055a7714d653ec4889205399af5264e18cee2d56ef1d57ce"
+    },
+    {
+      "path": "surface-motion.js",
+      "sha256": "759ba1e1f8a5dbd3a3468615831f6e01246ce3c910c350ba4e0e3a70c48f418b"
     }
   ]
 }

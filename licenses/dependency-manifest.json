@@ -3,18 +3,18 @@
   "generatedFrom": {
     "lockfile": "package-lock.json",
     "lockfileVersion": 3,
-    "lockfileSha256": "924a0d36ae7d1d6efcff0e3155da4440ad45afe463b3e5c730e3475d99925f9c",
+    "lockfileSha256": "65db96b9b184706c738137bdb67acb34d6356b1181cced7eec89ff4b49a75462",
     "platform": "darwin",
     "architecture": "arm64",
     "node": "24.11.0",
     "scope": "All installed third-party package locations in the root npm workspace lockfile, including development dependencies; workspace source licenses are separate."
   },
   "coverage": {
-    "lockedPackageLocations": 511,
-    "installedPackageLocations": 319,
-    "uniqueInstalledPackages": 232,
-    "noticeFiles": 306,
-    "uniqueNoticeContents": 137,
+    "lockedPackageLocations": 515,
+    "installedPackageLocations": 324,
+    "uniqueInstalledPackages": 237,
+    "noticeFiles": 311,
+    "uniqueNoticeContents": 140,
     "installedWithoutNoticeText": [
       "apps/admin/node_modules/@esbuild/darwin-arm64",
       "apps/admin/node_modules/@rolldown/binding-darwin-arm64",
@@ -211,7 +211,6 @@
       "node_modules/lightningcss-linux-x64-musl",
       "node_modules/lightningcss-win32-arm64-msvc",
       "node_modules/lightningcss-win32-x64-msvc",
-      "node_modules/tslib",
       "node_modules/vite/node_modules/@esbuild/android-arm",
       "node_modules/vite/node_modules/@esbuild/android-arm64",
       "node_modules/vite/node_modules/@esbuild/android-x64",
@@ -6547,6 +6546,30 @@
       "noticeIssues": []
     },
     {
+      "path": "node_modules/framer-motion",
+      "name": "framer-motion",
+      "version": "14.3.0",
+      "source": "https://registry.npmjs.org/framer-motion/-/framer-motion-14.3.0.tgz",
+      "integrity": "sha512-d8WCrU0ZQn7ukKMykCsDyIOwb/taZeDqqrDBK0du5GO0AO/ynz8fdR/LIIz9Pyy3n3tGwrneR+n0egyrrLa3fw==",
+      "license": "MIT",
+      "development": false,
+      "optional": false,
+      "target": {
+        "os": null,
+        "cpu": null,
+        "libc": null
+      },
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "5ff46083b88563822b0560dd6221ab89d2f74bc97a52d4c97a75020fd62c6f32",
+          "bytes": 1078
+        }
+      ],
+      "noticeIssues": []
+    },
+    {
       "path": "node_modules/fsevents",
       "name": "fsevents",
       "version": "2.3.3",
@@ -7440,6 +7463,78 @@
           "file": "LICENCE",
           "sha256": "950429b35f82e225a613a0638e7933855a4ce05172bd36dc060093ba58793bbe",
           "bytes": 1052
+        }
+      ],
+      "noticeIssues": []
+    },
+    {
+      "path": "node_modules/motion",
+      "name": "motion",
+      "version": "14.3.0",
+      "source": "https://registry.npmjs.org/motion/-/motion-14.3.0.tgz",
+      "integrity": "sha512-yh/nHYjikl68+FTxAMywFYzzj21/oGY7RGCfkqN5zpuT1rk3rp0lKfVU8EUq0A64qQeGnxuKUJWP85MipqdLBw==",
+      "license": "MIT",
+      "development": false,
+      "optional": false,
+      "target": {
+        "os": null,
+        "cpu": null,
+        "libc": null
+      },
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "1bf0dc3f7727723e5a032ed12164a47cf92c05204cb1a3485f123c24e2833ed1",
+          "bytes": 1100
+        }
+      ],
+      "noticeIssues": []
+    },
+    {
+      "path": "node_modules/motion-dom",
+      "name": "motion-dom",
+      "version": "14.3.0",
+      "source": "https://registry.npmjs.org/motion-dom/-/motion-dom-14.3.0.tgz",
+      "integrity": "sha512-rcKO4aEJzAqDEsrH6qFzhLZxs7bNqZpiUEuEATz9LaRwt6dG7hZEbcFUSHNR8NECaKYM0Iuw6Iv6NpWEGXDI+w==",
+      "license": "MIT",
+      "development": false,
+      "optional": false,
+      "target": {
+        "os": null,
+        "cpu": null,
+        "libc": null
+      },
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "1bf0dc3f7727723e5a032ed12164a47cf92c05204cb1a3485f123c24e2833ed1",
+          "bytes": 1100
+        }
+      ],
+      "noticeIssues": []
+    },
+    {
+      "path": "node_modules/motion-utils",
+      "name": "motion-utils",
+      "version": "14.1.1",
+      "source": "https://registry.npmjs.org/motion-utils/-/motion-utils-14.1.1.tgz",
+      "integrity": "sha512-3VvN5Uvf8B6qG+OfOui6Nht5EWp+vLuU3IqcAj7ItZGKqtmTjCebl5sGZF7/08gEHRnEl1AP/fIwbcEyVrcQGQ==",
+      "license": "MIT",
+      "development": false,
+      "optional": false,
+      "target": {
+        "os": null,
+        "cpu": null,
+        "libc": null
+      },
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "1bf0dc3f7727723e5a032ed12164a47cf92c05204cb1a3485f123c24e2833ed1",
+          "bytes": 1100
         }
       ],
       "noticeIssues": []
@@ -8921,15 +9016,21 @@
       "source": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
       "license": "0BSD",
-      "development": true,
-      "optional": true,
+      "development": false,
+      "optional": false,
       "target": {
         "os": null,
         "cpu": null,
         "libc": null
       },
-      "status": "not-installed-optional",
-      "notices": [],
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE.txt",
+          "sha256": "210b19e543130388c68654b7497e967119ce17145f66ab7d85688fbd70f08751",
+          "bytes": 655
+        }
+      ],
       "noticeIssues": []
     },
     {

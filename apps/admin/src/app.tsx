@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type AdminState, ApiError, type Config, getState, login, logout, saveConfig } from "./api";
+import { FeedbackToast, RouteContent } from "./motion";
 import BooksPage from "./pages/Books";
 import { DiagnosticsPage, ModelsPage, ResourcesPage, SessionsPage, UsersPage } from "./pages/Operations";
 import RolesPage from "./pages/Roles";
@@ -423,8 +424,9 @@ export default function App() {
                       )}
                     </span>
                     <button
-                      className="icon-button"
+                      className="icon-button topbar-refresh"
                       aria-label="刷新后台数据"
+                      aria-busy={refreshing}
                       disabled={refreshing}
                       onClick={() =>
                         void refresh()
@@ -443,11 +445,7 @@ export default function App() {
                     </button>
                   </div>
                 </header>
-                <main
-                  className="main-content"
-                  id="main-content"
-                  key={current?.route + route.split("/").slice(2).join("/")}
-                >
+                <RouteContent key={current?.route + route.split("/").slice(2).join("/")}>
                   {Page ? (
                     <Page />
                   ) : (
@@ -456,7 +454,7 @@ export default function App() {
                       <Button onClick={() => navigate("/roles")}>返回角色卡</Button>
                     </div>
                   )}
-                </main>
+                </RouteContent>
               </div>
             </div>
             <Dialog
@@ -547,15 +545,7 @@ export default function App() {
           />
         )
       )}
-      {toast && !expired && state && (
-        <div className="toast" data-tone={toast.tone} role={toast.tone === "error" ? "alert" : "status"}>
-          <Icon name={toast.tone === "error" ? "alert" : "check"} />
-          <span>{toast.message}</span>
-          <button aria-label="关闭通知" className="icon-button" onClick={() => setToast(null)}>
-            <Icon name="close" size={14} />
-          </button>
-        </div>
-      )}
+      {!expired && state && <FeedbackToast feedback={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }

@@ -1,0 +1,48 @@
+.glass-workbench {
+  --bt-motion-ease-out: cubic-bezier(.23, 1, .32, 1);
+  --bt-motion-fast: 120ms;
+}
+
+.nav-item,
+.collection-item,
+.document-outline button,
+.document-outline a,
+.related-books button,
+.data-table tbody tr {
+  transition: background-color var(--bt-motion-fast) ease,
+    border-color var(--bt-motion-fast) ease,
+    color var(--bt-motion-fast) ease;
+}
+
+.bt-button .button-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+  transition: opacity var(--bt-motion-fast) var(--bt-motion-ease-out);
+}
+.bt-button { position: relative; }
+.bt-button[aria-busy=true] .button-content { opacity: 0; }
+.button-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--bt-motion-fast) var(--bt-motion-ease-out);
+}
+.bt-button[aria-busy=true] .button-busy { opacity: 1; }
+.topbar-refresh[aria-busy=true] > svg { animation: spin .8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-item, .collection-item, .document-outline button, .document-outline a,
+  .related-books button, .data-table tbody tr, .button-content, .button-busy {
+    transition-duration: 0ms;
+  }
+  .topbar-refresh[aria-busy=true] > svg { animation: none; }
+}
+html[data-input-modality=keyboard] .nav-item,
+html[data-input-modality=keyboard] .collection-item,
+html[data-input-modality=keyboard] .document-outline button { transition: none; }

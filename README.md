@@ -83,4 +83,4 @@ unset between_password
 
 SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。新后台未沿用旧模板 UI；通用设计资源的来源、Geist 字体 OFL 及随包公开对照模块 MIT 见 [设计资源说明](apps/admin/public/design/ASSET-SOURCES.md)。本次对 SillyTavern、RisuAI 和 Lorebook Manager 的编辑体验研究不复制其 UI 代码，不改变各项目原有许可。四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
 
-只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前后台的实际视觉修正、七项自查和实测范围见 [玻璃工作台验收](docs/后台玻璃工作台重写与验收.md)；早先目录重组记录见 [历史重组验收](docs/项目结构重组与验收.md)。
+只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前后台的实际视觉修正、七项自查和实测范围见 [玻璃工作台验收](docs/后台玻璃工作台重写与验收.md)；本次浮层、切换与保存动效见 [过渡动画验收](docs/后台过渡动画与视觉验收.md)；早先目录重组记录见 [历史重组验收](docs/项目结构重组与验收.md)。

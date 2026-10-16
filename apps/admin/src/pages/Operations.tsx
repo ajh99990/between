@@ -1,5 +1,6 @@
 import { type FormEvent, type ReactNode, useRef, useState } from "react";
 import { api } from "../api";
+import { readerScrollBehavior } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
 import type { Config, PlanConfig, Preset } from "../types";
 import { Badge, Button, Dialog, Empty, Field, PageHeader, Panel, Select } from "../ui";
@@ -232,7 +233,9 @@ export function ModelsPage() {
       setEditor({ kind, config, initial: clone(value), value });
     }
     requestAnimationFrame(() =>
-      document.getElementById("model-editor")?.scrollIntoView({ block: "start", behavior: "smooth" }),
+      document
+        .getElementById("model-editor")
+        ?.scrollIntoView({ block: "start", behavior: readerScrollBehavior() }),
     );
   };
   const cancel = () => {

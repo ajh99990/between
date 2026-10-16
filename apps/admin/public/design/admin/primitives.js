@@ -1,6 +1,7 @@
 import { enhanceSelect } from '../components/select.js';
 import { DIALOG_PRESET } from '../material-presets.js';
 import { createGlassSurface } from '../components/ui.js';
+import { createSurfaceMotion, trackMotionInput } from '../surface-motion.js';
 
 // Presentation state belongs to the caller. Events report intent only.
 // Updates shallow-merge props and preserve mounted controls and supplied Nodes.
@@ -392,6 +393,11 @@ function getModalStack(doc) {
   const onKeydown = event => {
     const entry = top();
     if (!entry) return;
+    if (entry.closing) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
@@ -409,7 +415,7 @@ function getModalStack(doc) {
   };
   const onFocusin = event => {
     const entry = top();
-    if (!entry || redirecting) return;
+    if (!entry || entry.closing || redirecting) return;
     if (entry.panel.contains(event.target)) entry.lastFocused = event.target;
     else {
       redirecting = true;
@@ -495,31 +501,55 @@ function createOverlay(kind, initial) {
   const glass = createGlassSurface({ element: panel, ...DIALOG_PRESET.glass });
   let glassKey = JSON.stringify(overlayGlassOptions());
   host.append(panel);
+  const input = trackMotionInput(host.ownerDocument);
+  const motion = createSurfaceMotion({
+    surface: panel,
+    foregrounds: () => [...panel.children],
+    moveSurface: false,
+    fadeDecorations: true,
+    axis: kind === 'drawer' ? 'x' : 'y',
+  });
   const stack = getModalStack(host.ownerDocument);
   let props, active = false, disposed = false, revision = 0;
   const entry = {
-    element: host, panel, body, opener: null, lastFocused: null,
+    element: host, panel, body, opener: null, lastFocused: null, closing: false,
     requestClose(reason) {
-      if (active && stack.isTop(entry) && !props.closeDisabled) emit(props, 'onClose', reason);
+      if (active && props.open && stack.isTop(entry) && !props.closeDisabled) emit(props, 'onClose', reason);
     },
   };
   const cleanups = [];
   listen(close, 'click', () => entry.requestClose('button'), cleanups);
   listen(host, 'click', event => { if (event.target === host) entry.requestClose('backdrop'); }, cleanups);
-  const deactivate = () => {
-    if (!active) return;
+  const restorePanelInteraction = () => {
+    entry.closing = false;
+    panel.inert = false;
+    panel.style.removeProperty('pointer-events');
+  };
+  const finishDeactivate = () => {
+    if (!active) { restorePanelInteraction(); return; }
     active = false;
     host.hidden = true;
+    restorePanelInteraction();
     stack.remove(entry);
     entry.lastFocused = null;
   };
+  const deactivate = () => {
+    if (!active) { host.hidden = true; return; }
+    entry.closing = true;
+    panel.inert = true;
+    panel.style.pointerEvents = 'none';
+    motion.set(false, { immediate: Boolean(props.immediate) || input.isKeyboard(), onFinish: finishDeactivate });
+  };
   const activate = () => {
-    if (active || disposed || !props.open || !host.isConnected) return;
+    if (disposed || !props.open || !host.isConnected) return;
+    const wasActive = active;
     active = true;
-    entry.opener = host.ownerDocument.activeElement;
+    restorePanelInteraction();
+    if (!wasActive) entry.opener = host.ownerDocument.activeElement;
     host.hidden = false;
-    stack.add(entry);
+    if (!wasActive) stack.add(entry);
     glass.update();
+    motion.set(true, { immediate: Boolean(props.immediate) || input.isKeyboard() });
   };
   const update = (next = {}) => {
     if (disposed) return;
@@ -556,10 +586,9 @@ function createOverlay(kind, initial) {
       if (!active) queueMicrotask(() => { if (currentRevision === revision) activate(); });
     } else {
       deactivate();
-      host.hidden = true;
     }
     // Replacing child arrays may remove the active control; keep focus inside.
-    if (active && stack.isTop(entry) && host.ownerDocument.hasFocus() && !panel.contains(host.ownerDocument.activeElement)) initialFocus(entry);
+    if (active && !entry.closing && stack.isTop(entry) && host.ownerDocument.hasFocus() && !panel.contains(host.ownerDocument.activeElement)) initialFocus(entry);
   };
   props = { open: false, children: [], footer: [], ...initial };
   update();
@@ -570,7 +599,9 @@ function createOverlay(kind, initial) {
       if (disposed) return;
       disposed = true;
       revision++;
-      deactivate();
+      motion.destroy();
+      input.destroy();
+      finishDeactivate();
       cleanups.splice(0).forEach(cleanup => cleanup());
       glass.destroy();
       host.remove();
@@ -580,7 +611,8 @@ function createOverlay(kind, initial) {
 
 /** Append while closed, then update({open:true}); close only via caller update.
  * onClose receives escape | backdrop | button. children/footer contain DOM Nodes.
- * glass is an optical snapshot; contentWash/scrimOpacity are independent 0..1 backgrounds. */
+ * glass is an optical snapshot; contentWash/scrimOpacity are independent 0..1 backgrounds.
+ * immediate closes without retaining an exit frame (for permission/authentication changes). */
 export function createDialog(initial = {}) { return createOverlay('dialog', initial); }
 
 /** Same controlled contract as createDialog, with an independently scrolling body. */

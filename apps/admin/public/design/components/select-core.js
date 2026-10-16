@@ -1,5 +1,7 @@
 // A controlled, select-only combobox. Only open/active/typeahead are local state.
 // update() merges props; onSelect(value) emits an intent and never writes value.
+import { createSurfaceMotion, trackMotionInput } from '../surface-motion.js';
+
 let sequence = 0;
 let openSelect = null;
 const SVG = 'http://www.w3.org/2000/svg';
@@ -44,6 +46,7 @@ export function createSelect(initial = {}) {
   panel.id = `${instance}-listbox`;
   panel.className = 'gw-select-panel gw-popup';
   panel.setAttribute('role', 'listbox');
+  panel.setAttribute('aria-hidden', 'true');
   panel.hidden = true;
   trigger.setAttribute('aria-controls', panel.id);
   element.append(trigger, panel);
@@ -56,6 +59,16 @@ export function createSelect(initial = {}) {
   let openEvents = null, resizeObserver = null, frame = 0;
   let typeahead = '', typeTimer = 0;
   let pointerGuard = null, pointerGuardTimer = 0;
+  const input = trackMotionInput(panel.ownerDocument);
+  const motion = createSurfaceMotion({
+    surface: panel,
+    foregrounds: () => [panel],
+    moveSurface: false,
+    fadeSurface: true,
+    distance: () => panel.dataset.side === 'top' ? 3 : -3,
+    enterDuration: 170,
+    exitDuration: 120,
+  });
   const localEvents = new AbortController();
   const on = (target, type, handler, settings = {}) => target.addEventListener(type, handler, { ...settings, signal: localEvents.signal });
   const setOptional = (node, name, value) => {
@@ -123,7 +136,7 @@ export function createSelect(initial = {}) {
 
   function positionPanel() {
     if (!opened || disposed) return;
-    if (!trigger.isConnected || trigger.getClientRects().length === 0) { close(); return; }
+    if (!trigger.isConnected || trigger.getClientRects().length === 0) { close({ immediate: true }); return; }
     const anchor = trigger.getBoundingClientRect();
     const viewport = window.visualViewport;
     const edge = 8, gap = 5;
@@ -131,7 +144,7 @@ export function createSelect(initial = {}) {
     const topEdge = (viewport?.offsetTop || 0) + edge;
     const rightEdge = (viewport?.offsetLeft || 0) + (viewport?.width || document.documentElement.clientWidth) - edge;
     const bottomEdge = (viewport?.offsetTop || 0) + (viewport?.height || document.documentElement.clientHeight) - edge;
-    if (anchor.bottom < topEdge || anchor.top > bottomEdge || anchor.right < leftEdge || anchor.left > rightEdge) { close(); return; }
+    if (anchor.bottom < topEdge || anchor.top > bottomEdge || anchor.right < leftEdge || anchor.left > rightEdge) { close({ immediate: true }); return; }
     const width = Math.max(0, Math.min(Math.max(anchor.width, 132), rightEdge - leftEdge));
     panel.style.width = `${width}px`;
     const naturalHeight = Math.min(320, panel.scrollHeight + 2);
@@ -151,7 +164,14 @@ export function createSelect(initial = {}) {
     frame = window.requestAnimationFrame(() => { frame = 0; positionPanel(); ensureActiveVisible(); });
   }
 
-  function close() {
+  function finishClose() {
+    if (usePopover) {
+      try { panel.hidePopover(); } catch { /* Already closed or disconnected. */ }
+    }
+    panel.hidden = true;
+  }
+
+  function close({ immediate = false } = {}) {
     if (openSelect === registryEntry) openSelect = null;
     opened = false;
     openEvents?.abort();
@@ -161,16 +181,16 @@ export function createSelect(initial = {}) {
     if (frame) window.cancelAnimationFrame(frame);
     frame = 0;
     resetTypeahead();
-    if (usePopover) {
-      try { panel.hidePopover(); } catch { /* Already closed or disconnected. */ }
-    }
-    panel.hidden = true;
+    panel.inert = true;
+    panel.setAttribute('aria-hidden', 'true');
+    panel.style.pointerEvents = 'none';
     delete panel.dataset.open;
     element.dataset.open = 'false';
     trigger.setAttribute('aria-expanded', 'false');
     trigger.removeAttribute('aria-activedescendant');
     active = -1;
     rows.forEach(row => { row.dataset.active = 'false'; });
+    motion.set(false, { immediate: immediate || input.isKeyboard(), onFinish: finishClose });
   }
 
   function open(preference = 'selected') {
@@ -185,17 +205,22 @@ export function createSelect(initial = {}) {
     active = preference === 'first' ? (choices[0] ?? -1)
       : preference === 'last' ? (choices.at(-1) ?? -1)
         : selected >= 0 ? selected : preference === 'up' ? (choices.at(-1) ?? -1) : (choices[0] ?? -1);
+    const wasVisible = !panel.hidden;
     panel.hidden = false;
+    panel.inert = false;
+    panel.removeAttribute('aria-hidden');
+    panel.style.removeProperty('pointer-events');
     panel.dataset.open = 'true';
     element.dataset.open = 'true';
     trigger.setAttribute('aria-expanded', 'true');
-    if (usePopover) {
+    if (usePopover && !wasVisible) {
       try { panel.showPopover(); } catch { panel.removeAttribute('popover'); usePopover = false; }
     }
     trigger.focus({ preventScroll: true });
     positionPanel();
     if (!opened) return;
     paintActive(true);
+    motion.set(true, { immediate: input.isKeyboard() });
     openEvents = new AbortController();
     const settings = { capture: true, signal: openEvents.signal };
     window.addEventListener('keydown', onOpenKeydown, settings);
@@ -210,7 +235,7 @@ export function createSelect(initial = {}) {
     }, settings);
     window.addEventListener('scroll', schedulePosition, { ...settings, passive: true });
     window.addEventListener('resize', schedulePosition, { signal: openEvents.signal, passive: true });
-    window.addEventListener('blur', close, { signal: openEvents.signal });
+    window.addEventListener('blur', () => close({ immediate: true }), { signal: openEvents.signal });
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', schedulePosition, { signal: openEvents.signal, passive: true });
       window.visualViewport.addEventListener('scroll', schedulePosition, { signal: openEvents.signal, passive: true });
@@ -331,21 +356,21 @@ export function createSelect(initial = {}) {
     valueNode.textContent = selected ? selected.label : text(props.placeholder || '请选择');
     trigger.dataset.placeholder = String(!selected);
     rows = visible.map((option, index) => {
-      const row = document.createElement('div');
+      const row = rows[index] || document.createElement('div');
       row.className = 'gw-select-option';
       row.id = `${instance}-option-${index}`;
       row.dataset.selectIndex = String(index);
       row.setAttribute('role', 'option');
       row.setAttribute('aria-selected', String(sameValue(option.value, props.value)));
       row.setAttribute('aria-disabled', String(option.disabled));
-      const label = document.createElement('span');
+      const label = row.firstElementChild || document.createElement('span');
       label.className = 'gw-select-option-label';
       label.textContent = option.label;
-      row.append(label, icon('m5 12 4 4L19 6', 'gw-select-check'));
+      if (!row.firstElementChild) row.append(label, icon('m5 12 4 4L19 6', 'gw-select-check'));
       return row;
     });
-    panel.replaceChildren(...rows);
-    if (props.disabled) { close(); clearPointerGuard(); }
+    if (panel.children.length !== rows.length || rows.some((row, index) => panel.children[index] !== row)) panel.replaceChildren(...rows);
+    if (props.disabled) { close({ immediate: true }); clearPointerGuard(); }
     else if (opened) {
       const preserved = previousActive ? visible.findIndex(option => sameValue(option.value, previousActive.value) && !option.disabled) : -1;
       active = preserved >= 0 ? preserved : selectedIndex() >= 0 ? selectedIndex() : (enabledIndices()[0] ?? -1);
@@ -361,7 +386,9 @@ export function createSelect(initial = {}) {
     destroy() {
       if (disposed) return;
       disposed = true;
-      close();
+      close({ immediate: true });
+      motion.destroy();
+      input.destroy();
       clearPointerGuard();
       localEvents.abort();
       element.remove();

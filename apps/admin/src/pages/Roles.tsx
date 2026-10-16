@@ -1,5 +1,6 @@
 import { type ReactNode, useMemo, useState } from "react";
 import type { Config, Role } from "../api";
+import { readerScrollBehavior, useReaderTransition } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
 import { Badge, Button, Dialog, Empty, Field, Icon, PageHeader } from "../ui";
 
@@ -163,6 +164,10 @@ export default function RolesPage() {
       )
     : [];
   const activeSection = field === "basic" ? null : roleSections.find((section) => section.key === field);
+  const readerTransition = useReaderTransition(
+    `${editor?.role.id ?? selectedId}:${editor ? "edit" : "read"}`,
+  );
+  const fieldTransition = useReaderTransition(field);
   return (
     <div className="page-stack library-page">
       <PageHeader
@@ -235,314 +240,318 @@ export default function RolesPage() {
           </div>
         </aside>
         <section className="reader-pane" aria-label={editor ? "编辑角色卡" : "角色卡全文"}>
-          {editor ? (
-            <>
-              <header className="document-header">
-                <div>
-                  <span className="eyebrow">角色卡编辑</span>
-                  <h2>{editor.role.name || "新建角色"}</h2>
-                  <div className="inline-actions">
-                    <Badge tone={dirty ? "warning" : "neutral"}>{dirty ? "有未保存修改" : "尚未修改"}</Badge>
-                    <span className="meta">基于版本 {editor.config.version}</span>
+          <div className="reader-transition-content" ref={readerTransition}>
+            {editor ? (
+              <>
+                <header className="document-header">
+                  <div>
+                    <span className="eyebrow">角色卡编辑</span>
+                    <h2>{editor.role.name || "新建角色"}</h2>
+                    <div className="inline-actions">
+                      <Badge tone={dirty ? "warning" : "neutral"}>
+                        {dirty ? "有未保存修改" : "尚未修改"}
+                      </Badge>
+                      <span className="meta">基于版本 {editor.config.version}</span>
+                    </div>
+                  </div>
+                  <Button disabled={busy} onClick={cancel}>
+                    退出编辑
+                  </Button>
+                </header>
+                {error && (
+                  <div className="notice danger" role="alert">
+                    {error}
+                  </div>
+                )}
+                <div className="document-editor">
+                  <nav className="document-outline" aria-label="角色编辑字段">
+                    <button
+                      aria-current={field === "basic" ? "page" : undefined}
+                      onClick={() => setField("basic")}
+                    >
+                      基本资料与关联
+                    </button>
+                    {roleSections.map((section) => (
+                      <button
+                        key={section.key}
+                        aria-current={field === section.key ? "page" : undefined}
+                        onClick={() => setField(section.key)}
+                      >
+                        {section.label}
+                        <small>{textOf(editor.role, section.key).length.toLocaleString()}</small>
+                      </button>
+                    ))}
+                  </nav>
+                  <div className="editor-content" ref={fieldTransition}>
+                    {field === "basic" ? (
+                      <>
+                        <h3>基本资料</h3>
+                        <p className="muted">名称与标签帮助用户辨认角色；内部内容请在对应字段维护。</p>
+                        <div className="field-grid grid gap-4 md:grid-cols-2">
+                          <Field
+                            label="角色名称"
+                            error={error && !editor.role.name.trim() ? "请输入角色名称" : undefined}
+                          >
+                            <input
+                              className="text-input"
+                              required
+                              maxLength={10000}
+                              value={editor.role.name}
+                              onChange={(e) => update({ name: e.target.value })}
+                            />
+                          </Field>
+                          <Field label="标签">
+                            <input
+                              className="text-input"
+                              maxLength={10000}
+                              value={editor.role.tag}
+                              onChange={(e) => update({ tag: e.target.value })}
+                            />
+                          </Field>
+                          <Field label="角色标记" description="最多16个字符；不会加载外部图片。">
+                            <input
+                              className="text-input"
+                              maxLength={16}
+                              value={editor.role.icon || ""}
+                              onChange={(e) => update({ icon: e.target.value })}
+                            />
+                          </Field>
+                          <Field label="原始关键词" description="逗号分隔。实际世界书注入由下方绑定决定。">
+                            <input
+                              className="text-input"
+                              value={editor.role.keys.join(", ")}
+                              onChange={(e) =>
+                                update({
+                                  keys: e.target.value
+                                    .split(/[,，]/)
+                                    .map((s) => s.trim())
+                                    .filter(Boolean),
+                                })
+                              }
+                            />
+                          </Field>
+                        </div>
+                        <section className="reading-section">
+                          <h3>关联世界书</h3>
+                          <p className="muted">勾选已有世界书，保留正文和触发配置的独立管理。</p>
+                          <div className="binding-list">
+                            {state.config.books.map((book) => (
+                              <label key={book.id} className="checkbox-row">
+                                <input
+                                  type="checkbox"
+                                  checked={editor.role.bookIds.includes(book.id)}
+                                  onChange={(e) =>
+                                    update({
+                                      bookIds: e.target.checked
+                                        ? [...editor.role.bookIds, book.id]
+                                        : editor.role.bookIds.filter((id) => id !== book.id),
+                                    })
+                                  }
+                                />
+                                <span>{book.name}</span>
+                                <span className="meta">{book.entries?.length ?? 1} 条目</span>
+                              </label>
+                            ))}
+                            {!state.config.books.length && (
+                              <p className="muted">当前没有世界书。可先保存角色，再在世界书页面创建。</p>
+                            )}
+                          </div>
+                        </section>
+                        {editor.role.source && (
+                          <div className="notice">
+                            <strong>来源归因保留</strong>
+                            <p>
+                              {editor.role.source.attribution} · {editor.role.source.license}
+                            </p>
+                            <p className="meta">保存完整保留 source 及未编辑的扩展字段。</p>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      activeSection && (
+                        <>
+                          <div className="editor-section-heading">
+                            <h3>{activeSection.label}</h3>
+                            <span className="meta">
+                              {textOf(editor.role, activeSection.key).length.toLocaleString()} / 24,000 字符
+                            </span>
+                          </div>
+                          <p className="field-description">{activeSection.hint}</p>
+                          <textarea
+                            className={`text-area long-editor ${activeSection.key === "examples" ? "dialogue-editor" : ""}`}
+                            aria-label={activeSection.label}
+                            maxLength={24000}
+                            value={textOf(editor.role, activeSection.key)}
+                            onChange={(e) => update({ [activeSection.key]: e.target.value })}
+                            spellCheck={false}
+                          />
+                        </>
+                      )
+                    )}
                   </div>
                 </div>
-                <Button disabled={busy} onClick={cancel}>
-                  退出编辑
-                </Button>
-              </header>
-              {error && (
-                <div className="notice danger" role="alert">
-                  {error}
-                </div>
-              )}
-              <div className="document-editor">
-                <nav className="document-outline" aria-label="角色编辑字段">
-                  <button
-                    aria-current={field === "basic" ? "page" : undefined}
-                    onClick={() => setField("basic")}
-                  >
-                    基本资料与关联
-                  </button>
-                  {roleSections.map((section) => (
-                    <button
-                      key={section.key}
-                      aria-current={field === section.key ? "page" : undefined}
-                      onClick={() => setField(section.key)}
-                    >
-                      {section.label}
-                      <small>{textOf(editor.role, section.key).length.toLocaleString()}</small>
-                    </button>
-                  ))}
-                </nav>
-                <div className="editor-content">
-                  {field === "basic" ? (
-                    <>
-                      <h3>基本资料</h3>
-                      <p className="muted">名称与标签帮助用户辨认角色；内部内容请在对应字段维护。</p>
-                      <div className="field-grid grid gap-4 md:grid-cols-2">
-                        <Field
-                          label="角色名称"
-                          error={error && !editor.role.name.trim() ? "请输入角色名称" : undefined}
-                        >
-                          <input
-                            className="text-input"
-                            required
-                            maxLength={10000}
-                            value={editor.role.name}
-                            onChange={(e) => update({ name: e.target.value })}
-                          />
-                        </Field>
-                        <Field label="标签">
-                          <input
-                            className="text-input"
-                            maxLength={10000}
-                            value={editor.role.tag}
-                            onChange={(e) => update({ tag: e.target.value })}
-                          />
-                        </Field>
-                        <Field label="角色标记" description="最多16个字符；不会加载外部图片。">
-                          <input
-                            className="text-input"
-                            maxLength={16}
-                            value={editor.role.icon || ""}
-                            onChange={(e) => update({ icon: e.target.value })}
-                          />
-                        </Field>
-                        <Field label="原始关键词" description="逗号分隔。实际世界书注入由下方绑定决定。">
-                          <input
-                            className="text-input"
-                            value={editor.role.keys.join(", ")}
-                            onChange={(e) =>
-                              update({
-                                keys: e.target.value
-                                  .split(/[,，]/)
-                                  .map((s) => s.trim())
-                                  .filter(Boolean),
-                              })
-                            }
-                          />
-                        </Field>
+                <footer className="editor-footer">
+                  <p className="meta">保存整份角色档案，保留未编辑字段与原始归因。</p>
+                  <div className="inline-actions">
+                    <Button disabled={busy} onClick={cancel}>
+                      取消
+                    </Button>
+                    <Button variant="primary" loading={busy} disabled={!dirty} onClick={() => void commit()}>
+                      保存角色
+                    </Button>
+                  </div>
+                </footer>
+              </>
+            ) : selected ? (
+              <>
+                <header className="document-header">
+                  <div className="identity-heading">
+                    <span className="role-monogram large" aria-hidden="true">
+                      {selected.name.slice(0, 1)}
+                    </span>
+                    <div>
+                      <span className="eyebrow">角色档案</span>
+                      <h2>{selected.name}</h2>
+                      <div className="inline-actions">
+                        {selected.tag && <Badge>{selected.tag}</Badge>}
+                        <span className="meta">{selected.bookIds.length} 本世界书</span>
+                        {selected.source && <span className="meta">{selected.source.license}</span>}
                       </div>
-                      <section className="reading-section">
-                        <h3>关联世界书</h3>
-                        <p className="muted">勾选已有世界书，保留正文和触发配置的独立管理。</p>
-                        <div className="binding-list">
-                          {state.config.books.map((book) => (
-                            <label key={book.id} className="checkbox-row">
-                              <input
-                                type="checkbox"
-                                checked={editor.role.bookIds.includes(book.id)}
-                                onChange={(e) =>
-                                  update({
-                                    bookIds: e.target.checked
-                                      ? [...editor.role.bookIds, book.id]
-                                      : editor.role.bookIds.filter((id) => id !== book.id),
-                                  })
-                                }
-                              />
-                              <span>{book.name}</span>
-                              <span className="meta">{book.entries?.length ?? 1} 条目</span>
-                            </label>
-                          ))}
-                          {!state.config.books.length && (
-                            <p className="muted">当前没有世界书。可先保存角色，再在世界书页面创建。</p>
+                    </div>
+                  </div>
+                  <div className="inline-actions">
+                    <Button onClick={() => edit(selected)}>
+                      <Icon name="edit" />
+                      编辑角色
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      disabled={state.config.roles.length <= 1}
+                      aria-label={`移除角色 ${selected.name}`}
+                      onClick={() => setDeleteRole(selected)}
+                    >
+                      <Icon name="trash" />
+                    </Button>
+                  </div>
+                </header>
+                <div className="document-toolbar">
+                  <div className="search-box">
+                    <Icon name="search" />
+                    <input
+                      className="search-input"
+                      aria-label="在角色卡中查找"
+                      placeholder="在全文中定位…"
+                      value={find}
+                      onChange={(e) => setFind(e.target.value)}
+                    />
+                    {find && (
+                      <button aria-label="清空全文查找" className="icon-button" onClick={() => setFind("")}>
+                        <Icon name="close" size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <span className="meta">
+                    {find ? `${readingSections.length} 个匹配段落` : "完整内容 · 保留原始换行"}
+                  </span>
+                </div>
+                <div className="document-reading">
+                  <article className="reading-body">
+                    {readingSections.map((section) => (
+                      <section key={section.key} id={`role-${section.key}`} className="reading-section">
+                        <header>
+                          <h3>{section.label}</h3>
+                          <span className="meta">
+                            {textOf(selected, section.key).length.toLocaleString()} 字符
+                          </span>
+                        </header>
+                        <p className="field-description">{section.hint}</p>
+                        <div className={`prose ${section.key === "examples" ? "dialogue-text" : ""}`}>
+                          {textOf(selected, section.key) ? (
+                            highlighted(textOf(selected, section.key), find)
+                          ) : (
+                            <span className="empty-value">未设置</span>
                           )}
                         </div>
                       </section>
-                      {editor.role.source && (
-                        <div className="notice">
-                          <strong>来源归因保留</strong>
-                          <p>
-                            {editor.role.source.attribution} · {editor.role.source.license}
-                          </p>
-                          <p className="meta">保存完整保留 source 及未编辑的扩展字段。</p>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    activeSection && (
-                      <>
-                        <div className="editor-section-heading">
-                          <h3>{activeSection.label}</h3>
-                          <span className="meta">
-                            {textOf(editor.role, activeSection.key).length.toLocaleString()} / 24,000 字符
-                          </span>
-                        </div>
-                        <p className="field-description">{activeSection.hint}</p>
-                        <textarea
-                          className={`text-area long-editor ${activeSection.key === "examples" ? "dialogue-editor" : ""}`}
-                          aria-label={activeSection.label}
-                          maxLength={24000}
-                          value={textOf(editor.role, activeSection.key)}
-                          onChange={(e) => update({ [activeSection.key]: e.target.value })}
-                          spellCheck={false}
-                        />
-                      </>
-                    )
-                  )}
-                </div>
-              </div>
-              <footer className="editor-footer">
-                <p className="meta">保存整份角色档案，保留未编辑字段与原始归因。</p>
-                <div className="inline-actions">
-                  <Button disabled={busy} onClick={cancel}>
-                    取消
-                  </Button>
-                  <Button variant="primary" loading={busy} disabled={!dirty} onClick={() => void commit()}>
-                    保存角色
-                  </Button>
-                </div>
-              </footer>
-            </>
-          ) : selected ? (
-            <>
-              <header className="document-header">
-                <div className="identity-heading">
-                  <span className="role-monogram large" aria-hidden="true">
-                    {selected.name.slice(0, 1)}
-                  </span>
-                  <div>
-                    <span className="eyebrow">角色档案</span>
-                    <h2>{selected.name}</h2>
-                    <div className="inline-actions">
-                      {selected.tag && <Badge>{selected.tag}</Badge>}
-                      <span className="meta">{selected.bookIds.length} 本世界书</span>
-                      {selected.source && <span className="meta">{selected.source.license}</span>}
-                    </div>
-                  </div>
-                </div>
-                <div className="inline-actions">
-                  <Button onClick={() => edit(selected)}>
-                    <Icon name="edit" />
-                    编辑角色
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    disabled={state.config.roles.length <= 1}
-                    aria-label={`移除角色 ${selected.name}`}
-                    onClick={() => setDeleteRole(selected)}
-                  >
-                    <Icon name="trash" />
-                  </Button>
-                </div>
-              </header>
-              <div className="document-toolbar">
-                <div className="search-box">
-                  <Icon name="search" />
-                  <input
-                    className="search-input"
-                    aria-label="在角色卡中查找"
-                    placeholder="在全文中定位…"
-                    value={find}
-                    onChange={(e) => setFind(e.target.value)}
-                  />
-                  {find && (
-                    <button aria-label="清空全文查找" className="icon-button" onClick={() => setFind("")}>
-                      <Icon name="close" size={14} />
-                    </button>
-                  )}
-                </div>
-                <span className="meta">
-                  {find ? `${readingSections.length} 个匹配段落` : "完整内容 · 保留原始换行"}
-                </span>
-              </div>
-              <div className="document-reading">
-                <article className="reading-body">
-                  {readingSections.map((section) => (
-                    <section key={section.key} id={`role-${section.key}`} className="reading-section">
-                      <header>
-                        <h3>{section.label}</h3>
-                        <span className="meta">
-                          {textOf(selected, section.key).length.toLocaleString()} 字符
-                        </span>
-                      </header>
-                      <p className="field-description">{section.hint}</p>
-                      <div className={`prose ${section.key === "examples" ? "dialogue-text" : ""}`}>
-                        {textOf(selected, section.key) ? (
-                          highlighted(textOf(selected, section.key), find)
-                        ) : (
-                          <span className="empty-value">未设置</span>
-                        )}
+                    ))}
+                    {!readingSections.length && (
+                      <Empty
+                        title="全文中没有匹配内容"
+                        action={<Button onClick={() => setFind("")}>清空查找</Button>}
+                      />
+                    )}
+                    <section className="reading-section" id="role-books">
+                      <h3>关联世界书</h3>
+                      <div className="related-books">
+                        {selected.bookIds.map((id) => {
+                          const book = state.config.books.find((book) => book.id === id);
+                          return (
+                            <button key={id} onClick={() => navigate(`/books/${encodeURIComponent(id)}`)}>
+                              <Icon name="book" />
+                              <span>
+                                <strong>{book?.name || id}</strong>
+                                <small>{book?.entries?.length ?? 1} 条完整条目与触发配置</small>
+                              </span>
+                              <Icon name="arrow" size={16} />
+                            </button>
+                          );
+                        })}
+                        {!selected.bookIds.length && <p className="muted">没有绑定世界书。</p>}
                       </div>
                     </section>
-                  ))}
-                  {!readingSections.length && (
-                    <Empty
-                      title="全文中没有匹配内容"
-                      action={<Button onClick={() => setFind("")}>清空查找</Button>}
-                    />
-                  )}
-                  <section className="reading-section" id="role-books">
-                    <h3>关联世界书</h3>
-                    <div className="related-books">
-                      {selected.bookIds.map((id) => {
-                        const book = state.config.books.find((book) => book.id === id);
-                        return (
-                          <button key={id} onClick={() => navigate(`/books/${encodeURIComponent(id)}`)}>
-                            <Icon name="book" />
-                            <span>
-                              <strong>{book?.name || id}</strong>
-                              <small>{book?.entries?.length ?? 1} 条完整条目与触发配置</small>
-                            </span>
-                            <Icon name="arrow" size={16} />
-                          </button>
-                        );
-                      })}
-                      {!selected.bookIds.length && <p className="muted">没有绑定世界书。</p>}
-                    </div>
-                  </section>
-                  {selected.source && (
-                    <section className="reading-section source-section">
-                      <h3>来源与许可</h3>
-                      <dl>
-                        <dt>作者</dt>
-                        <dd>{selected.source.attribution}</dd>
-                        <dt>许可</dt>
-                        <dd>{selected.source.license}</dd>
-                        <dt>来源</dt>
-                        <dd>{selected.source.repository}</dd>
-                        <dt>固定版本</dt>
-                        <dd className="mono">{selected.source.commit}</dd>
-                        <dt>适配</dt>
-                        <dd>{selected.source.adaptation}</dd>
-                      </dl>
-                    </section>
-                  )}
-                </article>
-                <nav className="document-outline" aria-label="角色卡目录">
-                  {readingSections.map((section) => (
-                    <a
-                      key={section.key}
-                      href={`#${location.hash.slice(1).split("#")[0]}`}
-                      onClick={(event) => {
-                        event.preventDefault();
+                    {selected.source && (
+                      <section className="reading-section source-section">
+                        <h3>来源与许可</h3>
+                        <dl>
+                          <dt>作者</dt>
+                          <dd>{selected.source.attribution}</dd>
+                          <dt>许可</dt>
+                          <dd>{selected.source.license}</dd>
+                          <dt>来源</dt>
+                          <dd>{selected.source.repository}</dd>
+                          <dt>固定版本</dt>
+                          <dd className="mono">{selected.source.commit}</dd>
+                          <dt>适配</dt>
+                          <dd>{selected.source.adaptation}</dd>
+                        </dl>
+                      </section>
+                    )}
+                  </article>
+                  <nav className="document-outline" aria-label="角色卡目录">
+                    {readingSections.map((section) => (
+                      <a
+                        key={section.key}
+                        href={`#${location.hash.slice(1).split("#")[0]}`}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document
+                            .getElementById(`role-${section.key}`)
+                            ?.scrollIntoView({ block: "start", behavior: readerScrollBehavior() });
+                        }}
+                      >
+                        {section.label}
+                      </a>
+                    ))}
+                    <button
+                      onClick={() =>
                         document
-                          .getElementById(`role-${section.key}`)
-                          ?.scrollIntoView({ block: "start", behavior: "smooth" });
-                      }}
+                          .getElementById("role-books")
+                          ?.scrollIntoView({ block: "start", behavior: readerScrollBehavior() })
+                      }
                     >
-                      {section.label}
-                    </a>
-                  ))}
-                  <button
-                    onClick={() =>
-                      document
-                        .getElementById("role-books")
-                        ?.scrollIntoView({ block: "start", behavior: "smooth" })
-                    }
-                  >
-                    关联世界书
-                  </button>
-                </nav>
-              </div>
-            </>
-          ) : (
-            <Empty
-              icon="roles"
-              title="选择一个角色卡"
-              description="从左侧角色库开始阅读全文，或创建新角色。"
-            />
-          )}
+                      关联世界书
+                    </button>
+                  </nav>
+                </div>
+              </>
+            ) : (
+              <Empty
+                icon="roles"
+                title="选择一个角色卡"
+                description="从左侧角色库开始阅读全文，或创建新角色。"
+              />
+            )}
+          </div>
         </section>
       </div>
       <Dialog

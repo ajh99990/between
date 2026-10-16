@@ -48,8 +48,10 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading}
     >
-      {loading && <span className="spinner" aria-hidden="true" />}
-      {children}
+      <span className="button-content">{children}</span>
+      <span className="button-busy" aria-hidden="true">
+        {loading && <span className="spinner" />}
+      </span>
     </button>
   );
 }
@@ -326,8 +328,25 @@ export function Dialog({
 }) {
   const enabled = useContext(UiInteractionContext);
   const effectiveOpen = open && enabled;
-  const latest = useRef({ open: effectiveOpen, title, onClose, size, closeDisabled });
-  latest.current = { open: effectiveOpen, title, onClose, size, closeDisabled };
+  const presentation = useRef({ title, children, footer, size });
+  if (effectiveOpen) presentation.current = { title, children, footer, size };
+  const visual = presentation.current;
+  const latest = useRef({
+    open: effectiveOpen,
+    title: visual.title,
+    onClose,
+    size: visual.size,
+    closeDisabled,
+    immediate: !enabled,
+  });
+  latest.current = {
+    open: effectiveOpen,
+    title: visual.title,
+    onClose,
+    size: visual.size,
+    closeDisabled,
+    immediate: !enabled,
+  };
   const controller = useRef<Controller | null>(null);
   const [slots, setSlots] = useState<{ body: HTMLElement; footer: HTMLElement } | null>(null);
   const [failed, setFailed] = useState(false);
@@ -375,7 +394,7 @@ export function Dialog({
         if (latest.current.open) latest.current.onClose();
       },
     });
-  }, [effectiveOpen, title, size, closeDisabled, slots]);
+  }, [effectiveOpen, enabled, title, size, closeDisabled, slots]);
   if (failed) {
     return effectiveOpen ? (
       <DialogUnavailable title={title} onClose={onClose} closeDisabled={closeDisabled} />
@@ -383,8 +402,8 @@ export function Dialog({
   }
   return slots ? (
     <>
-      {createPortal(children, slots.body)}
-      {createPortal(footer, slots.footer)}
+      {createPortal(visual.children, slots.body)}
+      {createPortal(visual.footer, slots.footer)}
     </>
   ) : null;
 }
