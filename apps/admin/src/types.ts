@@ -109,11 +109,9 @@ export interface Audit {
 export interface CommunityItem {
   id: string;
   name: string;
-  type: string;
   language: string;
   scenarios: string;
-  quality: string;
-  packaging: string;
+  contentNotes: string;
   entryCount: number;
   sourceURL: string;
 }
@@ -132,9 +130,7 @@ export interface AdminState {
   };
   plan: { description: string; connection?: string; canGenerate?: boolean; [key: string]: unknown };
   community: {
-    verification: string;
-    heatEvidence: string;
-    evidenceDate: string;
+    source: string;
     license: string;
     items: CommunityItem[];
     importBlocker: string;

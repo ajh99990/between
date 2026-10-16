@@ -8,21 +8,21 @@ export const roleSections = [
   {
     key: "description",
     label: "公开简介",
-    hint: "本地角色的这段简介会出现在用户角色列表。请勿填写内部提示词；社区角色使用固定公开简介。",
+    hint: "显示在用户的角色列表中，请勿填写内部指令。社区角色采用固定公开简介。",
   },
-  { key: "detail", label: "角色设定", hint: "人物身份、背景与行为方式，仅供管理员和模型上下文使用。" },
+  { key: "detail", label: "角色设定", hint: "供模型使用的人物身份、背景与行为方式。" },
   { key: "personality", label: "性格", hint: "人物的核心性格、表达习惯与边界。" },
   { key: "scenario", label: "场景", hint: "对话发生的环境和当前情境。" },
   { key: "greeting", label: "开场白", hint: "创建新会话时会作为第一条角色消息展示给用户。" },
-  { key: "examples", label: "示例对话", hint: "完整保留对话示范及换行；示例不是用户真实聊天记录。" },
-  { key: "system", label: "系统提示词", hint: "角色内部系统指令，不进入用户状态或朗读输入。" },
+  { key: "examples", label: "示例对话", hint: "供模型参考的对话风格与回应示范。" },
+  { key: "system", label: "系统提示词", hint: "约束角色行为与回答方式的内部指令。" },
   { key: "persona", label: "用户人设", hint: "提供给模型的对话对象设定。" },
   { key: "postHistory", label: "历史后指令", hint: "附加于历史后的角色指令，独立于全局提示预设。" },
   { key: "creatorNotes", label: "作者说明", hint: "管理员可见的创作和使用说明。" },
   {
     key: "world",
     label: "原始世界设定",
-    hint: "保留原角色字段；实际世界书注入来自绑定世界书，修改此处不会改写独立书库。",
+    hint: "角色卡附带的世界设定。对话中使用的世界书由关联决定，修改此处不会改动书库。",
   },
 ] as const;
 type Section = (typeof roleSections)[number]["key"];
@@ -172,7 +172,7 @@ export default function RolesPage() {
     <div className="page-stack library-page">
       <PageHeader
         title="角色卡"
-        description="阅读与维护完整的人物档案。内容修改用于新会话，既有会话快照保持不变。"
+        description="修改仅用于新会话，已有会话保持原设定。"
         actions={
           <Button
             variant="primary"
@@ -220,7 +220,7 @@ export default function RolesPage() {
                 </span>
                 <span className="collection-copy">
                   <strong>{role.name}</strong>
-                  <small>{role.tag || "未设置标签"}</small>
+                  {role.tag && <small>{role.tag}</small>}
                   <span className="meta">{role.bookIds.length} 本关联世界书</span>
                 </span>
                 <Icon name="arrow" size={14} />
@@ -229,14 +229,10 @@ export default function RolesPage() {
             {!roles.length && (
               <Empty
                 title="没有匹配的角色"
-                description="搜索覆盖完整设定和对话。"
+                description="尝试角色名称、设定或对话中的词句。"
                 action={<Button onClick={() => setQuery("")}>清空搜索</Button>}
               />
             )}
-          </div>
-          <div className="collection-footnote">
-            <Icon name="lock" size={14} />
-            <span>完整设定仅在管理员界面展示</span>
           </div>
         </aside>
         <section className="reader-pane" aria-label={editor ? "编辑角色卡" : "角色卡全文"}>
@@ -245,7 +241,6 @@ export default function RolesPage() {
               <>
                 <header className="document-header">
                   <div>
-                    <span className="eyebrow">角色卡编辑</span>
                     <h2>{editor.role.name || "新建角色"}</h2>
                     <div className="inline-actions">
                       <Badge tone={dirty ? "warning" : "neutral"}>
@@ -286,7 +281,6 @@ export default function RolesPage() {
                     {field === "basic" ? (
                       <>
                         <h3>基本资料</h3>
-                        <p className="muted">名称与标签帮助用户辨认角色；内部内容请在对应字段维护。</p>
                         <div className="field-grid grid gap-4 md:grid-cols-2">
                           <Field
                             label="角色名称"
@@ -333,7 +327,7 @@ export default function RolesPage() {
                         </div>
                         <section className="reading-section">
                           <h3>关联世界书</h3>
-                          <p className="muted">勾选已有世界书，保留正文和触发配置的独立管理。</p>
+                          <p className="muted">勾选供此角色使用的世界书。</p>
                           <div className="binding-list">
                             {state.config.books.map((book) => (
                               <label key={book.id} className="checkbox-row">
@@ -359,11 +353,10 @@ export default function RolesPage() {
                         </section>
                         {editor.role.source && (
                           <div className="notice">
-                            <strong>来源归因保留</strong>
+                            <strong>来源与许可</strong>
                             <p>
                               {editor.role.source.attribution} · {editor.role.source.license}
                             </p>
-                            <p className="meta">保存完整保留 source 及未编辑的扩展字段。</p>
                           </div>
                         )}
                       </>
@@ -391,7 +384,7 @@ export default function RolesPage() {
                   </div>
                 </div>
                 <footer className="editor-footer">
-                  <p className="meta">保存整份角色档案，保留未编辑字段与原始归因。</p>
+                  <p className="meta">{dirty ? "有未保存的修改。" : "尚未修改。"}</p>
                   <div className="inline-actions">
                     <Button disabled={busy} onClick={cancel}>
                       取消
@@ -410,7 +403,6 @@ export default function RolesPage() {
                       {selected.name.slice(0, 1)}
                     </span>
                     <div>
-                      <span className="eyebrow">角色档案</span>
                       <h2>{selected.name}</h2>
                       <div className="inline-actions">
                         {selected.tag && <Badge>{selected.tag}</Badge>}
@@ -450,9 +442,7 @@ export default function RolesPage() {
                       </button>
                     )}
                   </div>
-                  <span className="meta">
-                    {find ? `${readingSections.length} 个匹配段落` : "完整内容 · 保留原始换行"}
-                  </span>
+                  {find && <span className="meta">{readingSections.length} 个匹配段落</span>}
                 </div>
                 <div className="document-reading">
                   <article className="reading-body">
@@ -490,7 +480,7 @@ export default function RolesPage() {
                               <Icon name="book" />
                               <span>
                                 <strong>{book?.name || id}</strong>
-                                <small>{book?.entries?.length ?? 1} 条完整条目与触发配置</small>
+                                <small>{book?.entries?.length ?? 1} 个条目</small>
                               </span>
                               <Icon name="arrow" size={16} />
                             </button>
@@ -545,11 +535,7 @@ export default function RolesPage() {
                 </div>
               </>
             ) : (
-              <Empty
-                icon="roles"
-                title="选择一个角色卡"
-                description="从左侧角色库开始阅读全文，或创建新角色。"
-              />
+              <Empty icon="roles" title="选择一个角色卡" description="从左侧角色库中选择，或创建新角色。" />
             )}
           </div>
         </section>

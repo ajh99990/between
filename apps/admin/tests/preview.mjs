@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { createApp } from '../../server/server.mjs';
 import { importCommunity } from '../../server/community.mjs';
-import { fictionalPlanProvider, forbiddenServicePorts, initialConfig, syntheticPassword } from './browser-fixtures.mjs';
+import { forbiddenServicePorts, syntheticPassword } from './browser-fixtures.mjs';
+import { previewConfig, previewPlanProvider } from './preview-fixtures.mjs';
 
 // Explicitly started, disposable local preview. No model or credential access.
 assert(Number(process.versions.node.split('.')[0]) >= 24, 'Node.js 24 or newer is required');
@@ -24,10 +25,10 @@ process.once('uncaughtException', error => { console.error(error.message); stop(
 process.once('unhandledRejection', error => { console.error(error instanceof Error ? error.message : String(error)); stop(1); });
 try {
   root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'between-admin-new-preview-')));
-  const config = initialConfig();
+  const config = previewConfig();
   for (const id of ['peiyu', 'tangtuantuan', 'wangushi', 'huoyushen']) { const imported = await importCommunity(id); config.roles.push(imported.role); if (imported.book) config.books.push(imported.book); }
   await fs.writeFile(path.join(root, 'settings.json'), JSON.stringify(config), { mode: 0o600 });
-  app = await createApp({ root, port, demo: true, adminPassword: syntheticPassword, planProvider: fictionalPlanProvider() });
+  app = await createApp({ root, port, demo: true, adminPassword: syntheticPassword, planProvider: previewPlanProvider() });
   assert(!forbiddenServicePorts.has(new URL(app.url).port));
   // Rich temporary records go through actual public endpoints. No /turn calls.
   for (let index = 0; index < 12; index += 1) {
@@ -46,6 +47,8 @@ try {
     }
   }
 
-  console.log(`Between 新后台隔离预览（虚构数据、合成演示）：${app.url}/admin/`);
-  console.log(`虚构验收口令：${syntheticPassword}`);
+  console.log(`Between 隔离预览：${app.url}/admin/`);
+  console.log('内容：原创虚构角色、世界书与随包社区素材。用户和会话为临时示例；聊天使用合成回复，不连接真实模型。');
+  console.log('修改仅写入本次临时目录，退出后删除；不会读取或改动日常使用的数据。');
+  console.log(`示例管理员口令：${syntheticPassword}`);
 } catch (error) { await shutdown(); throw error; }

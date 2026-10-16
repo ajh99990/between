@@ -71,8 +71,8 @@ async function startUpstream() {
   return instance;
 }
 
-async function startApp() {
-  const instance = await createApp({ root, port: 0, adminPassword: syntheticPassword, planProvider,
+async function startApp(dataRoot = root) {
+  const instance = await createApp({ root: dataRoot, port: 0, adminPassword: syntheticPassword, planProvider,
     modelUrl: `http://127.0.0.1:${upstream.address().port}/v1`, modelName: 'synthetic-local-model' });
   const url = new URL(instance.url);
   assert.equal(url.hostname, '127.0.0.1');
@@ -80,10 +80,10 @@ async function startApp() {
   return instance;
 }
 
-async function attachRestrictions(target) {
+async function attachRestrictions(target, allowedOrigin = app.url) {
   await target.route('**/*', async route => {
     const request = route.request(), url = new URL(request.url());
-    if (url.origin !== app.url || (/\/turn$/.test(url.pathname) && !controlledTurn)) {
+    if (url.origin !== allowedOrigin || (/\/turn$/.test(url.pathname) && !controlledTurn)) {
       blockedRequests.push({ method: request.method(), origin: url.origin, path: url.pathname });
       await route.abort('blockedbyclient'); return;
     }
@@ -464,7 +464,7 @@ try {
     await expect(page.getByRole('heading', { name: '没有匹配的素材', exact: true })).toBeVisible();
     await page.getByRole('button', { name: '清除搜索', exact: true }).click();
     await nav('/diagnostics', '诊断与审计');
-    await expect(page.getByText(/世界书最终纳入条目诊断尚未接通/)).toBeVisible();
+    await expect(page.getByText(/世界书上下文详情暂不可用/)).toBeVisible();
     await expect(page.getByRole('row').filter({ hasText: '导入社区素材' })).toBeVisible();
     await page.getByLabel('搜索操作记录', { exact: true }).fill('不可能匹配的虚构审计对象');
     await expect(page.getByRole('heading', { name: '没有匹配的记录', exact: true })).toBeVisible();
@@ -593,8 +593,14 @@ try {
   });
 
   await step('initial-loading-first-failure-and-refresh-error-retain-state', async () => {
+    // This scenario needs its own unauthenticated login. Isolate the service too:
+    // earlier expiry/resource tests may exhaust the real per-address login limit.
+    // Do not weaken that protection or rely on the suite taking over one minute.
+    const recoveryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'between-admin-state-recovery-'));
+    await fs.writeFile(path.join(recoveryRoot, 'settings.json'), JSON.stringify(initial), { mode: 0o600 });
+    const recoveryApp = await startApp(recoveryRoot);
     const isolated = await browser.newContext({ viewport: { width: 1200, height: 900 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
-    await attachRestrictions(isolated);
+    await attachRestrictions(isolated, recoveryApp.url);
     let loginPosts = 0;
     isolated.on('request', request => {
       if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/admin/login') loginPosts += 1;
@@ -620,7 +626,7 @@ try {
     const pageErrors = [];
     target.on('pageerror', error => pageErrors.push(error.message));
     try {
-      await target.goto(`${app.url}/admin/#/roles`);
+      await target.goto(`${recoveryApp.url}/admin/#/roles`);
       await expect.poll(() => held).toBe(true);
       await expect(target.getByRole('status').filter({ hasText: '正在验证管理员会话' })).toBeVisible();
       await expect(target.getByLabel(/^管理员口令/)).toHaveCount(0);
@@ -652,7 +658,7 @@ try {
       mode = 'initial503';
       const firstFailurePage = await isolated.newPage();
       firstFailurePage.on('pageerror', error => pageErrors.push(error.message));
-      await firstFailurePage.goto(`${app.url}/admin/#/roles`);
+      await firstFailurePage.goto(`${recoveryApp.url}/admin/#/roles`);
       await expect(firstFailurePage.getByRole('alert').filter({ hasText: '首次读取状态失败（合成503）' })).toBeVisible();
       await shot('state-first-read-failure', firstFailurePage);
       const retry = firstFailurePage.getByRole('button', { name: '重试会话验证', exact: true });
@@ -666,7 +672,7 @@ try {
       assert.equal(loginPosts, loginPostsBeforeRetry, 'Read-only state retry must reuse the existing cookie without a new login POST');
       observations.push({ stage, initialFailure: { explicitRetryAvailable: true, recoveredThrough: 'read-only GET state retry using the existing administrator cookie', loginPostsBeforeRetry, loginPostsAfterRetry: loginPosts }, refreshFailure: { oldRoleVisible: true, draftPreserved: true, successNoticeAbsent: true, serverConfigUnchanged: true } });
       assert.deepEqual(pageErrors, []);
-    } finally { releaseInitial(); await isolated.close(); }
+    } finally { releaseInitial(); await isolated.close(); await recoveryApp.close(); await fs.rm(recoveryRoot, { recursive: true, force: true }); }
   });
 
   for (const width of [1440, 750, 390]) await step(`responsive-routes-and-select-${width}`, async () => {

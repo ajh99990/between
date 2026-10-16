@@ -285,7 +285,7 @@ export default function BooksPage() {
     <div className="page-stack library-page books-page">
       <PageHeader
         title="世界书"
-        description="阅读完整设定，为角色维护可复用的背景、地点与规则。修改仅影响新会话。"
+        description="维护角色使用的背景、地点与规则。修改仅用于新会话。"
         actions={
           <Button
             variant="primary"
@@ -338,7 +338,6 @@ export default function BooksPage() {
                 </button>
               )}
             </div>
-            <p className="field-description">查找完整内容，不改变运行时触发条件。</p>
           </div>
           <div className="collection-scroll">
             {filtered.map((book) => (
@@ -382,10 +381,6 @@ export default function BooksPage() {
               />
             )}
           </div>
-          <div className="collection-footnote">
-            <Icon name="lock" size={14} />
-            <span>完整设定仅在管理员界面展示</span>
-          </div>
         </aside>
         <section className="reader-pane book-reader" aria-label={draft ? "编辑世界书" : "世界书全文"}>
           <div className="reader-transition-content" ref={readerTransition}>
@@ -393,24 +388,21 @@ export default function BooksPage() {
               <Empty
                 icon="book"
                 title="选择一本世界书"
-                description="在左侧打开世界书，阅读完整正文或维护触发条件。"
+                description="在左侧打开世界书，查看正文或编辑触发条件。"
               />
             ) : (
               <>
                 <header className="document-header">
                   <div>
-                    <span className="eyebrow">{draft ? "世界书编辑" : "世界设定档案"}</span>
                     <h2>
                       <Marked text={display.name || "未命名世界书"} query={draft ? "" : readQuery} />
                     </h2>
-                    <div className="inline-actions">
-                      <Badge tone={draft ? "warning" : "neutral"}>
-                        {draft ? (draft.isNew ? "新建草稿" : dirty ? "未保存" : "编辑中") : "全文阅读"}
-                      </Badge>
-                      <span className="meta">
-                        {draft ? `基于配置 v${draft.base.version}` : `配置 v${config.version}`}
-                      </span>
-                    </div>
+                    {draft && (
+                      <div className="inline-actions">
+                        <Badge tone="warning">{draft.isNew ? "新建草稿" : dirty ? "未保存" : "编辑中"}</Badge>
+                        <span className="meta">基于配置 v{draft.base.version}</span>
+                      </div>
+                    )}
                     <p className="meta book-binding-summary">
                       绑定角色：{boundRoles.map((role) => role.name).join("、") || "尚未绑定"} ·{" "}
                       {display.entries !== undefined
@@ -446,14 +438,11 @@ export default function BooksPage() {
                         <br />
                         版本：{display.source.commit}
                       </p>
-                      <p className="muted">来源归因随原记录保留，不可在此改动。</p>
                     </details>
                   )}
                   <details className="book-meta-item">
                     <summary>世界书原始元数据（只读）</summary>
-                    <p className="muted">
-                      包含书级关键词、正文、来源及其他原始字段；条目正文与配置在各条目中完整查看。
-                    </p>
+                    <p className="muted">查看书级关键词、正文与来源。各条目的正文和配置在下方展开。</p>
                     <Field label="世界书原始元数据 JSON">
                       <textarea
                         className="text-area"
@@ -734,10 +723,9 @@ export default function BooksPage() {
                               <details className="section-card">
                                 <summary>高级配置与原始扩展</summary>
                                 <p className="muted">
-                                  此 JSON
-                                  初始包含条目的全部其他原始字段，未编辑会原样保留。保存时整体替换其他字段，删除键或嵌套键会明确移除该字段。UID
-                                  和上方常用字段请通过对应控件修改。当前服务不支持向量、自动化及
-                                  outlet；接受某个扩展字段不代表对应能力已验证。
+                                  此处编辑其余扩展字段。保存会整体替换，删除键也会删除对应设置。UID
+                                  是只读的条目标识；常用触发条件请在上方编辑。向量匹配、自动化和 outlet
+                                  暂不支持。
                                 </p>
                                 <Field label="扩展配置（完整 JSON 对象）">
                                   <textarea
@@ -804,7 +792,7 @@ export default function BooksPage() {
                     )}
                     <div className="editor-footer">
                       <span className="muted">
-                        {dirty ? "更改尚未保存。" : "尚未修改。"} 取消会恢复服务器记录。
+                        {dirty ? "更改尚未保存。" : "尚未修改。"} 取消会放弃本次草稿。
                       </span>
                       <div className="inline-actions">
                         <Button variant="secondary" disabled={saving} onClick={() => guarded(clearDraft)}>
@@ -845,9 +833,7 @@ export default function BooksPage() {
                           </button>
                         )}
                       </div>
-                      <span className="meta">
-                        {readQuery ? `${readMatches.length} 个匹配条目` : "完整内容 · 保留原始换行"}
-                      </span>
+                      {readQuery && <span className="meta">{readMatches.length} 个匹配条目</span>}
                     </div>
                     <div className="book-reading-content">
                       {display.entries !== undefined ? (

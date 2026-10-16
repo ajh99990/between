@@ -176,12 +176,13 @@ function usePagination<T>(rows: T[]) {
 }
 
 const planLabels: Record<string, string> = {
+  unbound: "未连接",
   authorization_required: "等待授权",
   scope_missing: "授权范围不足",
   expired: "授权已过期",
   disconnected: "本地已断开",
   auth_rejected: "授权被拒绝",
-  ready: "已就绪 · 未验证推理",
+  ready: "已授权 · 等待首次响应",
   completed: "推理已完成",
   usage_limit: "额度暂停",
   unsupported: "配置不受支持",
@@ -197,7 +198,7 @@ const connectionLabels: Record<string, string> = {
   connected: "模型已响应",
   "auth-required": "需要授权",
   error: "连接异常",
-  demo: "本地合成演示",
+  demo: "演示模式",
 };
 type Editor =
   | {
@@ -391,7 +392,9 @@ export function ModelsPage() {
         <div className="toolbar">
           <div>
             <h2>Chat Completions 连接</h2>
-            <p className="muted">{state.model.description}</p>
+            <p className="muted">
+              {state.model.mode === "demo" ? "未连接模型服务，回复为演示内容。" : state.model.description}
+            </p>
           </div>
           <Badge tone={state.model.connection === "connected" ? "success" : "neutral"}>
             {connectionLabels[state.model.connection] ?? state.model.connection}
@@ -412,10 +415,8 @@ export function ModelsPage() {
           </div>
         </dl>
         <p className="muted">
-          当前计数器固定为 gpt-4o-mini；更换出站模型名称后的预算是估计值。
-          {state.model.mode === "demo"
-            ? "本地合成演示不能修改真实连接。"
-            : "保存不检查连接，首次真实请求后才更新响应状态。"}
+          Token 预算按 gpt-4o-mini 估算，其他模型可能有差异。
+          {state.model.mode === "demo" ? "演示模式下不可修改连接。" : "保存后，在首次请求时检查连接。"}
         </p>
         <Button
           variant="secondary"
@@ -678,7 +679,7 @@ export function SessionsPage() {
   };
   return (
     <div className="page-stack">
-      <PageHeader title="会话与任务" description="查看会话元数据，停止生成或删除本地保存的会话。" />
+      <PageHeader title="会话与任务" description="查看会话、停止生成或删除会话。" />
       <ErrorNotice error={error} />
       <Panel className="section-card task-overview">
         <div className="toolbar">
@@ -776,7 +777,7 @@ export function SessionsPage() {
           <>
             <div className="table-scroll">
               <table className="data-table">
-                <caption className="sr-only">已保存的会话元数据</caption>
+                <caption className="sr-only">已保存的会话</caption>
                 <thead>
                   <tr>
                     <th>会话</th>
@@ -844,9 +845,7 @@ export function SessionsPage() {
           <Empty
             icon={sessions.length ? "search" : "sessions"}
             title={sessions.length ? "没有匹配的会话" : "还没有会话"}
-            description={
-              sessions.length ? "调整搜索内容或角色筛选后重试。" : "用户创建会话后，这里将显示其元数据。"
-            }
+            description={sessions.length ? "调整搜索内容或角色筛选后重试。" : "用户创建会话后会出现在这里。"}
             action={
               sessions.length ? (
                 <Button
@@ -863,7 +862,7 @@ export function SessionsPage() {
             }
           />
         )}
-        <p className="muted">后台当前不提供聊天正文读取接口；会话版本表示创建时使用的配置快照。</p>
+        <p className="muted">此处仅显示会话信息，不含聊天正文。配置版本为会话创建时的版本。</p>
       </Panel>
       {dialog}
     </div>
@@ -903,7 +902,7 @@ export function UsersPage() {
   };
   return (
     <div className="page-stack">
-      <PageHeader title="用户与全局" description="管理本机浏览器身份及全局进入和生成开关。" />
+      <PageHeader title="用户与全局" description="管理浏览器用户，以及新用户进入和生成请求。" />
       <ErrorNotice error={error} />
       <Panel className="section-card">
         <h2>全局控制</h2>
@@ -1066,7 +1065,7 @@ export function UsersPage() {
             }
           />
         )}
-        <p className="muted">这里管理本机匿名浏览器身份，不是生产账号、SSO 或多租户账户系统。</p>
+        <p className="muted">用户由浏览器标识区分。同一个人在不同浏览器中会显示为不同用户。</p>
       </Panel>
       {dialog}
     </div>
@@ -1099,15 +1098,14 @@ export function ResourcesPage() {
   );
   return (
     <div className="page-stack">
-      <PageHeader title="社区素材" description="从固定、已核验的本地资源中导入角色卡和独立世界书。" />
+      <PageHeader title="社区素材" description="导入角色卡与关联世界书，供新会话使用。" />
       <ErrorNotice error={error} />
       <Panel className="section-card">
         <div className="toolbar">
-          <div>
-            <h2>已核验目录</h2>
-            <p className="muted">{state.community.verification}</p>
-          </div>
-          <Badge tone="info">{state.community.items.length} 份素材</Badge>
+          <h2>素材目录</h2>
+          <span className="meta">
+            {items.length} / {state.community.items.length} 份素材
+          </span>
         </div>
         <Search label="搜索素材" value={query} placeholder="角色名称、适用场景或语言" onChange={setQuery} />
         {items.length ? (
@@ -1130,10 +1128,10 @@ export function ResourcesPage() {
                     <div>
                       <h3>{item.name}</h3>
                       <p className="meta">
-                        {item.language} · {item.entryCount} 条世界书 · {item.type}
+                        {item.language} · 世界书 {item.entryCount} 条目
                       </p>
                     </div>
-                    <Badge tone={imported ? "success" : "neutral"}>{imported ? "已导入" : "待导入"}</Badge>
+                    {imported && <Badge tone="success">已导入</Badge>}
                   </div>
                   <dl>
                     <div>
@@ -1142,15 +1140,11 @@ export function ResourcesPage() {
                     </div>
                     <div>
                       <dt>内容说明</dt>
-                      <dd>{item.quality}</dd>
-                    </div>
-                    <div>
-                      <dt>导入方式</dt>
-                      <dd>{item.packaging}</dd>
+                      <dd>{item.contentNotes}</dd>
                     </div>
                   </dl>
                   <div className="toolbar">
-                    <SourceLink url={item.sourceURL}>查看固定版本来源</SourceLink>
+                    <SourceLink url={item.sourceURL}>查看原始素材</SourceLink>
                     {!imported && (
                       <Button
                         variant="secondary"
@@ -1161,11 +1155,9 @@ export function ResourcesPage() {
                             title: `导入「${item.name}」？`,
                             description: (
                               <>
-                                <p>
-                                  包含角色卡和 {item.entryCount} 条世界书。保留原文、既有内容冲突与 Foreverse
-                                  Team / CC BY 4.0 归因。
-                                </p>
-                                <p>导入后仅对新会话生效，不请求模型。</p>
+                                <p>将新增角色卡和包含 {item.entryCount} 条目的世界书，二者会自动关联。</p>
+                                <p>仅用于新会话，已有会话不变。</p>
+                                <p className="muted">作者 Foreverse Team · CC BY 4.0</p>
                               </>
                             ),
                             label: "确认导入",
@@ -1204,14 +1196,10 @@ export function ResourcesPage() {
         )}
       </Panel>
       <Panel className="section-card">
-        <h2>来源与使用范围</h2>
+        <h2>素材来源</h2>
         <p>{state.community.license}</p>
-        <p className="muted">{state.community.heatEvidence}</p>
-        <p className="meta">证据日期：{state.community.evidenceDate}</p>
-        <p className="muted">
-          当前仅支持此固定目录。任意文件上传、外部 URL
-          导入与角色卡导出尚无接口；内容质量说明是静态核验，不能代表真实模型表现。
-        </p>
+        <SourceLink url={state.community.source}>Foreverse Team 角色卡库</SourceLink>
+        <p className="muted">当前可导入此目录中的素材，暂不支持文件上传、外部链接导入或导出。</p>
       </Panel>
       {dialog}
     </div>
@@ -1271,7 +1259,7 @@ export function DiagnosticsPage() {
     <div className="page-stack">
       <PageHeader
         title="诊断与审计"
-        description="查看服务返回的运行状态与本进程最近操作记录。"
+        description="查看运行状态与最近操作记录。"
         actions={
           <Button variant="secondary" loading={refreshing} onClick={() => void reload()}>
             刷新状态
@@ -1295,14 +1283,8 @@ export function DiagnosticsPage() {
             </div>
           ))}
         </dl>
-        <div className="notice">
-          世界书最终纳入条目诊断尚未接通；关键词命中不等于通过概率、递归和预算后最终进入上下文。Langfuse
-          当前未接入。
-        </div>
-        <p className="muted">
-          “Chat Completions
-          响应验证”只表示该连接曾响应，不代表套餐模型已验证，也不表示模型效果、自然度或媒体服务已验收。
-        </p>
+        <div className="notice">世界书上下文详情暂不可用；关键词匹配不表示条目已进入模型上下文。</div>
+        <p className="muted">连接响应状态仅适用于 Chat Completions，不包含套餐后端、语音或图片服务。</p>
       </Panel>
       <Panel className="section-card">
         <div className="toolbar">
@@ -1372,9 +1354,7 @@ export function DiagnosticsPage() {
           <Empty
             icon={state.audit.length ? "search" : "diagnostics"}
             title={state.audit.length ? "没有匹配的记录" : "本进程还没有操作记录"}
-            description={
-              state.audit.length ? "调整搜索内容或结果筛选后重试。" : "记录仅保留在当前进程中，重启会清空。"
-            }
+            description={state.audit.length ? "调整搜索内容或结果筛选后重试。" : undefined}
             action={
               state.audit.length ? (
                 <Button
@@ -1391,7 +1371,6 @@ export function DiagnosticsPage() {
             }
           />
         )}
-        <p className="muted">最多保留本进程最近 200 条记录，不是持久或不可篡改审计；服务重启后清空。</p>
       </Panel>
     </div>
   );

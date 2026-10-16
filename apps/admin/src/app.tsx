@@ -6,7 +6,7 @@ import { DiagnosticsPage, ModelsPage, ResourcesPage, SessionsPage, UsersPage } f
 import RolesPage from "./pages/Roles";
 import { type BackgroundController, designModule } from "./skill";
 import { AdminProvider } from "./state";
-import { Badge, Button, Dialog, Field, Glass, Icon, Select, UiInteractionProvider } from "./ui";
+import { Button, Dialog, Field, Glass, Icon, Select, UiInteractionProvider } from "./ui";
 
 const navigation = [
   { route: "/roles", label: "角色卡", icon: "roles", group: "内容管理" },
@@ -55,11 +55,7 @@ function Login({
           </span>
         </div>
         <h1>{expired ? "重新验证管理员身份" : "登录管理后台"}</h1>
-        <p className="muted">
-          {expired
-            ? "会话已过期。本页草稿仍在，重新登录后可继续处理。"
-            : "使用本机服务配置的管理员口令登录。此入口与用户聊天会话隔离。"}
-        </p>
+        {expired && <p className="muted">会话已过期。本页草稿仍在，重新登录后可继续处理。</p>}
         <form
           onSubmit={async (event) => {
             event.preventDefault();
@@ -103,10 +99,6 @@ function Login({
             登录
           </Button>
         </form>
-        <p className="login-footnote">
-          <Icon name="lock" size={14} />
-          口令不写入浏览器存储，也不进入页面诊断。
-        </p>
       </Glass>
     </div>
   );
@@ -125,8 +117,7 @@ export default function App() {
     [preset, setPreset] = useState("terrace"),
     [motion, setMotion] = useState(false);
   const [toast, setToast] = useState<{ message: string; tone: string } | null>(null),
-    [refreshing, setRefreshing] = useState(false),
-    [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+    [refreshing, setRefreshing] = useState(false);
   const backgroundElement = useRef<HTMLDivElement>(null),
     background = useRef<BackgroundController | null>(null),
     root = useRef<HTMLDivElement>(null),
@@ -147,7 +138,6 @@ export default function App() {
     try {
       const fresh = await getState();
       setState(fresh);
-      setLastRefresh(new Date());
     } finally {
       setRefreshing(false);
     }
@@ -158,7 +148,6 @@ export default function App() {
       .then((data) => {
         if (alive) {
           setState(data);
-          setLastRefresh(new Date());
         }
       })
       .catch((error) => {
@@ -210,6 +199,10 @@ export default function App() {
     const timer = setTimeout(() => setToast(null), 9000);
     return () => clearTimeout(timer);
   }, [toast]);
+  useEffect(() => {
+    // Keep the isolated preview identifiable without repeating a QA badge in every workspace.
+    document.title = state?.model.mode === "demo" ? "Between · 管理后台（示例）" : "Between · 管理后台";
+  }, [state?.model.mode]);
   useEffect(() => {
     let disposed = false;
     void designModule("background/background.js")
@@ -370,10 +363,7 @@ export default function App() {
                   <span className="admin-avatar" aria-hidden="true">
                     <Icon name="lock" size={16} />
                   </span>
-                  <div>
-                    <strong>管理员</strong>
-                    <small>独立会话 · 本机服务</small>
-                  </div>
+                  <strong>管理员</strong>
                   <button
                     className="icon-button"
                     aria-label="退出管理员登录"
@@ -412,17 +402,6 @@ export default function App() {
                     <strong>{current?.label || "页面不存在"}</strong>
                   </div>
                   <div className="topbar-actions">
-                    {state.model.mode === "demo" && <Badge>合成演示</Badge>}
-                    <span className="sync-status">
-                      <i />
-                      配置 v{state.config.version}
-                      {lastRefresh && (
-                        <small>
-                          {" "}
-                          · {lastRefresh.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}
-                        </small>
-                      )}
-                    </span>
                     <button
                       className="icon-button topbar-refresh"
                       aria-label="刷新后台数据"
@@ -492,7 +471,6 @@ export default function App() {
               }
             >
               <div className="page-stack">
-                <p className="muted">仅调整当前页面的背景，不改变内容、玻璃配方或业务配置。</p>
                 <Field label="背景">
                   <Select label="背景" value={preset} options={backgrounds} onChange={setPreset} />
                 </Field>
@@ -502,9 +480,9 @@ export default function App() {
                     checked={motion}
                     onChange={(event) => setMotion(event.target.checked)}
                   />
-                  <span>正常速度动态背景</span>
+                  <span>动态背景</span>
                 </label>
-                <p className="field-description">默认静止以方便长文本阅读。开启后尊重系统减少动态设置。</p>
+                <p className="field-description">刷新页面后恢复默认。动态效果遵循系统的减少动态设置。</p>
               </div>
             </Dialog>
           </AdminProvider>
@@ -527,7 +505,6 @@ export default function App() {
                 .then((fresh) => {
                   setState(fresh);
                   setExpired(false);
-                  setLastRefresh(new Date());
                 })
                 .catch((error) => {
                   if (!(error instanceof ApiError && error.status === 401)) {
@@ -539,7 +516,6 @@ export default function App() {
             onLogin={(fresh) => {
               setState(fresh);
               setExpired(false);
-              setLastRefresh(new Date());
               setInitialError("");
             }}
           />
