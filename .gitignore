@@ -1,63 +1,41 @@
 node_modules/
 dist/
-.runtime/
-.library-helper/
-*.db*
-*.log
-
-.library-upload-current/
-deliverables/
-runtime-config.json
-*.enc
-
-# Private/imported provenance and local acceptance artifacts are not repository uploads.
-inputs/
-historical/
+artifacts/
 evidence/
-docs/用户原文要求.md
-HANDOFF.md
-DELIVERY-MANIFEST.json
-references/*.jpg
-references/*.png
-apps/desktop/src/renderer/fixtures/
+.runtime/
 .env
 .env.*
+!.env.example
+*.log
+*.db*
 *.sqlite*
-*.relbackup
 *.pem
 *.key
 *.p12
 *.pfx
-
-# Sealed recovery archives and operation-owned plaintext are never source.
-*.relcheckpoint
-.recovery-*/
-
-artifacts/
-packages/*/publish/
-upstream/qwen-code-0.24.7/
+*.enc
+*.zip
 *.tgz
 *.tar.gz
-apps/desktop/resources/
-packages/*/build-meta.json
-packages/*/package-test-result.json
+.DS_Store
+apps/admin/src/.umi*/
+apps/server/role-app-data/
+**/test-results/
+# 运行配置、用户数据和授权材料不属于源码。
+role-app-data/
+data/
+cache/
+inputs/
+historical/
+.library-helper/
+.library-upload-current/
+deliverables/
+runtime-config.json
+HANDOFF.md
+DELIVERY-MANIFEST.json
 
-# Regenerable local focused-test outputs.
-.focused-tests/
-
-# 酒馆版运行产物；测试 fixtures 与源码应正常入库。
-sillytavern/**/node_modules/
-sillytavern/**/evidence/
-sillytavern/**/data/
-sillytavern/**/cache/
-sillytavern/**/dist/
-sillytavern/**/test-results/
-
-# 本机独有凭据、调试记录和旧交付不得入库。
-*.zip
-sillytavern/**/role-app-data/
-sillytavern/**/reasoning-benchmark/
-sillytavern/**/reasoning-change-originals/
-sillytavern/**/local-patch-originals/
-sillytavern/**/local-live-evidence/
-sillytavern/**/local-model-catalog.json
+# 旧备份仍可能包含私人数据，不能作为源码上传。
+*.relbackup
+*.relcheckpoint
+.recovery-*/
+docs/用户原文要求.md

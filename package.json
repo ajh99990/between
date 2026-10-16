@@ -3,36 +3,59 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.19.0",
+  "description": "基于 SillyTavern 角色引擎的本机聊天应用与管理控制台",
+  "license": "AGPL-3.0",
+  "packageManager": "npm@11.6.1",
   "engines": {
-    "node": "24.19.0",
-    "pnpm": "11.19.0"
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
   },
+  "workspaces": [
+    "apps/admin",
+    "apps/server",
+    "packages/role-engine"
+  ],
   "scripts": {
-    "build": "pnpm -r --sort run build && node scripts/build-integration.mjs",
-    "typecheck": "pnpm -r --sort run typecheck && tsc -p tests/integration/tsconfig.json",
-    "test": "node scripts/run-tests.mjs",
-    "start": "pnpm --filter @between/desktop start",
-    "skills:check": "node scripts/skills.mjs validate --source skills/relationship",
-    "skills:pack": "node scripts/skills.mjs pack --source skills/relationship --out artifacts/skills",
-    "test:skills": "node --test tests/packaging/skills*.mjs",
-    "check:boundaries": "node scripts/check-boundaries.mjs",
-    "test:contracts": "node scripts/test-contracts.mjs",
-    "test:release": "node scripts/run-tests.mjs --release",
-    "pack:desktop": "node scripts/package-desktop.mjs",
-    "native:check": "node scripts/check-native.mjs"
+    "dev": "npm run dev --workspace @between/admin",
+    "setup": "npm run setup --workspace @between/admin",
+    "build": "npm run build --workspace @between/admin",
+    "typecheck": "npm run setup && npm run typecheck --workspace @between/admin && node scripts/check-modules.mjs",
+    "lint": "npm run lint --workspace @between/admin",
+    "test": "npm run test --workspace @between/role-engine && npm run test --workspace @between/server && npm run test:plan --workspace @between/server && npm run test:local --workspace @between/server && npm run test --workspace @between/admin && npm run test:smoke",
+    "test:engine": "npm run test --workspace @between/role-engine",
+    "test:app": "npm run test --workspace @between/server",
+    "test:plan": "npm run test:plan --workspace @between/server",
+    "test:local": "npm run test:local --workspace @between/server",
+    "test:browser": "npm run test:browser --workspace @between/admin && node tests/browser/chat.mjs && node tests/browser/oauth.mjs",
+    "check": "npm run typecheck && npm run lint && npm run build && npm test",
+    "start": "node apps/server/server.mjs",
+    "start:demo": "node apps/server/server.mjs --demo",
+    "start:local": "node apps/server/local-start.mjs",
+    "preview": "node apps/admin/tests/preview.mjs",
+    "licenses": "node scripts/collect-licenses.mjs",
+    "test:smoke": "node tests/smoke.mjs"
   },
   "devDependencies": {
-    "typescript": "5.9.3",
-    "@types/node": "22.19.3",
-    "@types/better-sqlite3": "7.6.13",
-    "esbuild": "0.25.12",
-    "@modelcontextprotocol/client": "2.3.0",
-    "@between/contracts": "workspace:*",
-    "@between/core": "workspace:*",
-    "@between/host-qwen": "workspace:*",
-    "better-sqlite3": "13.0.3",
-    "@between/desktop": "workspace:*",
-    "crc-32": "1.2.2"
+    "acorn": "8.16.0"
+  },
+  "overrides": {
+    "@umijs/plugins": {
+      "@ant-design/pro-components": "^3.1.14-2",
+      "axios": "^1.19.0",
+      "@ant-design/icons": "^6.3.2"
+    },
+    "@umijs/lint": {
+      "@babel/core": "^7.29.6"
+    },
+    "@utoo/pack": {
+      "send": "^0.19.0"
+    },
+    "dva-immer": {
+      "immer": "^9.0.6"
+    },
+    "cosmiconfig": {
+      "js-yaml": "^4.3.1"
+    },
+    "postcss": "^8.5.23"
   }
 }

@@ -1,7 +1,17 @@
-# Dependency notices
+# 当前依赖的许可证与归因清单
 
-Generated with `node scripts/collect-licenses.mjs` from the installed exact pnpm graph. `dependency-manifest.json` records package versions and license declarations; notices present in each official archive are preserved byte-for-byte. This platform's optional binary packages are included; other-platform binaries retain the notices shipped with their own official distributions.
+在根目录执行 `npm ci` 后运行 `npm run licenses`。收集脚本只读取根 `package-lock.json` 列出的第三方安装目录、包元数据和法律文本；不扫描运行配置或用户数据，也不执行依赖脚本。工作区自有包和符号链接不作为第三方包重复收集。
 
-Three official archives in this installed graph do not contain a top-level notice file: `@electron-internal/extract-zip` declares BSD-2-Clause, `character-card-utils` declares ISC, and `@esbuild/linux-x64` declares MIT. Their manifest declarations are recorded without inventing author/copyright wording. The esbuild distribution's own MIT text is preserved separately. Review all target-platform notices before a signed/public binary release.
+- [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt) 保留所找到的许可、版权、作者和 NOTICE 文本。原文件字节按 SHA-256 去重，每份文本前列出所有对应安装位置、名称、版本和原文件路径。
+- [dependency-manifest.json](dependency-manifest.json) 记录锁文件哈希、当前平台和 Node 版本，以及每个锁定安装位置的版本、归档来源、完整性值、许可证声明、文本哈希和读取状态。`coverage` 列出缺失文本、未安装可选依赖和异常；必需依赖缺失、版本不符或不安全路径使生成命令失败。
 
-Qwen upstream is separately covered by `upstream/QWEN-LICENSE`. First-party Between has no selected license yet; these notices do not license first-party code.
+本次 macOS ARM64 安装图包含 1824 个第三方包位置，其中安装 1648 个位置（1396 个不同的名称与版本组合）；找到 1568 个法律文本文件，去重为 612 份文本。109 个已安装位置没有可收集的独立文本，176 个可选位置未安装。准确名单及重新生成后的统计以 JSON 为准；同一个包因不同依赖位置出现多次，不能把安装位置数当成不同包数。
+
+收集范围包括顶层 `LICENSE` / `LICENCE` / `COPYING` / `NOTICE` / `COPYRIGHT` / `AUTHORS` 及许可目录内的文本。未安装的平台二进制包只记录锁文件元数据；没有独立文本的包只记录其声明，不虚构作者或许可证原文。嵌在源码、README、归档或可执行文件中的声明、安装脚本另行下载的二进制均不在自动收集范围。清单不表示所有平台的分发义务已经全部核验；实际目标平台安装及发布时需补齐该平台的文本和未覆盖声明。
+
+项目与内容的授权边界在[根 README](../README.md) 说明，不由本清单重新授权：
+
+- SillyTavern 复用代码与应用的 AGPL 文本见[根 LICENSE](../LICENSE)，抽取来源见[角色引擎来源记录](../packages/role-engine/vendor/provenance.json)。
+- 管理端原模板的 MIT 文本保留于 [apps/admin/LICENSE](../apps/admin/LICENSE)。
+- 社区角色内容的 CC BY 4.0 许可和原作者说明见[社区归因](../apps/server/community/ATTRIBUTION.md)及[内容许可](../apps/server/community/LICENSE-CONTENT.txt)。
+- 用户自有灵光模块沿用[来源及复用边界声明](../apps/server/lingguang/SOURCE.zh-CN.md)，不得由依赖清单或项目总许可证替换其授权声明。

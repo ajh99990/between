@@ -1,0 +1,2 @@
+import {parse,readSource,writeOutput} from './source.mjs';
+const source=readSource('public/scripts/sse-stream.js');const node=parse(source,{ecmaVersion:'latest',sourceType:'module'}).body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='EventSourceStream');if(!node)throw Error('Missing EventSourceStream declaration');writeOutput('packages/role-engine/vendor/stream.mjs','// Original SillyTavern 06bde939f EventSourceStream, AGPL-3.0.\n'+source.slice(node.start,node.end)+'\nexport {EventSourceStream};\n');

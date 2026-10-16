@@ -1,0 +1,2 @@
+# Preserve upstream notice bytes, including line endings and trailing whitespace.
+THIRD-PARTY-NOTICES.txt -text -whitespace

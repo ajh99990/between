@@ -1,0 +1,36 @@
+{
+  "name": "@between/role-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": "./index.mjs",
+    "./core": "./core.mjs",
+    "./media": "./media.mjs",
+    "./stream": "./vendor/stream.mjs"
+  },
+  "scripts": {
+    "test": "node test/core-regression.mjs && node test/media-core.mjs && node test/integration.mjs && node test/lifecycle.mjs",
+    "demo": "node demo.mjs"
+  },
+  "dependencies": {
+    "tiktoken": "1.0.22",
+    "jimp": "0.22.12",
+    "wavefile": "11.0.0"
+  },
+  "peerDependencies": {
+    "sillytavern-transformers": "2.14.6"
+  },
+  "peerDependenciesMeta": {
+    "sillytavern-transformers": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "acorn": "8.16.0"
+  }
+}

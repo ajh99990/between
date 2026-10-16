@@ -1,66 +1,82 @@
-> **当前酒馆版协作入口：** [sillytavern/engine](sillytavern/engine/APP-README.zh-CN.md)。仓库固定使用 `dev` 开发、验收后合入默认分支 `main`；不再按日期或环境创建分支。开工先读 [AGENTS.md](AGENTS.md)、[双向 Git 交接流程](docs/Git双向开发与交接流程.md) 与[分支及本机目录](docs/分支与本机目录.md)。下面旧 Electron/Qwen 说明和源码仅保留历史，其根目录启动流程不适用于酒馆版。运行与模型调用按具体任务授权执行，合入 main 不等于公开部署。
-
 # Between
 
-第一版线上关系Agent的开发候选。TypeScript、Electron、固定Qwen Code宿主、Skills和MCP；当前单角色阿岚，记忆默认关闭，保留成人/AI披露、暂停与退出控制。Langfuse属于开发后台观测和排错，不是聊天前台功能。
+基于裁剪并复用 SillyTavern 核心的角色聊天应用，包含独立管理员后台。当前第一版只运行在本机回环地址；真实文本聊天已实现，模型服务由运行配置提供。演示模式使用本地合成流，不代表真实模型效果。
 
-## Workspace
+## 目录与依赖
 
-- `apps/desktop`：main、sandboxed preload、renderer、业务运行入口
-- `packages/contracts`：浏览器可加载的schema和HostAdapter契约
-- `packages/core`：会话/存储/权限/幂等/隐私/删除/恢复
-- `packages/host-qwen`：固定宿主启动、权限收敛、事件和资源核验
-- `packages/mcp-server`：独立stdio发行包与受信host生命周期API
-- `skills/relationship`：独立版本内容资产
-- `patches/qwen-code`、`upstream`：精确上游锁、补丁、合同和检查；不包含上游展开源码
+| 路径 | 职责 |
+| --- | --- |
+| `apps/admin` | React / TypeScript / Umi Max / Ant Design Pro / Tailwind 后台，源码页面在 `src/pages`，构建到 `dist` |
+| `apps/server` | 聊天静态页面、HTTP API、管理员鉴权、角色卡/世界书/会话管理、套餐兼容服务与本机启动器 |
+| `packages/role-engine` | 角色上下文组装、世界书、会话事务/隔离、模型流、多模态与语音适配；`vendor` 保存实际复用的上游代码 |
+| `scripts/vendor` | 从外部固定 SillyTavern checkout 重新抽取源码的开发工具，不是另一套运行应用 |
+| `tests/browser` | 聊天入口的隔离浏览器回归；后台完整浏览器回归在 `apps/admin/tests` |
+| `docs`、`design-system` | 当前协作、配置、结构决策与后台设计规范 |
+| `licenses` | 已安装依赖的许可证/版权通知及目标平台覆盖范围 |
 
-依赖方向由`pnpm check:boundaries`检查。无旧根src/electron/renderer入口或兼容fallback；无Turbo/Nx。
+依赖方向为 `apps/server → @between/role-engine`；后台只通过同源 HTTP API 调用服务。服务同时提供 `/` 聊天和 `/admin/` 后台，后台不能读取运行时模型凭据。根 npm workspaces 和唯一 `package-lock.json` 管理全部第一方包。Electron、Qwen Host、独立 MCP、旧 Skills 产品及原酒馆完整应用已删除；追溯使用 Git 历史。
 
-## 安装与验证
+## 开发与验证
 
-固定Node24.19.0、pnpm11.19.0。安装官方Node和pnpm后，在仓库根执行：
+使用 Node **24.x**（`.node-version` 为 24.19.0）、npm **11.x**（锁文件使用 11.6.1）。在仓库根执行：
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm build
-pnpm typecheck
-pnpm test
-pnpm test:release
-pnpm start
+npm ci
+npm run check
 ```
 
-测试默认临时目录位于仓库相邻的`.between-test-tmp`，避免将依赖安装包堆到RAM-backed `/tmp`；可以显式设置绝对路径`BETWEEN_TEST_TMPDIR`。这不改变OS或网络安全设置。
+`.npmrc` 禁止依赖安装脚本；`typecheck` 自动执行 Umi setup，`build` 显式应用锁定版本 CSP 补丁。`check` 顺序运行后台类型检查、服务/引擎模块解析、lint、后台构建与全部离线测试。不要先运行依赖后台静态产物的测试再构建。
 
-first-party统一`pnpm-lock.yaml`；Qwen保持上游独立锁。pnpm11使用精确版本allowBuilds：仅Electron、esbuild允许脚本；better-sqlite3明确false，因为13.0.3官方包已附prebuild，禁止binding.gyp触发不必要隐式重编译。`pnpm native:check`实际载入官方包内prebuild并执行SQLite事务；没有适配当前平台的二进制时直接失败，不静默替代。当前Linux Node验证不代表macOS安装包/签名通过。桌面broker用外部Node24，不在Electron main加载SQLite。
+```sh
+npm run build
+npm test
+npm run test:engine
+npm run test:app
+npm run test:plan
+npm run test:local
+CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test:browser
+```
 
-`pnpm test`按包执行同一保留的业务/进程故障测试、浏览器contracts及Skills测试。`test:release`还检查独立分发产物；只通过单测不能当成完整产品完成。
+也可安装 Playwright Chromium 后省略 `CHROMIUM_PATH`。浏览器保留 sandbox，仅访问本次随机回环服务。测试用虚构角色、临时数据和模拟服务验证管理员登录、全文查看/编辑、版本冲突、会话隔离、套餐协议、上下文隐私与启动清理；不读真实授权、不发收费模型请求。输出在被忽略的 `artifacts` / `evidence` 中。CI 使用同一 `npm run check` 与浏览器入口，不部署。
 
-## 独立MCP与Skills
+`npm run dev` 启动后台开发服务器 `127.0.0.1:8888`；API 目标由 `BETWEEN_ADMIN_DEV_API` 设置为自己已启动的回环服务。开发服务器不是完整应用入口。
 
-[独立MCP使用和可信hook协议](packages/mcp-server/README.md)。MCP tarball内联第一方库，干净Node环境不需要Electron或Qwen。默认`serve`只允许握手/发现，业务调用没有可信当前输入时拒绝。`trusted-init`是用户/可信host入口；`trusted-turn`是单轮启动；公开`trusted-host` API支持同一连接多轮begin/end。grant和控制永远不是模型工具。
+## 启动
 
-普通静态MCP配置不能证明“当前真实用户输入来自谁”，不能承诺任意host装上即自动获得安全长期记忆。通用host必须接入独立受信生命周期hook。当前协议测试使用真实MCP SDK和合成输入，不是已完成所有第三方宿主或真实模型聊天验收。
+先 `npm run build`。隔离预览后台与聊天（临时虚构数据、不调用真实模型）：
 
-[Skill内容包](skills/README.md)独立打包和安装，校验版本、host-context schema、hash、引用、大小及路径。安装用明确目的地和已核对hash，不从开发机cwd读取资源。
+```sh
+BETWEEN_ADMIN_PREVIEW_PORT=0 npm run preview
+```
 
-[桌面分发说明](docs/desktop-distribution.md)包含独立Linux目录/tarball验证，和尚未覆盖的系统安装包差异。合成布局夹具仅使用原创文字/几何图；第三方参考截图不进入公开源码或发行物。
+它输出随机回环入口，按 Ctrl+C 清理服务与临时数据。演示应用需要自行选择未占用端口和新的数据目录：
 
-## Qwen固定上游
+```sh
+npm run start:demo -- --data /tmp/between-demo-new --port 8799
+```
 
-[构建与核验](upstream/README.md)。当前CLI v0.24.7、SDK0.1.17、managed host contract2，使用完整123文件源码补丁；本轮应用整体验收仍在进行，不得将旧contract1运行时视为兼容。上游archive与补丁受hash约束；运行时必须核整套dist、chunks、assets，不只loader。无凭据/运行时配置时生产明确失败，不使用测试Host替身。
+该命令没有默认管理员口令。需要管理能力时以标准输入提供至少 12 字符口令：
 
-## 数据边界和未完成项
+```sh
+read -rs 'between_password?管理员口令：'
+printf '%s' "$between_password" | npm run start:demo -- --data /tmp/between-demo-new --port 8799 --admin-password-stdin
+unset between_password
+```
 
-当前开发树使用main schema6、authority2、spool2，默认新数据目录为`.runtime/data-v6`；旧库拒绝打开，不做自动迁移。已发布schema5快照保留独立身份。记忆关闭收件需可用安全密钥；Linux明文safeStorage backend拒绝。原始关闭记忆输入仅有界加密保留，不提供明文fallback。停止/取消控制优先于满普通队列。
+`npm start -- --data /绝对路径/专用数据目录 --port 8799 --admin-password-stdin` 为真实配置入口：读取 `BETWEEN_MODEL_URL`（HTTPS 或本机 HTTP 的 Chat Completions 根地址）、`BETWEEN_MODEL_NAME`、可选 `BETWEEN_MODEL_KEY`。环境变量优先于保存设置，不自动读取 `.env`。后台修改配置不会自动发送推理请求；“已配置”不等于“真实推理通过”。当前计数器固定 `gpt-4o-mini`，换出站模型名不保证预算精确一致。
 
-[删除与备份](docs/privacy-and-backups.md)、[离线封存恢复](docs/offline-recovery.md)说明确切范围。可信API支持完整关系删除及独立权威屏障、当前离线seal的受限恢复；一般任意历史备份恢复、权威/密钥丢失恢复、前台恢复流程仍未实现。底层文件删除不声称介质物理擦除。
+`npm run start:local` 启动已接入的独立套餐兼容服务与应用，默认使用仓库外 macOS `~/Library/Application Support/Between` 的独立 Between 授权和数据，仅监听 `8787` / `8766`，不抢占现存服务。它会常驻；停止须核验状态文件中的本次 PID 后发送 SIGTERM。本次重组未启动或修改用户现有运行目录。配置、授权与恢复边界见 [套餐后端](docs/套餐后端.md) 和 [服务说明](apps/server/README.md)。
 
-[记忆候选边界](docs/memory-boundaries.md)：分层记忆候选只证明引文/状态/来源有效性与预算等机械边界，普通偏好自动语义准入、自然语言纠错和真实角色自然度仍未验证。needs_review为内部状态，不增加逐条确认前台。
+## 能力与限制
 
-真实provider回合、完整Langfuse链路、OS级宿主隔离和跨平台签名安装包尚未通过。bwrap已遇到环境权限拒绝，不绕过；不能把未完成开发一概归为环境限制。云端实际Electron正常开窗/披露/开始/关闭有历史观察；设置/删除/恢复GUI未获准复测，不冒充通过。每次迁移后的视觉证据以最终验收报告为准。
+保留真实文本聊天、角色卡/世界书管理和全文、管理员鉴权、模型设置、套餐兼容后端、用户与会话隔离、流式停止/重试及上下文组装。角色设定、世界书和内部字段仅参与模型上下文，不能进入用户 API/SSE 的可见消息或朗读输入；回归覆盖该边界。角色/世界书/预设修改作用于新会话，既有快照不被重写。
 
-[后续顺序与角色适配病例](docs/next-product-gates.md)。这是持续开发候选，不是已完成整个产品roadmap。
+有效图像、音频、ASR、TTS 适配保留在角色引擎；真实连接默认仅开放文本，媒体能力须由宿主显式配置。可选本地推理宿主需自行安装 `sillytavern-transformers@2.14.6`；仓库安装不会下载模型，实时双工语音未实现。Langfuse **未接入**。当前是单进程本机应用，生产账号/SSO、多机器凭据协调、断电级应用索引持久性、真实模型自然度和完整媒体服务验收仍未覆盖。
 
-## 许可证与隐私
+## 数据、许可证与协作
 
-第三方依赖声明和通知见`licenses/`与`upstream/QWEN-LICENSE`。第一方开源许可证尚未选择，不擅自授予许可证。不要提交实际聊天、DB、密钥、`.runtime`、私有研究资料或参考截图。公开发布只使用审核后的白名单快照。
+真实聊天、授权、密钥、运行配置和构建产物不得提交。数据目录包含身份材料和聊天，禁止放入 Git；所有权锁存在时先核实进程，不盲删、不自动迁移旧数据。结构重组不影响其他检出或现存服务。
+
+SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。后台模板保留 [MIT 许可证](apps/admin/LICENSE)，四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
+
+只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。本次结构决策和实测范围见 [重组验收](docs/项目结构重组与验收.md)。
