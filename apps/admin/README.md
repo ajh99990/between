@@ -25,11 +25,14 @@
 | `src/pages/Roles.tsx` | 角色全文阅读和编辑 |
 | `src/pages/Books.tsx`、`book-utils.ts` | 世界书、条目、字段保留与冲突草稿 |
 | `src/pages/Operations.tsx` | 素材、模型、会话、用户和诊断 |
+| `src/icons.tsx` | 本地安装的 Lucide 语义映射、统一尺寸与线宽；静态命名导入，无 CDN |
 | `src/ui.tsx`、`src/skill.ts`、`src/styles.css` | React 受控适配、资源生命周期与应用布局 |
 | `public/design`、`design-assets.json` | 自包含的通用设计资源及 SHA-256 清单 |
 | `tests`、`scripts` | 单元/静态/浏览器验证、隔离预览、设计资源校验 |
 
 界面实际复用 `glass-workbench-ui` 的通用玻璃、单选、弹窗、字体与抽象背景实现，React 适配层负责创建、更新和销毁。资源已经随项目保存，使用时无需读取任何其他项目或仓库。导航/按钮采用轻量磨砂折射参数；弹窗使用独立的深色染色及内容衬底；长正文优先保证阅读。`?qa=1` 仅启用白名单样式和状态的只读探针，不导出表单值或业务正文。
+
+图标统一来自精确锁定的 `lucide-react@1.58.0`，通过本地 npm 依赖构建为 SVG，运行时不请求第三方图标服务。新增图标在 `src/icons.tsx` 静态引入并登记语义；导航和操作默认 18px / 1.75 线宽，辅助图标 14–17px，空状态 26px。仅图标按钮保留可访问名称，SVG 本身作为装饰隐藏。选型与实际视觉修正见 [图标调研](../../docs/图标库选型与视觉修正.md)，完整 ISC / Feather MIT 许可在根 `licenses/THIRD-PARTY-NOTICES.txt`。
 
 资源校验失败时应辨认变化来源，并同步审查清单与许可，不要删掉校验绕过问题。公开字体及对照模块许可保留在 `public/design/licenses` 和 `public/design/admin/vendor`，详见 [素材与实现说明](public/design/ASSET-SOURCES.md)。内容编辑的设计依据、固定上游版本与许可见 [调研](../../docs/管理员内容编辑调研.md)；未复制这些参考项目的 UI 实现。
 

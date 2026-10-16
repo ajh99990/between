@@ -3,18 +3,18 @@
   "generatedFrom": {
     "lockfile": "package-lock.json",
     "lockfileVersion": 3,
-    "lockfileSha256": "6a364cbe24632df5d134791e98a57ca5c551bca5b6424c261af246f270e37616",
+    "lockfileSha256": "924a0d36ae7d1d6efcff0e3155da4440ad45afe463b3e5c730e3475d99925f9c",
     "platform": "darwin",
     "architecture": "arm64",
     "node": "24.11.0",
     "scope": "All installed third-party package locations in the root npm workspace lockfile, including development dependencies; workspace source licenses are separate."
   },
   "coverage": {
-    "lockedPackageLocations": 510,
-    "installedPackageLocations": 318,
-    "uniqueInstalledPackages": 231,
-    "noticeFiles": 305,
-    "uniqueNoticeContents": 136,
+    "lockedPackageLocations": 511,
+    "installedPackageLocations": 319,
+    "uniqueInstalledPackages": 232,
+    "noticeFiles": 306,
+    "uniqueNoticeContents": 137,
     "installedWithoutNoticeText": [
       "apps/admin/node_modules/@esbuild/darwin-arm64",
       "apps/admin/node_modules/@rolldown/binding-darwin-arm64",
@@ -7344,6 +7344,30 @@
           "file": "LICENSE.md",
           "sha256": "fb153e8eaf70c10aa169bc3d7401946a9d51163cafaca23458cea8e67de972f4",
           "bytes": 1071
+        }
+      ],
+      "noticeIssues": []
+    },
+    {
+      "path": "node_modules/lucide-react",
+      "name": "lucide-react",
+      "version": "1.58.0",
+      "source": "https://registry.npmjs.org/lucide-react/-/lucide-react-1.58.0.tgz",
+      "integrity": "sha512-hXaFNm6mk6QVtBnDGBn1YAs8j2tGUk0A4s/CpclIcczfxeXiW1rdOLVo6zCsoIih9XXsGvDODQerl749a2n7bA==",
+      "license": "ISC",
+      "development": false,
+      "optional": false,
+      "target": {
+        "os": null,
+        "cpu": null,
+        "libc": null
+      },
+      "status": "installed",
+      "notices": [
+        {
+          "file": "LICENSE",
+          "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+          "bytes": 3208
         }
       ],
       "noticeIssues": []

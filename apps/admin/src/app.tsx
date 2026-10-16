@@ -15,7 +15,7 @@ const navigation = [
   { route: "/sessions", label: "会话与任务", icon: "sessions", group: "运行管理" },
   { route: "/users", label: "用户与全局", icon: "users", group: "运行管理" },
   { route: "/diagnostics", label: "诊断与审计", icon: "diagnostics", group: "运行管理" },
-];
+] as const;
 const routeFromHash = () => location.hash.slice(1) || "/roles";
 const backgrounds = [
   { value: "terrace", label: "层光漫游" },
@@ -439,7 +439,7 @@ export default function App() {
                       aria-label="工作台外观"
                       onClick={() => setAppearance(true)}
                     >
-                      <Icon name="settings" />
+                      <Icon name="appearance" />
                     </button>
                   </div>
                 </header>
@@ -549,7 +549,7 @@ export default function App() {
       )}
       {toast && !expired && state && (
         <div className="toast" data-tone={toast.tone} role={toast.tone === "error" ? "alert" : "status"}>
-          <Icon name={toast.tone === "error" ? "diagnostics" : "check"} />
+          <Icon name={toast.tone === "error" ? "alert" : "check"} />
           <span>{toast.message}</span>
           <button aria-label="关闭通知" className="icon-button" onClick={() => setToast(null)}>
             <Icon name="close" size={14} />

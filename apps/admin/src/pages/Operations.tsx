@@ -737,7 +737,7 @@ export function SessionsPage() {
             </table>
           </div>
         ) : (
-          <Empty title="当前没有生成任务" description="任务运行时会出现在这里。" />
+          <Empty icon="sessions" title="当前没有生成任务" description="任务运行时会出现在这里。" />
         )}
       </Panel>
       <Panel className="section-card">
@@ -839,6 +839,7 @@ export function SessionsPage() {
           </>
         ) : (
           <Empty
+            icon={sessions.length ? "search" : "sessions"}
             title={sessions.length ? "没有匹配的会话" : "还没有会话"}
             description={
               sessions.length ? "调整搜索内容或角色筛选后重试。" : "用户创建会话后，这里将显示其元数据。"
@@ -1039,6 +1040,7 @@ export function UsersPage() {
           </>
         ) : (
           <Empty
+            icon={state.users.length ? "search" : "users"}
             title={state.users.length ? "没有匹配的用户" : "还没有浏览器用户"}
             description={
               state.users.length
@@ -1365,6 +1367,7 @@ export function DiagnosticsPage() {
           </>
         ) : (
           <Empty
+            icon={state.audit.length ? "search" : "diagnostics"}
             title={state.audit.length ? "没有匹配的记录" : "本进程还没有操作记录"}
             description={
               state.audit.length ? "调整搜索内容或结果筛选后重试。" : "记录仅保留在当前进程中，重启会清空。"

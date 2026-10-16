@@ -14,6 +14,7 @@
     "test:browser": "node tests/browser.mjs"
   },
   "dependencies": {
+    "lucide-react": "1.58.0",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },

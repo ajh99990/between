@@ -537,7 +537,11 @@ export default function RolesPage() {
               </div>
             </>
           ) : (
-            <Empty title="选择一个角色卡" description="从左侧角色库开始阅读全文，或创建新角色。" />
+            <Empty
+              icon="roles"
+              title="选择一个角色卡"
+              description="从左侧角色库开始阅读全文，或创建新角色。"
+            />
           )}
         </section>
       </div>

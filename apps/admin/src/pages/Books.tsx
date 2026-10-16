@@ -362,6 +362,7 @@ export default function BooksPage() {
             ))}
             {filtered.length === 0 && (
               <Empty
+                icon={query ? "search" : "book"}
                 title={query ? "没有匹配的世界书" : "还没有世界书"}
                 description={
                   query ? "尝试名称、正文中的词句或条目关键词。" : "创建第一本世界书，再在角色页中绑定。"
@@ -383,7 +384,11 @@ export default function BooksPage() {
         </aside>
         <section className="reader-pane book-reader" aria-label={draft ? "编辑世界书" : "世界书全文"}>
           {!display ? (
-            <Empty title="选择一本世界书" description="在左侧打开世界书，阅读完整正文或维护触发条件。" />
+            <Empty
+              icon="book"
+              title="选择一本世界书"
+              description="在左侧打开世界书，阅读完整正文或维护触发条件。"
+            />
           ) : (
             <>
               <header className="document-header">
@@ -732,6 +737,7 @@ export default function BooksPage() {
                         </div>
                       ) : (
                         <Empty
+                          icon="book"
                           title="这本世界书暂无条目"
                           description="添加条目后编辑正文与触发条件，也可以保存为空条目集合。"
                           action={
