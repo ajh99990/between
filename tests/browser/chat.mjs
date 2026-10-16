@@ -205,8 +205,8 @@ try {
 
       const admin = await page.goto(`${app.url}/admin/`, { waitUntil: 'networkidle' });
       assert.equal(admin.status(), 200);
-      await expect(page.getByLabel('管理员口令', { exact: true })).toBeVisible();
-      await expect(page.getByRole('button', { name: '登录控制台', exact: true })).toBeVisible();
+      await expect(page.getByLabel(/^管理员口令/)).toBeVisible();
+      await expect(page.getByRole('button', { name: '登录', exact: true })).toBeVisible();
       await shot(page, `admin-login-${width}`);
       pass(`admin-entry-${width}: the built administration login loads`);
     } catch (error) {

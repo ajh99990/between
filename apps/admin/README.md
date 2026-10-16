@@ -1,41 +1,63 @@
-# Between 管理端
+# Between 管理员后台
 
-Ant Design Pro / React / TypeScript / Umi Max / Tailwind 管理控制台。源码位于 `apps/admin`，使用 `apps/server` 的管理 API；用户聊天页面与 `/admin/` 的构建产物均由 `apps/server/server.mjs` 提供。
+面向管理员的独立内容和运行管理界面，通过同源 `/api/admin/*` 调用服务。React、TypeScript、Tailwind CSS 与 Vite 负责界面；业务状态、路由、请求和草稿由本应用管理。旧后台已整体替换，不保留旧视觉组件或兼容入口。
 
-## 安装、构建与离线验证
+## 工作区
 
-要求 Node >=24。仓库根执行：
+| 页面 | 已接入的能力 | 边界 |
+| --- | --- | --- |
+| 角色库 | 全文搜索、11 个正文字段阅读、字段目录、逐字段大编辑区、新建/删除、关联世界书 | 保存完整角色对象并保留原始来源及未编辑扩展；配置用于新会话 |
+| 世界书 | 库与条目搜索、完整正文、触发条件、条目 UID、扩展 JSON、新建/删除、版本冲突处理 | `entries` 缺省是简单模式，空数组是零条目；删除书时同步解除角色绑定；扩展 JSON 是完整替换，不是递归合并 |
+| 社区素材 | 固定本地目录的来源、许可、静态核验说明与导入 | 没有任意上传、外部 URL 导入或导出接口 |
+| 模型与提示词 | 模型地址/名称、套餐连接管理、上下文与输出预算、温度、示例和历史后指令预设 | 密钥只由服务端提供；保存不发推理请求；角色/世界书/预设只应用于新会话 |
+| 会话与任务 | 筛选与分页、会话元数据、停止正在生成的任务、确认删除会话 | 没有管理员读取会话消息正文的 API；停止会丢弃本轮尚未完成内容 |
+| 用户与全局 | 浏览器身份查询与禁用、允许新用户、暂停后续生成 | 全局暂停不等于停止现有任务；禁用新注册不驱逐已有身份 |
+| 诊断 | 现有运行诊断及当前进程审计记录的筛选和阅读 | 未接入 Langfuse 或世界书最终纳入条目诊断；“已配置”不等于真实推理已验证 |
+
+角色设定、世界书、内部提示词和诊断只在管理员界面呈现；不向聊天消息或 TTS 注入。登录保持独立管理员 Cookie、Origin 与 CSRF 校验。登录失效会隐藏管理内容，重新登录后可继续未保存草稿；敏感凭据不在前端回显。
+
+## 代码与设计资源
+
+| 路径 | 职责 |
+| --- | --- |
+| `src/app.tsx`、`src/state.tsx` | 鉴权、路由、共享数据、保存确认与离开保护 |
+| `src/api.ts`、`src/types.ts` | 同源 API、请求超时/错误、现有服务契约 |
+| `src/pages/Roles.tsx` | 角色全文阅读和编辑 |
+| `src/pages/Books.tsx`、`book-utils.ts` | 世界书、条目、字段保留与冲突草稿 |
+| `src/pages/Operations.tsx` | 素材、模型、会话、用户和诊断 |
+| `src/ui.tsx`、`src/skill.ts`、`src/styles.css` | React 受控适配、资源生命周期与应用布局 |
+| `public/design`、`design-assets.json` | 自包含的通用设计资源及 SHA-256 清单 |
+| `tests`、`scripts` | 单元/静态/浏览器验证、隔离预览、设计资源校验 |
+
+界面实际复用 `glass-workbench-ui` 的通用玻璃、单选、弹窗、字体与抽象背景实现，React 适配层负责创建、更新和销毁。资源已经随项目保存，使用时无需读取任何其他项目或仓库。导航/按钮采用轻量磨砂折射参数；弹窗使用独立的深色染色及内容衬底；长正文优先保证阅读。`?qa=1` 仅启用白名单样式和状态的只读探针，不导出表单值或业务正文。
+
+资源校验失败时应辨认变化来源，并同步审查清单与许可，不要删掉校验绕过问题。公开字体及对照模块许可保留在 `public/design/licenses` 和 `public/design/admin/vendor`，详见 [素材与实现说明](public/design/ASSET-SOURCES.md)。内容编辑的设计依据、固定上游版本与许可见 [调研](../../docs/管理员内容编辑调研.md)；未复制这些参考项目的 UI 实现。
+
+## 开发与验证
+
+全部命令在仓库根执行，要求 Node 24.x 与 npm 11.x，使用根唯一锁文件：
 
 ```sh
-npm ci --ignore-scripts --no-audit --no-fund
-npm run setup --workspace @between/admin
-npm run typecheck --workspace @between/admin
-npm run lint --workspace @between/admin
-npm run build --workspace @between/admin
-npm test --workspace @between/admin
-CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test:browser --workspace @between/admin
+npm ci
+npm run check
+npm run test:browser
 ```
 
-没有系统 Chromium 时，先在仓库根运行 `npm exec --workspace @between/admin -- playwright install chromium`，随后不设置 `CHROMIUM_PATH`。浏览器测试保留 Chromium sandbox，自行创建临时虚构数据、回环服务和浏览器，结束后关闭服务并清理数据。完整验收输出到 `artifacts/browser/admin`，补充表格验收输出到 `artifacts/browser/tables`，每次运行使用独立目录；`BETWEEN_ADMIN_EVIDENCE` 可指定相应输出根目录内的子目录。这些产物被 Git 忽略。测试不会请求外部模型或使用运行环境凭据。
+`check` 顺序包含资源校验、TypeScript、模块解析、Biome、Vite 构建及离线测试。浏览器回归可通过 `CHROMIUM_PATH` 指向本机 Chrome；只启动临时虚构数据与随机回环服务，不读取真实运行配置，也不调用付费模型。测试输出位于忽略目录 `artifacts/browser/admin`。自动化结果和生成截图不能代替实际浏览器操作与目视验收；交付前还应按 `ui-ux-self-check` 检查全文阅读、展开菜单、弹窗、状态恢复及常用屏幕尺寸。
 
-完整应用从仓库根运行 `npm start`，先完成管理端构建后访问该服务的 `/admin/`。此命令使用本机运行配置，只应在已获授权的目标机器执行。`npm run dev --workspace @between/admin` 启动 127.0.0.1:8888 的 Umi 开发服务；需要 API 时用 `BETWEEN_ADMIN_DEV_API` 指向本次创建的隔离服务。离线预览可运行 `node apps/admin/tests/preview.mjs`，它创建独立虚构数据，按 Ctrl+C 清理退出。
+启动隔离预览：
 
-## 功能范围
+```sh
+npm run build
+BETWEEN_ADMIN_PREVIEW_PORT=0 npm run preview
+```
 
-六个页面：角色库、世界书、模型与提示词、会话与任务、用户与全局、素材与诊断。角色的 11 个正文字段和每个世界书条目完整呈现，列表摘要可以截断，详情全文不截断。目录、全文筛选、来源、未知世界书元数据都可查看。编辑使用原 API 版本检查，失败保留草稿；取消和离开有确认，保存范围提示说明新会话生效。
+终端输出随机回环 URL 与虚构验收口令。角色、世界书、用户及会话是明确的测试数据，使用实际应用 HTTP 接口；套餐提供者为离线替身，聊天为合成流。该预览不能证明真实模型、OAuth 或生产服务可用。Ctrl+C 清理此次服务和临时目录；不要把已有用户数据目录交给测试入口。
 
-管理员身份和用户身份仍由现有服务隔离；管理页不接收套餐凭据。这里是本机匿名浏览器身份管理，不是新建的生产多租户账户体系。真实模型自然度、真实套餐登录以及多人托管适用性不属于本次离线验收。
+开发界面并代理自己已经启动的回环测试服务：
 
-## 来源与适配
+```sh
+BETWEEN_ADMIN_DEV_API=http://127.0.0.1:8799 npm run dev
+```
 
-官方 Ant Design Pro 模板提交 `4ee65150b7318af933e56267d257bd9fe644fbd4`，MIT 原文在 `LICENSE`。保留 Umi 的路由、模型、请求、权限和布局插件，使用 ProLayout / ProTable；清理未使用的模板依赖、演示页面及占位组件。角色引擎与社区资源分别沿用原有 AGPL / 内容许可，不因这个 MIT 模板改变许可。
-
-依赖统一由根 npm workspace 与根 `package-lock.json` 管理。`npm ci --ignore-scripts` 后由 setup/build/dev 显式执行 `scripts/prepare-pro.mjs`。脚本通过 Node 的包解析定位当前管理端实际使用的依赖，支持根目录 hoist；仅修改当前检出中 `node_modules` 下的锁定版本，拒绝修改检出之外的依赖。所有补丁目标先通过检查再写入，重复执行不会重复插入 CSP 适配：
-
-- ProComponents 3.1.14-2 的 provider token 样式补传现有 `csp.nonce`。
-- rc-component/util 1.12.0 的动态样式读取服务端 meta nonce，处理 portal 滚动锁与滚动条测量未传入 CSP 的调用。
-- 版本或补丁目标变化立即报错，不能静默套用。依赖升级须重审两个补丁。
-
-Umi runtime `antd` 配置也传入 nonce；Umi 插件使用同一 icons 主版本。`esbuildMinifyIIFE` 解决构建时 helper 名称冲突，未关闭错误检测。详情见 [Umi 配置说明](https://umijs.org/docs/api/config/#esbuildminifyiife)。未放宽已有 script-src / style-src nonce 策略，未修改 DOM 全局 API。
-
-后台设计规范见仓库 `design-system/between-admin/MASTER.md`；当前运行与验收命令以根 `README.md` 为准。
+访问 `http://127.0.0.1:8888/admin/`。Vite 开发服务器不提供完整业务后端；构建后由 `apps/server` 在同一来源的 `/admin/` 服务。完整应用启动、凭据与数据保护要求见 [根 README](../../README.md) 和 [服务说明](../server/README.md)。

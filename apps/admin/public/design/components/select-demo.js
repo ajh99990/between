@@ -1,0 +1,22 @@
+import {createSelect,enhanceSelect} from './select.js';
+const $=selector=>document.querySelector(selector);
+const native=$('#workflow'),form=$('#form');
+let bridge=enhanceSelect(native),inputs=0,changes=0;
+const status=message=>{$('#form-status').textContent=`${message}\nvalue=${native.value||'(空)'} | input=${inputs} change=${changes}`;};
+native.addEventListener('input',()=>{inputs++;});
+native.addEventListener('change',()=>{changes++;native.removeAttribute('aria-invalid');status('用户选择');});
+native.addEventListener('invalid',()=>{native.setAttribute('aria-invalid','true');status('未提交：请选择任务状态。');});
+form.addEventListener('submit',event=>{event.preventDefault();status(`本地模拟提交：${JSON.stringify([...new FormData(form)])}`);});
+form.addEventListener('reset',event=>setTimeout(()=>{if(event.defaultPrevented)return;native.removeAttribute('aria-invalid');status('已恢复默认空值');},0));
+$('#validity').addEventListener('click',()=>{const checked=form.checkValidity();const reported=form.reportValidity();status(`checkValidity=${checked} | reportValidity=${reported}`);});
+$('#assign').addEventListener('click',()=>{native.value='review';native.removeAttribute('aria-invalid');status('程序更新：不得增加 input/change 次数');});
+$('#inspect').addEventListener('click',()=>status(`FormData: ${JSON.stringify([...new FormData(form)])}`));
+$('#disable').addEventListener('click',()=>{native.disabled=!native.disabled;$('#disable').textContent=native.disabled?'启用字段':'禁用字段';status('禁用字段不进入 FormData');});
+$('#lifecycle').addEventListener('click',()=>{if(bridge){bridge.destroy();bridge=null;$('#lifecycle').textContent='重新接管';status('已销毁：恢复原生字段与标签');}else{bridge=enhanceSelect(native);$('#lifecycle').textContent='销毁接管';status('已重新接管');}});
+let value='draft',pending=value;
+const options=[{value:'draft',label:'待开始'},{value:'blocked',label:'暂不可用',disabled:true},{value:'review',label:'待审核'},{value:'done',label:'已完成'},{value:'long',label:'这是一条较长的选项，用于检查宽度、截断与视口边界'},...Array.from({length:12},(_,i)=>({value:`extra-${i+1}`,label:`扩展选项 ${String(i+1).padStart(2,'0')}`}))];
+const controlled=createSelect({label:'受控状态',value,options,onSelect(next){pending=next;if(!$('#defer').checked){value=next;controlled.update({value});}paint();}});
+$('#controlled').append(controlled.element);
+function paint(){$('#controlled-status').textContent=`调用方值=${value} | 最近意图=${pending}`;}
+$('#commit').addEventListener('click',()=>{value=pending;controlled.update({value});paint();});paint();
+window.addEventListener('pagehide',event=>{if(event.persisted)return;bridge?.destroy();controlled.destroy();});

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>项目任务管理 · 玻璃工作台</title>
+  <link rel="stylesheet" href="../workbench.css">
+  <link rel="stylesheet" href="./admin.css">
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="app" class="glass-workbench admin-app" data-glass-style="zoned">
+    <div class="gw-atmosphere" aria-hidden="true"></div>
+    <a class="admin-skip" href="#main">跳到任务列表</a>
+    <button class="admin-nav-scrim" aria-label="关闭导航" hidden></button>
+    <aside id="navigation" class="admin-sidebar gw-glass--sidebar" aria-label="任务导航"></aside>
+    <div class="admin-body">
+      <header id="topbar" class="admin-topbar"></header>
+      <main id="main" class="admin-main" tabindex="-1"></main>
+    </div>
+  </div>
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>

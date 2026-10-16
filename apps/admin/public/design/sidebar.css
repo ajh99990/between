@@ -1,0 +1,17 @@
+.glass-workbench .gw-space-row { position: relative; display: flex; align-items: center; gap: 8px; height: 32px; min-height: 32px; margin-bottom: 3px; border-radius: 7px; color: var(--gw-text-secondary); background: transparent; transition: background-color 160ms, color 160ms; }
+.glass-workbench .gw-space-row:is(:hover, :focus-within) { background: rgb(238 241 244 / 6%); color: var(--gw-text); }
+.glass-workbench .gw-space-main { display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; height: 32px; padding: 0 64px 0 10px; border: 0; border-radius: 7px; background: transparent; color: inherit; font: 400 13px/20px var(--gw-font); text-align: left; }
+.glass-workbench .gw-space-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glass-workbench .gw-space-main svg { width: 15px; height: 15px; color: currentColor; }
+.glass-workbench .gw-space-count { position: absolute; right: 12px; color: var(--gw-text-muted); font-size: 12px; pointer-events: none; }
+.glass-workbench .gw-space-actions { position: absolute; right: 8px; display: flex; align-items: center; gap: 2px; visibility: hidden; opacity: 0; }
+.glass-workbench .gw-space-row:is(:hover, :focus-within) .gw-space-count { visibility: hidden; }
+.glass-workbench .gw-space-row:is(:hover, :focus-within) .gw-space-actions { visibility: visible; opacity: 1; }
+.glass-workbench .gw-space-action { display: grid; place-items: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: var(--gw-text-secondary); }
+.glass-workbench .gw-space-action svg { width: 14px; height: 14px; }
+.glass-workbench .gw-space-action:hover { background: rgb(238 241 244 / 8%); color: var(--gw-text); }
+.glass-workbench :is(.gw-space-action, .gw-space-main):focus-visible { outline: 2px solid var(--gw-text-secondary); outline-offset: -2px; }
+.glass-workbench .main-sidebar :is(.gw-history-row, .nav-item) { border-color: transparent; box-shadow: none; }
+.glass-workbench .main-sidebar :is(.gw-history-row, .nav-item):hover { background: rgb(238 241 244 / 6%); }
+.glass-workbench .main-sidebar :is(.gw-history-row, .nav-item)[aria-current='page'] { background: rgb(238 241 244 / 9%); border-color: transparent; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .glass-workbench .gw-space-row { transition: none; } }

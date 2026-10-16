@@ -1,0 +1,10 @@
+:where(.glass-workbench) .gw-glass { --gw-glass-tint: rgb(25 32 43 / 24%); --gw-glass-blur: 8px; position: relative; isolation: isolate; background: transparent; border-color: rgb(196 217 235 / 15%); }
+.glass-workbench .gw-glass-backdrop { position: absolute; inset: 0; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; background: linear-gradient(118deg, rgb(231 242 252 / 3%), transparent 42%, rgb(132 166 194 / 3%)), var(--gw-glass-tint); backdrop-filter: var(--gw-glass-refraction, ) blur(var(--gw-glass-filter-blur, var(--gw-glass-blur))) saturate(1.18); -webkit-backdrop-filter: var(--gw-glass-refraction, ) blur(var(--gw-glass-filter-blur, var(--gw-glass-blur))) saturate(1.18); box-shadow: inset 0 1px 0 rgb(237 246 255 / 15%), inset -1px 0 0 rgb(218 234 247 / 16%), inset 1px 0 0 rgb(255 255 255 / 4%); }
+.glass-workbench .gw-glass--sidebar { border-right: 1px solid rgb(196 217 235 / 15%); }
+.glass-workbench[data-glass-style='frosted'] .gw-glass { --gw-glass-tint: rgb(25 32 43 / 30%); --gw-glass-blur: 12px; }
+.glass-workbench[data-glass-style='frosted'] .gw-glass-backdrop { backdrop-filter: blur(12px) saturate(1.18); -webkit-backdrop-filter: blur(12px) saturate(1.18); }
+/* Recommended material. Tint opacity is independent from the optical filter. */
+.glass-workbench[data-glass-style='zoned'] .gw-glass { --gw-glass-tint: rgb(102 117 133 / 24%); --gw-glass-blur: 2px; }
+@media (max-width: 1023px) { .glass-workbench .gw-glass--sidebar.overlay-open { box-shadow: 12px 0 32px rgb(4 10 17 / 16%); } }
+@supports not (backdrop-filter: blur(1px)) { .glass-workbench .gw-glass-backdrop { background: rgb(25 32 43 / 88%); } }
+@media (prefers-reduced-transparency: reduce) { .glass-workbench .gw-glass-backdrop, .glass-workbench[data-glass-style='frosted'] .gw-glass-backdrop { background: var(--gw-surface-muted); backdrop-filter: none; -webkit-backdrop-filter: none; } }

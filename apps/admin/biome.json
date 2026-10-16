@@ -1,58 +1,39 @@
 {
-  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
   "files": {
-    "ignoreUnknown": true,
     "includes": [
-      "**/*",
-      "!**/.umi",
-      "!**/.umi-production",
-      "!**/.umi-test",
-      "!**/.umi-test-production",
-      "!**/src/services",
-      "!**/mock",
-      "!**/dist",
-      "!**/server",
-      "!**/public",
-      "!**/coverage",
-      "!**/node_modules",
-      "!biome.json",
-      "!tailwind.css",
-      "!package-lock.json",
-      "!**/.worktrees"
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "vite.config.ts"
     ]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended",
+      "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off",
-        "noUnknownAtRules": "off"
-      },
-      "correctness": {
-        "useUniqueElementIds": "off",
-        "useExhaustiveDependencies": "off"
+        "noExplicitAny": "off"
       },
       "a11y": {
-        "noStaticElementInteractions": "off",
-        "useValidAnchor": "off",
-        "useKeyWithClickEvents": "off"
+        "useButtonType": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
       }
     }
   },
-  "javascript": {
-    "jsxRuntime": "reactClassic",
-    "formatter": {
-      "quoteStyle": "single"
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
     }
   }
 }

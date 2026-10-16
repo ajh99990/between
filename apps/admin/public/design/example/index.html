@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark"><title>Glass · 工作台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23667585'/%3E%3Cpath d='M8 12h16v12H8zM11 8h10v4' fill='none' stroke='%23eef1f4' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="../workbench.css">
+  <link rel="stylesheet" href="../beam/BorderBeam.module.css">
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./settings.css">
+</head>
+<body>
+<div id="workbench" class="glass-workbench" data-glass-style="zoned" data-view="home">
+  <div class="gw-atmosphere" data-motion="running" aria-hidden="true"></div>
+  <header class="gw-titlebar app-titlebar">
+    <div class="titlebar-left"><span class="window-controls" aria-hidden="true"><i></i><i></i><i></i></span><button class="icon-button" id="toggle-sidebar" aria-label="收起侧栏" title="收起侧栏" data-icon="panel"></button><span class="top-divider"></span><button class="breadcrumb" id="breadcrumb-home">工作台</button><span id="breadcrumb-tail" hidden>／ <span>聊天样例</span></span></div>
+    <span id="settings-page-title" class="gw-type-settings-title settings-page-title" hidden></span>
+    <div class="titlebar-right"><span class="demo-badge"><span class="gw-status-dot"></span>本地交互演示</span><label class="background-preset-label"><span class="sr-only">选择背景</span><select id="background-preset" aria-label="选择背景"><option value="curtain">虹纱织幕</option><option value="orbit">游弧微光</option><option value="caustic">浮光涟域</option><option value="terrace">层光漫游</option><option value="ribbon">蓝灰流带</option><option value="mist">青灰雾光</option><option value="ember">琥珀微晕</option><option value="tide">薄雾波面</option></select></label><button class="icon-button" id="motion-toggle" aria-label="暂停背景动效" title="暂停背景动效" data-icon="pause"></button><button class="icon-button" id="top-settings" aria-label="打开设置" title="设置" data-icon="settings"></button></div>
+  </header>
+  <div class="app-body">
+    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭侧栏" hidden></button>
+    <aside id="main-sidebar" class="main-sidebar gw-sidebar gw-glass gw-glass--sidebar" aria-label="工作台导航">
+      <div class="gw-glass-backdrop" aria-hidden="true"></div>
+      <div class="sidebar-heading"><div class="brand-emblem" data-icon="layers"></div><div class="sidebar-label"><span class="gw-type-brand">Glass Workbench</span><span class="gw-type-version">工作从一个想法开始</span></div><button class="icon-button sidebar-label" id="notifications" aria-label="通知" title="通知" data-icon="bell"></button></div>
+      <div class="sidebar-search"><button id="search-tasks" title="搜索会话"><span data-icon="search"></span><span class="sidebar-label">搜索会话</span><kbd class="sidebar-label">⌘ K</kbd></button></div>
+      <nav class="primary-nav" aria-label="主导航">
+        <button class="nav-item gw-type-nav" data-nav="home" aria-current="page" title="新建任务"><span data-icon="plus"></span><span class="sidebar-label">新建任务</span><kbd class="sidebar-label">⌘ N</kbd></button>
+        <button class="nav-item gw-type-nav" data-nav="chat" title="聊天样例"><span data-icon="message"></span><span class="sidebar-label">聊天样例</span><span class="mini-tag sidebar-label">模拟</span></button>
+      </nav>
+      <div class="sidebar-scroll">
+        <section class="sidebar-section"><div class="section-caption sidebar-label"><span class="gw-type-sticky-group">置顶</span><span data-icon="pin"></span></div>
+          <button class="gw-history-row" data-open-chat="项目启动前的思考" title="项目启动前的思考"><span class="pin-icon" data-icon="message"></span><span class="gw-history-title sidebar-label">项目启动前的思考</span></button>
+        </section>
+        <section class="sidebar-section"><div class="section-caption sidebar-label"><span class="gw-type-sticky-group">工作区</span><button class="tiny-button" id="add-workspace" aria-label="添加演示工作区" title="添加演示工作区" data-icon="plus"></button></div>
+          <div id="space-list"></div>
+        </section>
+        <section class="sidebar-section"><div class="section-caption sidebar-label"><span class="gw-type-sticky-group">最近会话</span><span class="gw-type-version">今天</span></div>
+          <button class="gw-history-row" data-open-chat="梳理产品迭代的优先级" title="梳理产品迭代的优先级"><span class="gw-history-title sidebar-label">梳理产品迭代的优先级</span><time class="gw-history-time sidebar-label">10:24</time></button>
+          <button class="gw-history-row" data-open-chat="一份清晰的会议纪要" title="一份清晰的会议纪要"><span class="gw-history-title sidebar-label">一份清晰的会议纪要</span><time class="gw-history-time sidebar-label">09:48</time></button>
+          <button class="gw-history-row" data-open-chat="探索新的工作方式" title="探索新的工作方式"><span class="gw-history-title sidebar-label">探索新的工作方式</span><time class="gw-history-time sidebar-label">昨天</time></button>
+          <button class="gw-history-row" data-open-chat="从想法到可执行清单" title="从想法到可执行清单"><span class="gw-history-title sidebar-label">从想法到可执行清单</span><time class="gw-history-time sidebar-label">昨天</time></button>
+        </section>
+      </div>
+      <div class="sidebar-footer"><button class="profile-button" id="profile-button" title="演示用户"><span class="avatar">G</span><span class="sidebar-label profile-copy"><strong>演示用户</strong><small>个人工作空间</small></span><span class="sidebar-label" data-icon="chevron-down"></span></button><button class="icon-button" id="sidebar-settings" aria-label="打开设置" title="设置" data-icon="settings"></button></div>
+      <div id="sidebar-resizer" role="separator" aria-label="调整侧栏宽度" aria-orientation="vertical" tabindex="0"></div>
+    </aside>
+    <main id="main-content">
+      <section id="home-view" class="home-view" aria-label="新建任务">
+        <div class="home-stage">
+          <div class="home-title-block"><canvas id="mascot" class="home-mascot" width="160" height="160" aria-hidden="true"></canvas><h1 class="gw-type-home-title"><span class="gw-type-home-character">把想法，变成下一步</span></h1></div>
+          <div class="agent-row gw-type-home-subtitle">基于 <button id="agent-menu" class="agent-select gw-type-home-agent">通用助手<span data-icon="chevron-down"></span></button> 进行智能探索</div>
+          <div class="home-input-wrap">
+            <div class="gw-home-composer-base">
+              <div class="gw-home-input home-editor">
+                <textarea id="home-prompt" class="gw-type-home-editor" rows="3" aria-label="任务内容" placeholder="描述你的想法，或提出一个问题…"></textarea>
+                <div id="home-pills" class="composer-pills"></div>
+                <div class="home-tools"><button class="gw-glass-round" id="home-add" aria-label="添加附件或能力" aria-expanded="false" aria-haspopup="menu" title="添加附件或能力" data-icon="plus"></button><div class="home-tools-right"><button class="model-picker" id="home-model" aria-expanded="false" aria-haspopup="dialog"><span data-icon="sparkles"></span><span class="selected-model">Balanced 3.5</span><span data-icon="chevron-down"></span></button><button class="gw-glass-round gw-glass-round--send" id="home-send" aria-label="发送任务" title="发送任务" disabled data-icon="arrow-up"></button></div></div>
+              </div>
+              <div class="home-context"><div class="gw-location-segment" role="radiogroup" aria-label="任务运行位置"><button type="button" role="radio" aria-checked="true" tabindex="0" data-location="local"><span data-icon="monitor"></span>本地</button><button type="button" role="radio" aria-checked="false" tabindex="-1" data-location="cloud"><span data-icon="cloud"></span>云端</button></div><button class="gw-workspace-button" id="workspace-menu" aria-haspopup="dialog" aria-expanded="false"><span data-icon="folder"></span><span id="workspace-label">选择工作区</span><span data-icon="chevron-down"></span></button><span class="context-hint">仅模拟运行，不连接服务</span></div>
+            </div>
+            <div class="stage-bottom"><div class="gw-lens-rail" role="group" aria-label="任务场景"><button class="gw-lens-button gw-type-scenario" data-scenario="work" aria-pressed="true"><span data-icon="briefcase"></span>工作</button><button class="gw-lens-button gw-type-scenario" data-scenario="code" aria-pressed="false"><span data-icon="code"></span>代码</button><button class="gw-lens-button gw-type-scenario" data-scenario="assistant" aria-pressed="false"><span data-icon="sparkles"></span>助手</button></div><button class="gw-voice-button" id="voice-input" aria-label="模拟语音输入" title="模拟语音输入" data-icon="mic"></button></div>
+          </div>
+          <div class="home-footnote"><span data-icon="corner-down"></span>Enter 发送 · Shift + Enter 换行<span class="footnote-dot">·</span><button id="open-sample">看看聊天样例<span data-icon="arrow-right"></span></button></div>
+        </div>
+        <div class="home-watermark">一个安静、专注的思考空间</div>
+      </section>
+      <section id="chat-view" class="chat-view" aria-label="聊天样例" hidden>
+        <div class="chat-heading"><div><span class="agent-chip"><span class="agent-dot"></span>通用助手</span><span class="chat-heading-title" id="chat-title">项目启动前的思考</span></div><div><span id="chat-state" class="chat-state">等待回答 · 模拟</span><button class="icon-button" id="chat-search" aria-label="查找聊天内容" title="查找聊天内容" data-icon="search"></button><button class="icon-button" id="chat-more" aria-label="聊天更多操作" title="更多操作" data-icon="more"></button></div></div>
+        <div class="conversation-viewport">
+          <div id="timeline" class="timeline"><div id="message-list" class="reading-column"></div></div>
+          <button class="jump-bottom" id="jump-bottom" aria-label="回到底部" title="回到底部" hidden data-icon="arrow-down"></button>
+          <div class="chat-input-overlay"><div id="chat-input-stack" class="chat-input-stack">
+            <section id="question-card" class="question-card gw-dock" aria-label="补充信息"></section>
+            <div id="chat-editor" class="chat-editor gw-editor"><span class="beam" data-border-beam="idle" data-animated="true" aria-hidden="true"><span class="bloom"></span><span class="edge"></span></span>
+              <textarea id="chat-prompt" class="gw-type-home-editor" rows="2" aria-label="继续对话" placeholder="继续聊聊，或补充你的想法…"></textarea>
+              <div id="chat-pills" class="composer-pills"></div>
+              <div class="chat-toolband"><div class="chat-toolband-left"><button class="plain-tool" id="chat-add" aria-label="添加附件或能力" title="添加附件或能力" aria-haspopup="menu" aria-expanded="false" data-icon="plus"></button><button class="tool-pill" id="permission-mode" title="切换模拟权限模式"><span data-icon="shield"></span><span>先询问</span></button><button class="tool-pill chat-model" id="chat-model" aria-haspopup="dialog" aria-expanded="false"><span data-icon="sparkles"></span><span class="selected-model">Balanced 3.5</span><span data-icon="chevron-down"></span></button></div><div class="chat-toolband-right"><span class="composer-status" id="composer-status">模拟响应</span><button class="gw-glass-round gw-glass-round--send" id="chat-send" aria-label="发送消息" title="发送消息" disabled data-icon="arrow-up"></button><button class="stop-button" id="chat-stop" aria-label="停止模拟生成" title="停止模拟生成" hidden><span></span></button></div></div>
+            </div>
+            <div class="chat-disclaimer">本样例使用预设内容演示交互，未调用模型、工具或外部服务。</div>
+          </div></div>
+        </div>
+      </section>
+      <div id="settings-root" hidden></div>
+    </main>
+  </div>
+  <div id="floating-layer"></div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <input id="attachment-input" type="file" multiple hidden>
+</div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -39,23 +39,6 @@
     "acorn": "8.16.0"
   },
   "overrides": {
-    "@umijs/plugins": {
-      "@ant-design/pro-components": "^3.1.14-2",
-      "axios": "^1.19.0",
-      "@ant-design/icons": "^6.3.2"
-    },
-    "@umijs/lint": {
-      "@babel/core": "^7.29.6"
-    },
-    "@utoo/pack": {
-      "send": "^0.19.0"
-    },
-    "dva-immer": {
-      "immer": "^9.0.6"
-    },
-    "cosmiconfig": {
-      "js-yaml": "^4.3.1"
-    },
     "postcss": "^8.5.23"
   }
 }

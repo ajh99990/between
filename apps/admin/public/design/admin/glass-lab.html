@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark"><title>弹窗玻璃调参 · 后台实景</title>
+  <link rel="stylesheet" href="../workbench.css"><link rel="stylesheet" href="./glass-lab.css">
+</head>
+<body class="glass-workbench lab-page">
+  <header class="lab-heading"><div><h1>弹窗玻璃调参</h1><p>用真实后台表单检查文字可读性；当前调整只影响弹窗，导航与按钮保持原样。</p></div><a href="./demo.html" target="_blank" rel="noopener">打开完整样例 ↗</a></header>
+  <div class="lab-layout">
+    <aside class="lab-controls" aria-label="弹窗玻璃参数" id="controls" tabindex="-1">
+      <fieldset class="lab-algorithms"><legend>玻璃算法</legend>
+        <label><input type="radio" name="algorithm" value="frosted">纯磨砂</label>
+        <label><input type="radio" name="algorithm" value="clear">纯折射</label>
+        <label><input type="radio" name="algorithm" value="upstream">社区融合</label>
+        <label><input type="radio" name="algorithm" value="zoned" checked>分区融合</label>
+      </fieldset>
+      <p id="algorithm-help" class="lab-help"></p>
+      <label class="lab-range">磨砂 <output id="blur-value">2 px</output><input id="blur" type="range" min="0" max="20" step="1" value="2" aria-label="磨砂强度"></label>
+      <label class="lab-range">折射 <output id="strength-value">17 px</output><input id="strength" type="range" min="0" max="60" step="1" value="17" aria-label="折射强度"></label>
+      <label class="lab-range">边缘宽度 <output id="edge-value">22 px</output><input id="edge" type="range" min="1" max="80" step="1" value="22" aria-label="边缘宽度"></label>
+      <div class="lab-divider"></div>
+      <label class="lab-field">磨砂底色<select id="tint-preset"><option value="#0a121a">深墨蓝 · 弹窗推荐</option><option value="#667585">烟灰蓝 · 导航推荐</option><option value="#777c82">中性灰</option><option value="#84796e">暖灰</option><option value="#364557">深海蓝</option><option value="#ffffff">白色 · 对照</option><option value="custom">自定义</option></select></label>
+      <div class="lab-color"><input id="tint-picker" type="color" value="#0a121a" aria-label="自选磨砂底色"><input id="tint-hex" type="text" value="#0A121A" maxlength="7" aria-label="磨砂底色十六进制" aria-describedby="tint-error" spellcheck="false"><span id="tint-error" role="status" hidden>请输入 #RRGGBB</span></div>
+      <label class="lab-range">材质底色不透明度 <output id="opacity-value">40%</output><input id="opacity" type="range" min="0" max="100" step="1" value="40" aria-label="材质底色不透明度"></label>
+      <p class="lab-help">0% 只关闭染色；磨砂、折射和下方内容衬底仍独立生效。文字始终不透明。</p>
+      <label class="lab-range">内容深色衬底 <output id="contentWash-value">61%</output><input id="contentWash" type="range" min="0" max="100" step="1" value="61" aria-label="内容深色衬底"></label>
+      <label class="lab-range">弹窗外遮罩 <output id="scrimOpacity-value">30%</output><input id="scrimOpacity" type="range" min="0" max="90" step="1" value="30" aria-label="弹窗外遮罩"></label>
+      <p class="lab-help">增加衬底可抑制背景字形干扰；外遮罩只控制弹窗周围环境。初始值为已确认的弹窗推荐配置；导航与按钮保留原推荐值。</p>
+      <div class="lab-divider"></div>
+      <div class="lab-actions"><button id="reopen">重新打开弹窗</button><button id="compare" aria-pressed="false">并排对比导航材质</button><button id="background" aria-pressed="false">切换光栅背景</button><button id="animate" aria-pressed="false">移动背景</button><button id="reset">恢复弹窗推荐值</button><button id="export" aria-expanded="false" aria-controls="parameters">显示当前参数</button></div>
+      <textarea id="parameters" aria-label="当前弹窗参数，可全选复制" readonly hidden rows="12"></textarea>
+      <p id="status" class="lab-status" role="status">正在准备后台预览…</p>
+    </aside>
+    <main class="lab-previews" id="previews">
+      <section class="lab-preview"><div class="lab-preview-heading"><h2>当前弹窗参数</h2><span id="active-summary">分区融合 · 2 / 17 / 22 · 40%</span></div><iframe id="active-preview" title="可调参数的后台表单预览" src="./demo.html?glass-lab=1" loading="eager"></iframe></section>
+      <section class="lab-preview" id="baseline-card" hidden><div class="lab-preview-heading"><h2>导航材质用于弹窗 · 固定对照</h2><span>2 / 14 / 20 · #667585 · 24% · 衬底28%</span></div><iframe id="baseline-preview" title="导航材质对照的后台表单预览" data-src="./demo.html?glass-lab=1" loading="lazy"></iframe></section>
+    </main>
+  </div>
+  <script type="module" src="./glass-lab.js"></script>
+</body></html>

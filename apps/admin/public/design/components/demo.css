@@ -1,0 +1,29 @@
+html,body { min-height:100%;margin:0;background:#15181d; }
+.component-demo { min-height:100dvh;overflow:hidden; }
+.component-demo [hidden] { display:none!important; }
+.component-demo>header { display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:68px;padding:0 32px;border-bottom:1px solid rgb(238 241 244 / 7%); }
+.component-demo>header>div { display:flex;align-items:center;gap:16px; }
+.demo-local { color:var(--gw-text-muted);font-size:11px; }
+.component-demo main { position:relative;max-width:1360px;margin:0 auto;padding:28px 32px 40px; }
+.component-demo h1,.component-demo h2 { margin:0; }
+.demo-controls { display:flex;align-items:center;gap:20px;margin-bottom:30px; }
+.demo-controls>div { flex:1; }.demo-controls p { margin:6px 0 0; }.demo-controls>label { display:flex;align-items:center;gap:7px;font-size:12px;color:var(--gw-text-secondary); }
+.component-demo input[type='checkbox'],.component-demo input[type='radio'] { accent-color:#8fa5bc; }
+.demo-grid { display:grid;grid-template-columns:minmax(300px,.8fr) minmax(400px,1.2fr);gap:36px;align-items:start; }
+.demo-left>h2,.demo-right>h2 { margin-bottom:18px; }
+.demo-glass-stage { position:relative;height:220px;overflow:hidden;border-radius:14px;border:1px solid rgb(238 241 244 / 8%);background:repeating-linear-gradient(90deg,transparent 0 15px,rgb(202 222 239 / 12%) 15px 16px); }
+.demo-test-lines { position:absolute;inset:18px 0;color:rgb(238 241 244 / 32%);font:14px/44px var(--gw-font);white-space:nowrap;transform:translateX(10px); }
+#glass-slot { position:absolute;inset:20px 28px; }
+.demo-glass { height:100%;border:1px solid rgb(196 217 235 / 15%);border-radius:14px;padding:18px; }
+.demo-glass h3 { margin:0 0 8px;font-size:14px;font-weight:600; }.demo-glass p { margin:0;font-size:12px;color:var(--gw-text-secondary);line-height:1.7; }.demo-glass small { display:block;margin-top:14px;font-size:11px;color:var(--gw-text-muted); }
+.demo-material-modes { display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:12px;font-size:11px;color:var(--gw-text-secondary); }.demo-material-modes label { display:flex;align-items:center;gap:4px; }
+.demo-entry-row { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px; }.demo-entry-row .gw-voice-button { margin-top:12px; }
+#entry-status { min-height:20px;margin:12px 0 22px; }
+.demo-contract { margin-top:24px;padding:16px 0;border-top:1px solid rgb(238 241 244 / 7%);font-size:12px;color:var(--gw-text-secondary); }.demo-contract strong { font-weight:500;color:var(--gw-text-secondary); }.demo-contract p { font-size:12px;line-height:1.7;color:var(--gw-text-muted);margin:6px 0 0; }
+#question-slot { margin-bottom:12px; }#composer-slot { margin-top:12px; }#demo-status { min-height:20px;margin:10px 0 0; }
+.demo-right .gw-component-question { max-height:520px; }
+.demo-messages { display:flex;flex-direction:column;gap:12px;margin-top:18px; }.demo-message { padding:12px 14px;border:1px solid rgb(238 241 244 / 7%);border-radius:10px;background:rgb(32 37 45 / 30%);font-size:13px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere; }.demo-message small { display:block;color:var(--gw-text-muted);font-size:10px;margin-bottom:5px; }
+.demo-event-box { margin-top:24px;padding-top:18px;border-top:1px solid rgb(238 241 244 / 7%);font-size:12px;color:var(--gw-text-secondary); }.demo-event-box strong { font-weight:500; }.demo-event-box ol { margin:10px 0 0;padding-left:18px;color:var(--gw-text-muted);font:11px/1.8 var(--gw-mono); }
+.component-demo>footer { max-width:1360px;box-sizing:border-box;margin:0 auto;padding:16px 32px 30px;color:var(--gw-text-muted);font-size:11px; }
+@media (max-width:1000px) { .demo-grid { grid-template-columns:1fr;gap:28px; }.demo-controls { flex-wrap:wrap; }.demo-controls>div { flex-basis:100%; }.component-demo>header { flex-wrap:wrap;padding:18px 24px;gap:8px; }.component-demo main { padding:24px; } }
+@media (max-width:600px) { .component-demo>header>div { flex-direction:column;align-items:flex-start;gap:4px; }.component-demo main { padding:20px 16px; }.demo-controls { gap:12px; }.demo-controls>label { font-size:11px; }.component-demo>footer { padding-inline:16px; }.demo-grid { display:block; }.demo-right { margin-top:28px; }.demo-glass-stage { height:210px; }#glass-slot { inset:18px; } }

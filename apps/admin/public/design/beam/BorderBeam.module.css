@@ -1,0 +1,14 @@
+@property --gw-rim-angle { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+.beam { --gw-rim-angle: 0deg; --gw-rim-padding: 8px; position: absolute; inset: 0; z-index: 2; overflow: hidden; border-radius: inherit; pointer-events: none; opacity: .3; transition: opacity 700ms; }
+.beam[data-border-beam='working'] { opacity: .95; }
+.beam[data-rounded='true'] { --gw-rim-padding: 3px; border-radius: 50%; }
+.beam[data-animated='true'] { animation: gw-rim-orbit 20s linear infinite, gw-rim-breathe 8s ease-in-out infinite; }
+.beam[data-border-beam='working'][data-animated='true'] { animation: gw-rim-orbit 10s linear infinite; }
+.bloom, .edge { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.bloom { filter: blur(10px); opacity: .8; }
+.bloom::after, .edge { position: absolute; inset: 0; border-radius: inherit; background: conic-gradient(from var(--gw-rim-angle), transparent 0deg 20deg, #35c8db 54deg, #a17ce1 92deg, transparent 125deg 185deg, #d68dad 220deg, #3bdc8c 265deg, transparent 310deg); mask: linear-gradient(white 0 0) content-box, linear-gradient(white 0 0); mask-composite: exclude; }
+.bloom::after { content: ''; padding: var(--gw-rim-padding); }
+.edge { padding: 1px; opacity: .55; }
+@keyframes gw-rim-orbit { to { --gw-rim-angle: 1turn; } }
+@keyframes gw-rim-breathe { 0%, 100% { opacity: .3; } 50% { opacity: .23; } }
+@media (prefers-reduced-motion: reduce) { .beam { animation: none !important; transition: none; } }

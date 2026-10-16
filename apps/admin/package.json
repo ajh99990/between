@@ -2,42 +2,35 @@
   "name": "@between/admin",
   "version": "1.0.0",
   "private": true,
-  "description": "Between 管理控制台，基于完整 Ant Design Pro 6",
-  "repository": "https://github.com/ajh99990/between",
+  "type": "module",
+  "description": "Between 通用深色玻璃管理员后台",
   "scripts": {
-    "dev": "node scripts/prepare-pro.mjs && cross-env MOCK=none max dev --host 127.0.0.1 --port 8888",
-    "build": "node scripts/prepare-pro.mjs && max build",
-    "setup": "node scripts/prepare-pro.mjs && max setup",
+    "dev": "vite --host 127.0.0.1 --port 8888",
+    "build": "node scripts/verify-assets.mjs && vite build",
+    "setup": "node scripts/verify-assets.mjs",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check src config",
-    "test": "vitest run tests/config.test.ts && node tests/static.mjs",
+    "lint": "biome check src vite.config.ts",
+    "test": "vitest run && node tests/static.mjs",
     "test:browser": "node tests/browser.mjs"
   },
-  "browserslist": [
-    "defaults"
-  ],
   "dependencies": {
-    "@ant-design/icons": "^6.3.2",
-    "@ant-design/pro-components": "^3.1.14-2",
-    "antd": "^6.6.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "@ant-design/cssinjs": "2.1.2",
-    "@rc-component/util": "1.12.0"
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.3",
-    "@types/node": "^26.2.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@umijs/max": "^4.7.3",
-    "cross-env": "^10.1.0",
-    "tailwindcss": "^4.3.2",
-    "typescript": "^7.0.2",
+    "@biomejs/biome": "2.5.3",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
     "vitest": "4.1.10",
     "@playwright/test": "1.61.1"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24 <25"
   }
 }
