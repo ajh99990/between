@@ -22,7 +22,7 @@ git ls-remote origin refs/heads/main refs/heads/dev
 
 ## 统一安装与验收
 
-当前产品使用根 npm workspace 和单个 `package-lock.json`，运行代码位于 `apps/admin`、`apps/server`、`packages/role-engine`。Node 版本与完整命令以 [根 README](../README.md) 和根 `package.json` 为准。
+当前产品使用根 npm workspace 和单个 `package-lock.json`，四个运行 workspace 为 `apps/admin`、`apps/server`、`packages/role-engine`、`packages/ui`。Node 版本与完整命令以 [根 README](../README.md) 和根 `package.json` 为准。
 
 在仓库根执行：
 
@@ -31,9 +31,9 @@ npm ci
 npm run check
 ```
 
-`check` 聚合类型检查、lint、管理端构建及测试；测试依赖管理端已构建。根 `.npmrc` 统一安装脚本策略，管理端所需准备步骤由项目命令显式执行。不得回到旧目录分别安装、生成第二份锁文件或为绕过错误升级依赖。
+`check` 聚合后台/UI 资源校验与类型检查、lint、管理端构建及离线测试；测试依赖管理端已构建。根 `.npmrc` 统一安装脚本策略，管理端所需准备步骤由项目命令显式执行。不得回到旧目录分别安装、生成第二份锁文件或为绕过错误升级依赖。
 
-结构调整至少覆盖依赖解析、管理端类型与构建、角色引擎和应用回归、套餐后端离线测试、启动冒烟与关键接口。实际执行范围及无法覆盖项需逐项记录。浏览器可用时执行根 `npm run test:browser`，也可通过 `CHROMIUM_PATH` 指向本机 Chrome；必须保留浏览器沙箱，使用隔离虚构数据和随机回环端口。证据位于忽略目录 `artifacts/browser/admin`。离线模拟、接口测试和真实模型推理是不同证据，不相互替代。
+结构调整至少覆盖依赖解析、管理端类型与构建、角色引擎和应用回归、套餐后端离线测试、启动冒烟与关键接口。实际执行范围及无法覆盖项需逐项记录。浏览器可用时执行根 `npm run test:browser`，也可通过 `CHROMIUM_PATH` 指向本机 Chrome；必须保留浏览器沙箱，使用隔离虚构数据和随机回环端口。共享 UI 的单独开发/验收入口为 `npm run dev:ui`、`npm run build:ui-playground`、`npm run test:ui:browser`；根 `test:browser` 包含共享 UI 与业务浏览器回归。工作台不发布到后台。证据位于忽略目录 `artifacts/browser/ui`、`artifacts/browser/admin` 等对应测试目录。离线模拟、接口测试和真实模型推理是不同证据，不相互替代。
 
 提交前检查完整 diff、未跟踪文件、许可证及归因。不得提交凭据、运行配置、真实聊天、用户存储、依赖、缓存、构建或本机测试产物。只暂存已审查的改动，不能依赖忽略规则代替内容核验。
 

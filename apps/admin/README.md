@@ -1,6 +1,8 @@
 # Between 管理员后台
 
-面向管理员的独立内容和运行管理界面，通过同源 `/api/admin/*` 调用服务。React、TypeScript、Tailwind CSS 与 Vite 负责界面；业务状态、路由、请求和草稿由本应用管理。旧后台已整体替换，不保留旧视觉组件或兼容入口。
+面向管理员的独立内容和运行管理界面，通过同源 `/api/admin/*` 调用服务。React、TypeScript、Tailwind CSS 与 Vite 负责界面；业务状态、路由、请求和草稿由本应用管理。通用控件、图标、字体、玻璃、程序背景与浮层动画统一从私有 `@between/ui` 引入；不保留另一套应用内组件或重复设计目录。仓库另有服务、角色引擎和共享 UI，共四个 npm workspace。
+
+本轮共享组件迁移的结构、删除项、命令、七项自查和实测边界见 [共享组件库与验收](../../docs/共享组件库与验收.md)。组件接口与工作台场景见 [UI 包说明](../../packages/ui/README.md)。
 
 ## 工作区
 
@@ -25,16 +27,18 @@
 | `src/pages/Roles.tsx` | 角色全文阅读和编辑 |
 | `src/pages/Books.tsx`、`book-utils.ts` | 世界书、条目、字段保留与冲突草稿 |
 | `src/pages/Operations.tsx` | 素材、模型、会话、用户和诊断 |
-| `src/icons.tsx` | 本地安装的 Lucide 语义映射、统一尺寸与线宽；静态命名导入，无 CDN |
-| `src/ui.tsx`、`src/skill.ts`、`src/styles.css` | React 受控适配、资源生命周期与应用布局 |
-| `public/design`、`design-assets.json` | 自包含的通用设计资源及 SHA-256 清单 |
+| `src/styles.css` | 应用网格、业务阅读与编辑布局、页面密度和响应式装配；共享样式从 `@between/ui/styles.css` 引入 |
+| `src/motion.tsx`、`src/reader-motion.tsx` | 路由和业务文档切换提示；身份只取实际文档/字段，不按输入重新播放 |
+| `../../packages/ui/src` | 唯一通用控件、图标、视觉基元、材质、背景、浮层交互及动画实现 |
+| `../../packages/ui/design-assets.json` | 共享运行资源实际字节及来源 SHA-256 清单 |
+| `design-assets.json`、`scripts/verify-assets.mjs` | 指向共享清单并拒绝重复 `public/design`；不再复制运行资源 |
 | `tests`、`scripts` | 单元/静态/浏览器验证、隔离预览、设计资源校验 |
 
-界面实际复用 `glass-workbench-ui` 的通用玻璃、单选、弹窗、字体与抽象背景实现，React 适配层负责创建、更新和销毁。资源已经随项目保存，使用时无需读取任何其他项目或仓库。导航/按钮采用轻量磨砂折射参数；弹窗使用独立的深色染色及内容衬底；长正文优先保证阅读。`?qa=1` 仅启用白名单样式和状态的只读探针，不导出表单值或业务正文。
+`@between/ui` 使用 Base UI 管理键盘、焦点、交互状态、浮层和无障碍语义；共享 React 组件补齐默认样式、材质和生命周期。材质与字体源于已保存在包内的通用 `glass-workbench-ui` 资源，使用时不读取其他项目或仓库。导航/按钮与弹窗使用不同配方，长正文优先保证阅读。通用复杂组件仍可进入 UI 包；角色、世界书、模型设置等业务组合，以及权限、草稿、请求、保存和冲突处理留在本应用。
 
-图标统一来自精确锁定的 `lucide-react@1.58.0`，通过本地 npm 依赖构建为 SVG，运行时不请求第三方图标服务。新增图标在 `src/icons.tsx` 静态引入并登记语义；导航和操作默认 18px / 1.75 线宽，辅助图标 14–17px，空状态 26px。仅图标按钮保留可访问名称，SVG 本身作为装饰隐藏。选型与实际视觉修正见 [图标调研](../../docs/图标库选型与视觉修正.md)，完整 ISC / Feather MIT 许可在根 `licenses/THIRD-PARTY-NOTICES.txt`。
+图标统一从 `@between/ui` 的 `Icon` / `IconButton` 使用，语义映射在 `packages/ui/src/icons.tsx` 静态登记，使用本地锁定的 Lucide，无 CDN。导航和操作默认 18px / 1.75 线宽，辅助图标 14–17px，空状态 26px。图标按钮提供可访问名称，SVG 作为装饰隐藏。选型背景见 [图标调研](../../docs/图标库选型与视觉修正.md)；第三方依赖完整许可由根 `licenses/THIRD-PARTY-NOTICES.txt` 随依赖清单更新。
 
-资源校验失败时应辨认变化来源，并同步审查清单与许可，不要删掉校验绕过问题。公开字体及对照模块许可保留在 `public/design/licenses` 和 `public/design/admin/vendor`，详见 [素材与实现说明](public/design/ASSET-SOURCES.md)。内容编辑的设计依据、固定上游版本与许可见 [调研](../../docs/管理员内容编辑调研.md)；未复制这些参考项目的 UI 实现。
+共享资源验证覆盖 SHA-256、完整目录和本地依赖闭包。失败时辨认来源，审查实际代码、来源 hash 与许可后更新清单，不删除验证绕过问题。公开字体许可与归因保留在 [共享资源](../../packages/ui/src/materials/runtime/ASSET-SOURCES.md) 中；内容编辑的设计依据和固定上游版本见 [调研](../../docs/管理员内容编辑调研.md)。旧 `src/ui.tsx`、`src/skill.ts`、原生控件控制器和 `public/design` 不再是当前入口。
 
 ## 开发与验证
 
@@ -44,11 +48,22 @@
 npm ci
 npm run check
 npm run test:browser
+# 单独验证共享 UI（包含 playground 构建）
+npm run test:ui:browser
 ```
 
-`check` 顺序包含资源校验、TypeScript、模块解析、Biome、Vite 构建及离线测试。浏览器回归可通过 `CHROMIUM_PATH` 指向本机 Chrome；只启动临时虚构数据与随机回环服务，不读取真实运行配置，也不调用付费模型。测试输出位于忽略目录 `artifacts/browser/admin`。自动化结果和生成截图不能代替实际浏览器操作与目视验收；交付前还应按 `ui-ux-self-check` 检查全文阅读、展开菜单、弹窗、状态恢复及常用屏幕尺寸。
+`check` 顺序包含共享资源校验、后台与 UI 包 TypeScript、模块解析、Biome、后台 Vite 构建及离线测试。根 `test:browser` 先运行共享 UI，再运行后台、聊天与 OAuth 浏览器回归。浏览器回归可通过 `CHROMIUM_PATH` 指向本机 Chrome；只启动临时虚构数据与随机回环服务，不读取真实运行配置，也不调用付费模型。后台测试输出位于忽略目录 `artifacts/browser/admin`，共享组件回归位于 `artifacts/browser/ui`。自动化结果和生成截图不能代替实际浏览器操作与目视验收；交付前还应按 `ui-ux-self-check` 检查全文阅读、展开菜单、弹窗、状态恢复及常用屏幕尺寸。
 
-启动隔离预览：
+共享组件开发使用独立入口：
+
+```sh
+npm run dev:ui
+npm run build:ui-playground
+```
+
+开发服务输出随机回环 URL，构建产物只在 `packages/ui/dist-playground`。它直接引用正式组件和样式，包含长表单、菜单、表格、草稿与故障场景；测试数据只在页面内存，不访问后台业务服务，也不随 `/admin/` 发布。完整场景和组件接口见 [UI 包说明](../../packages/ui/README.md)。工作台调试后仍须回到真实后台检查路由、长文、权限、保存失败和 409；不得将历史验收或工作台模拟当成本轮业务验收。
+
+启动隔离业务预览：
 
 ```sh
 npm run build

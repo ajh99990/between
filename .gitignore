@@ -39,3 +39,5 @@ DELIVERY-MANIFEST.json
 *.relcheckpoint
 .recovery-*/
 docs/用户原文要求.md
+
+packages/ui/dist-playground/

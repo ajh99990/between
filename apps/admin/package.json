@@ -14,10 +14,10 @@
     "test:browser": "node tests/browser.mjs"
   },
   "dependencies": {
-    "lucide-react": "1.58.0",
     "motion": "14.3.0",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.7",
+    "@between/ui": "0.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.3",

@@ -1,0 +1,13 @@
+:root { font-synthesis:none; -webkit-font-smoothing:antialiased; }
+.glass-workbench { --bt-motion-ease-out:cubic-bezier(.23,1,.32,1); --bt-motion-fast:120ms; min-width:0; }
+.glass-workbench :where(button,input,textarea,select,a) { touch-action:manipulation; }
+.glass-workbench :where(button,input,textarea,select,a,[tabindex]):focus-visible { outline:2px solid #b6c8d9; outline-offset:3px; }
+.glass-workbench :where(button,input,textarea,select) { font:inherit; }
+.glass-workbench :where(button) { cursor:pointer; }
+.glass-workbench :where(button:disabled,[data-disabled]) { cursor:not-allowed; }
+.glass-workbench :where(svg) { flex:none; }
+.glass-workbench [hidden] { display:none!important; }
+.glass-workbench.bt-overlay-root { position:fixed; inset:0; z-index:100; min-height:0; pointer-events:none; background:transparent; }
+.bt-overlay-root>* { pointer-events:auto; }
+.bt-ambient { position:absolute; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }
+@media(prefers-reduced-motion:reduce) { .glass-workbench { scroll-behavior:auto; } }

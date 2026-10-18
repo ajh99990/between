@@ -1,0 +1,45 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+  "files": {
+    "includes": [
+      "apps/admin/src/**/*.ts",
+      "apps/admin/src/**/*.tsx",
+      "apps/admin/vite.config.ts",
+      "packages/ui/src/**/*.ts",
+      "packages/ui/src/**/*.tsx",
+      "packages/ui/playground/**/*.ts",
+      "packages/ui/playground/**/*.tsx",
+      "packages/ui/tests/**/*.ts",
+      "packages/ui/vite.config.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 110
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
+      "a11y": {
+        "useButtonType": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      }
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

@@ -1,9 +1,24 @@
+import {
+  Badge,
+  Button,
+  Checkbox,
+  DataTable,
+  Dialog,
+  Empty,
+  ErrorNotice,
+  Field,
+  Input,
+  PageHeader,
+  Pagination,
+  Panel,
+  Select,
+  Textarea,
+} from "@between/ui";
 import { type FormEvent, type ReactNode, useRef, useState } from "react";
 import { api } from "../api";
 import { readerScrollBehavior } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
 import type { Config, PlanConfig, Preset } from "../types";
-import { Badge, Button, Dialog, Empty, Field, PageHeader, Panel, Select } from "../ui";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const date = (value: string) => {
@@ -116,14 +131,6 @@ function useOperation() {
   return { busy, error, run };
 }
 
-function ErrorNotice({ error }: { error: string }) {
-  return error ? (
-    <div className="notice error" role="alert">
-      {error}
-    </div>
-  ) : null;
-}
-
 function Search({
   label,
   value,
@@ -137,7 +144,7 @@ function Search({
 }) {
   return (
     <Field label={label}>
-      <input
+      <Input
         className="text-input"
         type="search"
         value={value}
@@ -158,19 +165,7 @@ function usePagination<T>(rows: T[]) {
     reset: () => setPage(1),
     control:
       rows.length > pageSize ? (
-        <nav className="toolbar pagination" aria-label="分页">
-          <span className="meta">
-            共 {rows.length} 条 · 第 {current} / {pages} 页
-          </span>
-          <div className="inline-actions">
-            <Button variant="ghost" disabled={current === 1} onClick={() => setPage(current - 1)}>
-              上一页
-            </Button>
-            <Button variant="ghost" disabled={current === pages} onClick={() => setPage(current + 1)}>
-              下一页
-            </Button>
-          </div>
-        </nav>
+        <Pagination page={current} total={rows.length} pageSize={pageSize} onPageChange={setPage} />
       ) : null,
   };
 }
@@ -315,7 +310,7 @@ export function ModelsPage() {
   return (
     <div className="page-stack">
       <PageHeader title="模型与提示词" description="管理后续请求的连接，以及新会话使用的提示预设。" />
-      <ErrorNotice error={error} />
+      {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card">
         <div className="toolbar">
           <div>
@@ -482,7 +477,7 @@ export function ModelsPage() {
                     label="兼容服务根地址"
                     description="HTTPS 或本机 HTTP，不得包含用户名、密码或查询参数。"
                   >
-                    <input
+                    <Input
                       className="text-input"
                       type="url"
                       required
@@ -495,7 +490,7 @@ export function ModelsPage() {
                     />
                   </Field>
                   <Field label="模型名称">
-                    <input
+                    <Input
                       className="text-input"
                       required
                       maxLength={200}
@@ -510,20 +505,18 @@ export function ModelsPage() {
               )}
               {editor.kind === "plan" && (
                 <div className="page-stack">
-                  <label className="checkbox-row">
-                    <input
-                      type="checkbox"
-                      checked={editor.value.enabled}
-                      onChange={(event) => {
-                        const enabled = event.target.checked;
-                        setEditor({ ...editor, value: { ...editor.value, enabled } });
-                      }}
-                    />
-                    启用套餐后端
-                  </label>
+                  <Checkbox
+                    label="启用套餐后端"
+                    className="checkbox-row"
+                    checked={editor.value.enabled}
+                    onChange={(checked) => {
+                      const enabled = checked;
+                      setEditor({ ...editor, value: { ...editor.value, enabled } });
+                    }}
+                  />
                   <div className="field-grid">
                     <Field label="套餐模型名称">
-                      <input
+                      <Input
                         className="text-input"
                         required={editor.value.enabled}
                         maxLength={200}
@@ -565,7 +558,7 @@ export function ModelsPage() {
                 <div className="page-stack">
                   <div className="field-grid">
                     <Field label="上下文预算" description="两种后端均遵循，最多 128000 tokens。">
-                      <input
+                      <Input
                         className="text-input"
                         type="number"
                         min={2}
@@ -580,7 +573,7 @@ export function ModelsPage() {
                       />
                     </Field>
                     <Field label="回复 Token 上限" description="须小于上下文预算，套餐模式忽略此项。">
-                      <input
+                      <Input
                         className="text-input"
                         type="number"
                         min={1}
@@ -595,7 +588,7 @@ export function ModelsPage() {
                       />
                     </Field>
                     <Field label="生成温度" description="0–2，套餐模式忽略此项。">
-                      <input
+                      <Input
                         className="text-input"
                         type="number"
                         min={0}
@@ -609,20 +602,18 @@ export function ModelsPage() {
                         }}
                       />
                     </Field>
-                    <label className="checkbox-row">
-                      <input
-                        type="checkbox"
-                        checked={editor.value.pinExamples}
-                        onChange={(event) => {
-                          const pinExamples = event.target.checked;
-                          setEditor({ ...editor, value: { ...editor.value, pinExamples } });
-                        }}
-                      />
-                      优先保留对话示例
-                    </label>
+                    <Checkbox
+                      label="优先保留对话示例"
+                      className="checkbox-row"
+                      checked={editor.value.pinExamples}
+                      onChange={(checked) => {
+                        const pinExamples = checked;
+                        setEditor({ ...editor, value: { ...editor.value, pinExamples } });
+                      }}
+                    />
                   </div>
                   <Field label="全局历史后指令" description="最多 10000 字符，仅进入新会话的模型上下文。">
-                    <textarea
+                    <Textarea
                       className="text-area"
                       rows={12}
                       maxLength={10000}
@@ -635,7 +626,7 @@ export function ModelsPage() {
                   </Field>
                 </div>
               )}
-              <ErrorNotice error={validation} />
+              {validation && <ErrorNotice>{validation}</ErrorNotice>}
               <div className="editor-footer">
                 <Button variant="secondary" type="button" disabled={busy} onClick={cancel}>
                   取消编辑
@@ -680,7 +671,7 @@ export function SessionsPage() {
   return (
     <div className="page-stack">
       <PageHeader title="会话与任务" description="查看会话、停止生成或删除会话。" />
-      <ErrorNotice error={error} />
+      {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card task-overview">
         <div className="toolbar">
           <div>
@@ -690,56 +681,55 @@ export function SessionsPage() {
           <Badge tone={state.tasks.length ? "info" : "neutral"}>{state.tasks.length} 个任务</Badge>
         </div>
         {state.tasks.length ? (
-          <div className="table-scroll">
-            <table className="data-table">
-              <caption className="sr-only">正在运行的生成任务</caption>
-              <thead>
-                <tr>
-                  <th>任务 / 会话</th>
-                  <th>用户</th>
-                  <th>类型</th>
-                  <th>开始时间</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td>
-                      <div className="meta">{task.id}</div>
-                      <div className="meta muted">{task.conversation}</div>
-                    </td>
-                    <td className="meta">{task.userId}</td>
-                    <td>{modes[task.mode] ?? task.mode}</td>
-                    <td>{date(task.startedAt)}</td>
-                    <td>
-                      <Button
-                        variant="danger"
-                        disabled={busy}
-                        onClick={() =>
-                          ask({
-                            title: "停止此生成任务？",
-                            description: (
-                              <>
-                                <p className="meta">{task.id}</p>
-                                <p>未完成的本轮内容不会保存。</p>
-                              </>
-                            ),
-                            label: "停止任务",
-                            danger: true,
-                            action: () =>
-                              run(() => api("/stop", "POST", { taskId: task.id }), "停止请求已发送。"),
-                          })
-                        }
-                      >
-                        停止任务
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            label="正在运行的生成任务"
+            rows={state.tasks}
+            getRowKey={(task) => task.id}
+            columns={[
+              {
+                key: "task",
+                header: "任务 / 会话",
+                render: (task) => (
+                  <>
+                    <div className="meta">{task.id}</div>
+                    <div className="meta muted">{task.conversation}</div>
+                  </>
+                ),
+              },
+              { key: "user", header: "用户", render: (task) => <span className="meta">{task.userId}</span> },
+              { key: "mode", header: "类型", render: (task) => <>{modes[task.mode] ?? task.mode}</> },
+              { key: "started", header: "开始时间", render: (task) => <>{date(task.startedAt)}</> },
+              {
+                key: "actions",
+                header: "操作",
+                render: (task) => (
+                  <>
+                    <Button
+                      variant="danger"
+                      disabled={busy}
+                      onClick={() =>
+                        ask({
+                          title: "停止此生成任务？",
+                          description: (
+                            <>
+                              <p className="meta">{task.id}</p>
+                              <p>未完成的本轮内容不会保存。</p>
+                            </>
+                          ),
+                          label: "停止任务",
+                          danger: true,
+                          action: () =>
+                            run(() => api("/stop", "POST", { taskId: task.id }), "停止请求已发送。"),
+                        })
+                      }
+                    >
+                      停止任务
+                    </Button>
+                  </>
+                ),
+              },
+            ]}
+          />
         ) : (
           <Empty icon="sessions" title="当前没有生成任务" description="任务运行时会出现在这里。" />
         )}
@@ -775,70 +765,79 @@ export function SessionsPage() {
         </div>
         {filtered.length ? (
           <>
-            <div className="table-scroll">
-              <table className="data-table">
-                <caption className="sr-only">已保存的会话</caption>
-                <thead>
-                  <tr>
-                    <th>会话</th>
-                    <th>角色</th>
-                    <th>所属用户</th>
-                    <th>配置版本</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pagination.rows.map((item) => (
-                    <tr key={`${item.userId}:${item.id}`}>
-                      <td>
-                        <div>{item.title}</div>
-                        <div className="meta muted">{item.id}</div>
-                      </td>
-                      <td>{item.name}</td>
-                      <td className="meta">{item.userId}</td>
-                      <td>
-                        <Badge>v{item.configVersion}</Badge>
-                      </td>
-                      <td>{date(item.createdAt)}</td>
-                      <td>
-                        <Button
-                          variant="danger"
-                          disabled={busy}
-                          onClick={() =>
-                            ask({
-                              title: `删除「${item.title}」？`,
-                              description: (
-                                <>
-                                  <p className="meta">{item.id}</p>
-                                  <p>
-                                    会停止此会话的任务并永久删除本机保存的聊天、媒体与幂等记录。不能撤销，不删除外部服务数据。
-                                  </p>
-                                </>
+            <DataTable
+              label="已保存的会话"
+              rows={pagination.rows}
+              getRowKey={(item) => `${item.userId}:${item.id}`}
+              columns={[
+                {
+                  key: "session",
+                  wrap: true,
+                  header: "会话",
+                  render: (item) => (
+                    <>
+                      <div>{item.title}</div>
+                      <div className="meta muted">{item.id}</div>
+                    </>
+                  ),
+                },
+                { key: "role", header: "角色", render: (item) => <>{item.name}</> },
+                {
+                  key: "user",
+                  header: "所属用户",
+                  render: (item) => <span className="meta">{item.userId}</span>,
+                },
+                {
+                  key: "version",
+                  header: "配置版本",
+                  render: (item) => (
+                    <>
+                      <Badge>v{item.configVersion}</Badge>
+                    </>
+                  ),
+                },
+                { key: "created", header: "创建时间", render: (item) => <>{date(item.createdAt)}</> },
+                {
+                  key: "actions",
+                  header: "操作",
+                  render: (item) => (
+                    <>
+                      <Button
+                        variant="danger"
+                        disabled={busy}
+                        onClick={() =>
+                          ask({
+                            title: `删除「${item.title}」？`,
+                            description: (
+                              <>
+                                <p className="meta">{item.id}</p>
+                                <p>
+                                  会停止此会话的任务并永久删除本机保存的聊天、媒体与幂等记录。不能撤销，不删除外部服务数据。
+                                </p>
+                              </>
+                            ),
+                            label: "永久删除会话",
+                            danger: true,
+                            action: () =>
+                              run(
+                                () =>
+                                  api("/conversation", "DELETE", {
+                                    userId: item.userId,
+                                    conversation: item.id,
+                                    confirm: true,
+                                  }),
+                                "会话已删除。",
                               ),
-                              label: "永久删除会话",
-                              danger: true,
-                              action: () =>
-                                run(
-                                  () =>
-                                    api("/conversation", "DELETE", {
-                                      userId: item.userId,
-                                      conversation: item.id,
-                                      confirm: true,
-                                    }),
-                                  "会话已删除。",
-                                ),
-                            })
-                          }
-                        >
-                          删除
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          })
+                        }
+                      >
+                        删除
+                      </Button>
+                    </>
+                  ),
+                },
+              ]}
+            />
             {pagination.control}
           </>
         ) : (
@@ -903,7 +902,7 @@ export function UsersPage() {
   return (
     <div className="page-stack">
       <PageHeader title="用户与全局" description="管理浏览器用户，以及新用户进入和生成请求。" />
-      <ErrorNotice error={error} />
+      {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card">
         <h2>全局控制</h2>
         <div className="setting-row">
@@ -975,69 +974,68 @@ export function UsersPage() {
         </div>
         {users.length ? (
           <>
-            <div className="table-scroll">
-              <table className="data-table">
-                <caption className="sr-only">浏览器身份用户</caption>
-                <thead>
-                  <tr>
-                    <th>用户 ID</th>
-                    <th>状态</th>
-                    <th>会话数</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pagination.rows.map((user) => (
-                    <tr key={user.id}>
-                      <td className="meta">{user.id}</td>
-                      <td>
-                        <Badge tone={user.disabled ? "warning" : "success"}>
-                          {user.disabled ? "已停用" : "正常"}
-                        </Badge>
-                      </td>
-                      <td>{user.conversations.length}</td>
-                      <td>{date(user.createdAt)}</td>
-                      <td>
-                        <Button
-                          variant={user.disabled ? "secondary" : "danger"}
-                          disabled={busy}
-                          onClick={() =>
-                            ask({
-                              title: user.disabled ? "恢复此用户？" : "停用此用户？",
-                              description: (
-                                <>
-                                  <p className="meta">{user.id}</p>
-                                  <p>
-                                    {user.disabled
-                                      ? "恢复后，该浏览器身份可继续访问自己的会话。"
-                                      : "会停止该用户正在运行的任务并禁止访问，不删除已有会话。"}
-                                  </p>
-                                </>
+            <DataTable
+              label="浏览器身份用户"
+              rows={pagination.rows}
+              getRowKey={(user) => user.id}
+              columns={[
+                { key: "user", header: "用户 ID", render: (user) => <span className="meta">{user.id}</span> },
+                {
+                  key: "status",
+                  header: "状态",
+                  render: (user) => (
+                    <>
+                      <Badge tone={user.disabled ? "warning" : "success"}>
+                        {user.disabled ? "已停用" : "正常"}
+                      </Badge>
+                    </>
+                  ),
+                },
+                { key: "sessions", header: "会话数", render: (user) => <>{user.conversations.length}</> },
+                { key: "created", header: "创建时间", render: (user) => <>{date(user.createdAt)}</> },
+                {
+                  key: "actions",
+                  header: "操作",
+                  render: (user) => (
+                    <>
+                      <Button
+                        variant={user.disabled ? "secondary" : "danger"}
+                        disabled={busy}
+                        onClick={() =>
+                          ask({
+                            title: user.disabled ? "恢复此用户？" : "停用此用户？",
+                            description: (
+                              <>
+                                <p className="meta">{user.id}</p>
+                                <p>
+                                  {user.disabled
+                                    ? "恢复后，该浏览器身份可继续访问自己的会话。"
+                                    : "会停止该用户正在运行的任务并禁止访问，不删除已有会话。"}
+                                </p>
+                              </>
+                            ),
+                            label: user.disabled ? "恢复用户" : "停用用户",
+                            danger: !user.disabled,
+                            action: () =>
+                              run(
+                                () =>
+                                  api("/user", "PUT", {
+                                    userId: user.id,
+                                    disabled: !user.disabled,
+                                    confirm: true,
+                                  }),
+                                user.disabled ? "用户已恢复。" : "用户已停用。",
                               ),
-                              label: user.disabled ? "恢复用户" : "停用用户",
-                              danger: !user.disabled,
-                              action: () =>
-                                run(
-                                  () =>
-                                    api("/user", "PUT", {
-                                      userId: user.id,
-                                      disabled: !user.disabled,
-                                      confirm: true,
-                                    }),
-                                  user.disabled ? "用户已恢复。" : "用户已停用。",
-                                ),
-                            })
-                          }
-                        >
-                          {user.disabled ? "恢复" : "停用"}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          })
+                        }
+                      >
+                        {user.disabled ? "恢复" : "停用"}
+                      </Button>
+                    </>
+                  ),
+                },
+              ]}
+            />
             {pagination.control}
           </>
         ) : (
@@ -1099,7 +1097,7 @@ export function ResourcesPage() {
   return (
     <div className="page-stack">
       <PageHeader title="社区素材" description="导入角色卡与关联世界书，供新会话使用。" />
-      <ErrorNotice error={error} />
+      {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card">
         <div className="toolbar">
           <h2>素材目录</h2>
@@ -1266,7 +1264,7 @@ export function DiagnosticsPage() {
           </Button>
         }
       />
-      <ErrorNotice error={error} />
+      {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card">
         <h2>运行诊断</h2>
         <dl className="diagnostic-list">
@@ -1319,35 +1317,40 @@ export function DiagnosticsPage() {
         </div>
         {audit.length ? (
           <>
-            <div className="table-scroll">
-              <table className="data-table">
-                <caption className="sr-only">最近操作记录</caption>
-                <thead>
-                  <tr>
-                    <th>时间</th>
-                    <th>操作</th>
-                    <th>操作者</th>
-                    <th>对象</th>
-                    <th>结果</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pagination.rows.map((item) => (
-                    <tr key={item.sequence}>
-                      <td>{date(item.at)}</td>
-                      <td>{auditLabels[item.action] ?? item.action}</td>
-                      <td className="meta">{item.actor}</td>
-                      <td className="meta">{item.target}</td>
-                      <td>
-                        <Badge tone={item.result === "ok" ? "success" : "danger"}>
-                          {item.result === "ok" ? "成功" : "失败"}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              label="最近操作记录"
+              rows={pagination.rows}
+              getRowKey={(item) => String(item.sequence)}
+              columns={[
+                { key: "at", header: "时间", render: (item) => <>{date(item.at)}</> },
+                {
+                  key: "action",
+                  header: "操作",
+                  render: (item) => <>{auditLabels[item.action] ?? item.action}</>,
+                },
+                {
+                  key: "actor",
+                  header: "操作者",
+                  render: (item) => <span className="meta">{item.actor}</span>,
+                },
+                {
+                  key: "target",
+                  header: "对象",
+                  render: (item) => <span className="meta">{item.target}</span>,
+                },
+                {
+                  key: "result",
+                  header: "结果",
+                  render: (item) => (
+                    <>
+                      <Badge tone={item.result === "ok" ? "success" : "danger"}>
+                        {item.result === "ok" ? "成功" : "失败"}
+                      </Badge>
+                    </>
+                  ),
+                },
+              ]}
+            />
             {pagination.control}
           </>
         ) : (

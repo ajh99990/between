@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "source": "glass-workbench-ui",
+  "root": "src/materials/runtime",
+  "scope": "Single shared runtime material, font and background source; UI components and motion are maintained in the React package.",
+  "files": [
+    {
+      "path": "ASSET-SOURCES.md",
+      "sha256": "90c40e0edbfe0b5338593a14be9afa043e856170e1ea08663072412429600a58",
+      "upstreamSha256": "002aec05ddc597d7868e7a5146d54eee9f5cc3edb04d3ec0596668f6f7264af6"
+    },
+    {
+      "path": "Geist-Variable.woff2",
+      "sha256": "a369fcf5628ea2aa4e1b9e2ec6a5b3624e365bda588e1f0f2f12b564f728fbb8",
+      "upstreamSha256": "a369fcf5628ea2aa4e1b9e2ec6a5b3624e365bda588e1f0f2f12b564f728fbb8"
+    },
+    {
+      "path": "GeistMono-Variable.woff2",
+      "sha256": "fba8f577f38a2bbcbe818efa6348dd58f36303a10b8737c42fefad275be563ab",
+      "upstreamSha256": "fba8f577f38a2bbcbe818efa6348dd58f36303a10b8737c42fefad275be563ab"
+    },
+    {
+      "path": "background/background.css",
+      "sha256": "eb6cc10709b313466b2f2506677e2129b763f01331c3c84b4f56f799c6ff8497",
+      "upstreamSha256": "eb6cc10709b313466b2f2506677e2129b763f01331c3c84b4f56f799c6ff8497"
+    },
+    {
+      "path": "background/background.d.ts",
+      "sha256": "7ed9cb37f58fb744d2eac352bf6e563494c0ec616e961fa35ef0553e2b26761e",
+      "origin": "local-type-declaration"
+    },
+    {
+      "path": "background/background.js",
+      "sha256": "e19986db4986201caf27a80b1334fba90f2aff464f3633ff8fe6506ae1b68951",
+      "upstreamSha256": "e19986db4986201caf27a80b1334fba90f2aff464f3633ff8fe6506ae1b68951"
+    },
+    {
+      "path": "background/creative-a.js",
+      "sha256": "a92ae5d9889c2d77592be5b1222407e44fee26ec68aedb0776ed17d9364beac2",
+      "upstreamSha256": "a92ae5d9889c2d77592be5b1222407e44fee26ec68aedb0776ed17d9364beac2"
+    },
+    {
+      "path": "background/creative-b.js",
+      "sha256": "7b9dc6fdf0126aaf99127872f62c2a3813bcaf9423698ff14fc1050166a128c3",
+      "upstreamSha256": "7b9dc6fdf0126aaf99127872f62c2a3813bcaf9423698ff14fc1050166a128c3"
+    },
+    {
+      "path": "background/field.js",
+      "sha256": "96d51d7a0d00ee0e0f9d887c92cbae0f32d0d646d8266207e6b1b39263ab2f41",
+      "upstreamSha256": "96d51d7a0d00ee0e0f9d887c92cbae0f32d0d646d8266207e6b1b39263ab2f41"
+    },
+    {
+      "path": "flow.png",
+      "sha256": "6ce1fcbd875d09fcf49c5fd19b90a6e541763d237cc01a470dcf3e5b87c957bf",
+      "upstreamSha256": "6ce1fcbd875d09fcf49c5fd19b90a6e541763d237cc01a470dcf3e5b87c957bf"
+    },
+    {
+      "path": "glass.css",
+      "sha256": "27ead453b419a28153443efe5374a0542234e10803cdbcac81812fd0653cdf90",
+      "upstreamSha256": "27ead453b419a28153443efe5374a0542234e10803cdbcac81812fd0653cdf90"
+    },
+    {
+      "path": "highlights.css",
+      "sha256": "ef5a57da32592af2121b042548077c0ccedd30987b57597deffce8d966e92426",
+      "upstreamSha256": "ef5a57da32592af2121b042548077c0ccedd30987b57597deffce8d966e92426"
+    },
+    {
+      "path": "licenses/Geist-LICENSE.txt",
+      "sha256": "930853ee1daa68554d9e35c8a9175affb74f699fad9a5da6ee5ebe76379d9137",
+      "upstreamSha256": "930853ee1daa68554d9e35c8a9175affb74f699fad9a5da6ee5ebe76379d9137"
+    },
+    {
+      "path": "licenses/Geist-OFL.txt",
+      "sha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90",
+      "upstreamSha256": "c683bfbcc7e087f5d37a54ef628f10387c451a83ddc459b151403a164ac46c90"
+    },
+    {
+      "path": "material-presets.d.ts",
+      "sha256": "d579a4e477f3871bc1a8d4d1daea54e744f762f02ef9ac8b278ce0ab9b618ddf",
+      "origin": "local-type-declaration"
+    },
+    {
+      "path": "material-presets.js",
+      "sha256": "33aa24731950d6c1e92070cdb88129b90bc8c8e175c139ede8b809eb1f42fa50",
+      "upstreamSha256": "33aa24731950d6c1e92070cdb88129b90bc8c8e175c139ede8b809eb1f42fa50"
+    },
+    {
+      "path": "sidebar.css",
+      "sha256": "eb815a49bc33a462a9e4453b4cdb55b58bb35ad8710d655ec630f4d9fa4220d9",
+      "upstreamSha256": "eb815a49bc33a462a9e4453b4cdb55b58bb35ad8710d655ec630f4d9fa4220d9"
+    },
+    {
+      "path": "typography.css",
+      "sha256": "b531eb581365dbb7af378284354f010cb632ffbb5e4b86f6e55fc4ea425632ee",
+      "upstreamSha256": "b531eb581365dbb7af378284354f010cb632ffbb5e4b86f6e55fc4ea425632ee"
+    },
+    {
+      "path": "workbench.css",
+      "sha256": "13344402db7b8bce68c74f85add975b2d4f8b1a66aedaefe0cab7f2533f8630b",
+      "upstreamSha256": "61307b849730051662ea3883b11c741c1f10f6b38d3eb537aa1fa9583f42e678"
+    },
+    {
+      "path": "zoned-glass.d.ts",
+      "sha256": "c7f7e89468f50ca38efb1f03fd56da4e2f81ce091f53f3e2a0b831bd7a5dbbaf",
+      "origin": "local-type-declaration"
+    },
+    {
+      "path": "zoned-glass.js",
+      "sha256": "f3da0d8ca73458ae055a7714d653ec4889205399af5264e18cee2d56ef1d57ce",
+      "upstreamSha256": "f3da0d8ca73458ae055a7714d653ec4889205399af5264e18cee2d56ef1d57ce"
+    }
+  ]
+}

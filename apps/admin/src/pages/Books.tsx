@@ -1,8 +1,20 @@
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Dialog,
+  Empty,
+  Field,
+  Icon,
+  Input,
+  PageHeader,
+  Select,
+  Textarea,
+} from "@between/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Book, BookEntry } from "../api";
 import { readerScrollBehavior, useReaderTransition } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
-import { Badge, Button, Dialog, Empty, Field, Icon, PageHeader, Select } from "../ui";
 import type { BookDraft, EntryDraft } from "./book-utils";
 import {
   bookSearchText,
@@ -313,12 +325,12 @@ export default function BooksPage() {
             </span>
           </div>
           <div className="book-library-search">
-            <label className="gw-admin-field-label" htmlFor="book-library-search">
+            <label className="bt-field-label" htmlFor="book-library-search">
               管理库全文搜索
             </label>
             <div className="search-box">
               <Icon name="search" size={16} />
-              <input
+              <Input
                 id="book-library-search"
                 type="search"
                 className="search-input"
@@ -444,7 +456,7 @@ export default function BooksPage() {
                     <summary>世界书原始元数据（只读）</summary>
                     <p className="muted">查看书级关键词、正文与来源。各条目的正文和配置在下方展开。</p>
                     <Field label="世界书原始元数据 JSON">
-                      <textarea
+                      <Textarea
                         className="text-area"
                         aria-label="世界书原始元数据 JSON"
                         rows={12}
@@ -498,7 +510,7 @@ export default function BooksPage() {
                               复制完整旧草稿
                             </Button>
                             <Field label={`旧草稿 ${index + 1} 完整 JSON`}>
-                              <textarea
+                              <Textarea
                                 className="text-area"
                                 aria-label={`旧草稿 ${index + 1} 完整 JSON`}
                                 rows={18}
@@ -511,7 +523,7 @@ export default function BooksPage() {
                       </section>
                     )}
                     <Field label="世界书名称">
-                      <input
+                      <Input
                         className="text-input"
                         aria-label="世界书名称"
                         value={draft.book.name}
@@ -562,7 +574,7 @@ export default function BooksPage() {
                                 </Button>
                               </div>
                               <Field label="条目标题">
-                                <input
+                                <Input
                                   className="text-input"
                                   aria-label="条目标题"
                                   disabled={saving}
@@ -574,7 +586,7 @@ export default function BooksPage() {
                                 label="条目全文"
                                 description={`${currentEntry.entry.content.length.toLocaleString()} / 24,000 字；内容只进入角色上下文。`}
                               >
-                                <textarea
+                                <Textarea
                                   className="text-area long-editor"
                                   aria-label="条目全文"
                                   rows={16}
@@ -590,29 +602,25 @@ export default function BooksPage() {
                                   这些关键词决定新会话中条目何时进入模型上下文，与上方管理库搜索相互独立。
                                 </p>
                                 <div className="field-grid">
-                                  <label className="checkbox-row">
-                                    <input
-                                      type="checkbox"
-                                      disabled={saving}
-                                      checked={!currentEntry.entry.disable}
-                                      onChange={(event) => updateEntry({ disable: !event.target.checked })}
-                                    />
-                                    启用条目
-                                  </label>
-                                  <label className="checkbox-row">
-                                    <input
-                                      type="checkbox"
-                                      disabled={saving}
-                                      checked={currentEntry.entry.constant}
-                                      onChange={(event) => updateEntry({ constant: event.target.checked })}
-                                    />
-                                    常驻条目（无需关键词匹配）
-                                  </label>
+                                  <Checkbox
+                                    label="启用条目"
+                                    className="checkbox-row"
+                                    disabled={saving}
+                                    checked={!currentEntry.entry.disable}
+                                    onChange={(checked) => updateEntry({ disable: !checked })}
+                                  />
+                                  <Checkbox
+                                    label="常驻条目（无需关键词匹配）"
+                                    className="checkbox-row"
+                                    disabled={saving}
+                                    checked={currentEntry.entry.constant}
+                                    onChange={(checked) => updateEntry({ constant: checked })}
+                                  />
                                   <Field
                                     label="主触发关键词"
                                     description="每行一个；普通条目至少命中一个主词才有机会触发。"
                                   >
-                                    <textarea
+                                    <Textarea
                                       className="text-area"
                                       aria-label="主触发关键词"
                                       rows={4}
@@ -625,7 +633,7 @@ export default function BooksPage() {
                                     label="二级触发关键词"
                                     description="每行一个；启用二级条件后按所选逻辑进一步筛选。"
                                   >
-                                    <textarea
+                                    <Textarea
                                       className="text-area"
                                       aria-label="二级触发关键词"
                                       rows={4}
@@ -636,15 +644,13 @@ export default function BooksPage() {
                                       }
                                     />
                                   </Field>
-                                  <label className="checkbox-row">
-                                    <input
-                                      type="checkbox"
-                                      disabled={saving}
-                                      checked={currentEntry.entry.selective}
-                                      onChange={(event) => updateEntry({ selective: event.target.checked })}
-                                    />
-                                    启用二级关键词条件
-                                  </label>
+                                  <Checkbox
+                                    label="启用二级关键词条件"
+                                    className="checkbox-row"
+                                    disabled={saving}
+                                    checked={currentEntry.entry.selective}
+                                    onChange={(checked) => updateEntry({ selective: checked })}
+                                  />
                                   <Field label="二级关键词逻辑">
                                     <Select
                                       label="二级关键词逻辑"
@@ -654,19 +660,15 @@ export default function BooksPage() {
                                       onChange={(value) => updateEntry({ selectiveLogic: Number(value) })}
                                     />
                                   </Field>
-                                  <label className="checkbox-row">
-                                    <input
-                                      type="checkbox"
-                                      disabled={saving}
-                                      checked={currentEntry.entry.useProbability}
-                                      onChange={(event) =>
-                                        updateEntry({ useProbability: event.target.checked })
-                                      }
-                                    />
-                                    启用概率筛选
-                                  </label>
+                                  <Checkbox
+                                    label="启用概率筛选"
+                                    className="checkbox-row"
+                                    disabled={saving}
+                                    checked={currentEntry.entry.useProbability}
+                                    onChange={(checked) => updateEntry({ useProbability: checked })}
+                                  />
                                   <Field label="触发概率（%）">
-                                    <input
+                                    <Input
                                       type="number"
                                       className="text-input"
                                       aria-label="触发概率（%）"
@@ -689,7 +691,7 @@ export default function BooksPage() {
                                     />
                                   </Field>
                                   <Field label="条目排序" description="用于条目优先级与注入排序。">
-                                    <input
+                                    <Input
                                       type="number"
                                       className="text-input"
                                       aria-label="条目排序"
@@ -728,7 +730,7 @@ export default function BooksPage() {
                                   暂不支持。
                                 </p>
                                 <Field label="扩展配置（完整 JSON 对象）">
-                                  <textarea
+                                  <Textarea
                                     className="text-area"
                                     aria-label="扩展配置（JSON 对象）"
                                     spellCheck={false}
@@ -760,7 +762,7 @@ export default function BooksPage() {
                           label="世界书全文"
                           description={`${draft.book.content.length.toLocaleString()} / 20,000 字；简单世界书按一条设定参与上下文。`}
                         >
-                          <textarea
+                          <Textarea
                             className="text-area long-editor"
                             aria-label="世界书全文"
                             rows={20}
@@ -774,7 +776,7 @@ export default function BooksPage() {
                           label="运行时触发关键词"
                           description="每行一个。与管理库搜索独立；简单世界书的触发规则由服务默认条目提供。"
                         >
-                          <textarea
+                          <Textarea
                             className="text-area"
                             aria-label="运行时触发关键词"
                             rows={4}
@@ -814,7 +816,7 @@ export default function BooksPage() {
                     <div className="document-toolbar">
                       <div className="search-box">
                         <Icon name="search" size={16} />
-                        <input
+                        <Input
                           className="search-input"
                           type="search"
                           aria-label="在此书全文中查找"
@@ -911,7 +913,7 @@ export default function BooksPage() {
                               <details className="book-meta-item">
                                 <summary>全部触发配置与原始字段（只读）</summary>
                                 <Field label={`条目 ${index + 1} 完整配置 JSON`}>
-                                  <textarea
+                                  <Textarea
                                     className="text-area"
                                     aria-label={`条目 ${index + 1} 完整配置 JSON`}
                                     rows={12}
@@ -982,9 +984,8 @@ export default function BooksPage() {
         <div className="page-stack">
           <p className="muted">先建立草稿，填写正文后保存入库。之后可在角色页绑定，供新会话使用。</p>
           <Field label="世界书名称">
-            <input
+            <Input
               className="text-input"
-              aria-label="新世界书名称"
               autoFocus
               value={createName}
               onChange={(event) => setCreateName(event.target.value)}
@@ -1154,7 +1155,7 @@ export default function BooksPage() {
           </p>
           <div className="field-grid">
             <Field label="开始编辑时的完整版本">
-              <textarea
+              <Textarea
                 className="text-area"
                 aria-label="开始编辑时的完整版本"
                 readOnly
@@ -1163,7 +1164,7 @@ export default function BooksPage() {
               />
             </Field>
             <Field label="服务端当前完整版本">
-              <textarea
+              <Textarea
                 className="text-area"
                 aria-label="服务端当前完整版本"
                 readOnly
@@ -1172,7 +1173,7 @@ export default function BooksPage() {
               />
             </Field>
             <Field label="本页完整草稿">
-              <textarea
+              <Textarea
                 className="text-area"
                 aria-label="本页完整草稿"
                 readOnly

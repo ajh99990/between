@@ -1,6 +1,6 @@
 # Between 管理员玻璃工作台设计规范
 
-本文件约束当前完全重写的 `apps/admin`，技术栈为 React、TypeScript、Tailwind CSS 与 Vite。界面实际复用自包含的 `glass-workbench-ui` 通用资源，由 React 适配层接入业务；不依赖其他产品源码，不恢复旧后台模板或兼容入口。设计依据见 [管理员内容编辑调研](../../docs/管理员内容编辑调研.md)，本次操作证据、截图和已知限制统一记录在 [后台玻璃工作台重写与验收](../../docs/后台玻璃工作台重写与验收.md)。规范本身不等于验收已通过。
+本文件约束当前 `apps/admin` 及其共享 `@between/ui`，技术栈为 React、TypeScript、Tailwind CSS 与 Vite。`packages/ui` 是通用组件、字体、材质、程序背景、图标和浮层动画的唯一来源：Base UI 提供交互基础，共享 React 组件提供当前视觉。底层通用资源自包含，不依赖其他业务仓库，也不恢复旧后台模板、原生控件控制器或兼容入口。设计依据见 [管理员内容编辑调研](../../docs/管理员内容编辑调研.md)，现行使用与验收入口见 [UI 包说明](../../packages/ui/README.md)。[早期后台验收](../../docs/后台玻璃工作台重写与验收.md) 只对应原版本，不能证明当前迁移已通过；规范本身不等于验收通过。
 
 ## 任务与内容结构
 
@@ -14,13 +14,13 @@
 
 使用随包 Geist / Geist Mono 公共字体及平台中文回退，不加载远程字体。中文实际字体由平台提供，不能把 CSS 字体列表当作字体已生效的证据。字段标签和常规输入采用 **14px / 22px、400 字重**；阅读正文采用 **15px / 1.85、400 字重**。标题、正文、辅助说明、时间/元数据和禁用文字分别使用通用文字 Token，不将整个前景容器降透明来制造层级。
 
-应用布局与业务密度由 `apps/admin/src/styles.css` 管理：桌面侧栏配工作区，角色/书库目录与阅读主体并列；窄屏使用可关闭导航、横向内容选择与单列阅读。断点应按真实文本与控件容纳情况检验，不能仅凭媒体查询存在就宣称响应式完成。正文限制舒适行宽但不截断，长 URL、ID 和 JSON 可折行或在自身容器滚动。
+字体、Token、通用控件和材质样式由 `packages/ui/src/styles`、`components` 与 `materials` 管理。应用布局与业务密度由 `apps/admin/src/styles.css` 装配：桌面侧栏配工作区，角色/书库目录与阅读主体并列；窄屏使用可关闭导航、横向内容选择与单列阅读。断点应按真实文本与控件容纳情况检验，不能仅凭媒体查询存在就宣称响应式完成。正文限制舒适行宽但不截断，长 URL、ID 和 JSON 可折行或在自身容器滚动。
 
 主要操作、次要操作、危险操作和禁用状态保持一致。导航悬停具有半透明高亮背景，当前项有明确文字和背景反馈；按钮高光、焦点边缘与玻璃边缘必须可见，但不能照亮整块长文。原生系统下拉菜单不能冒充已设计的深色展开菜单。
 
 ## 图标与身份标记
 
-只使用本地锁定的 Lucide React，`src/icons.tsx` 统一语义映射及静态导入，禁止重新手写不规则齿轮、混用多库或运行时加载整库。使用 24×24 viewBox、1.75 线宽、圆端点；默认 18px，辅助图标 14–17px，空状态 26px。角色档案与用户管理分别使用 ContactRound / UsersRound；外观入口用 Palette，反馈错误用 CircleAlert。空状态由 `Empty.icon` 明确指定业务语义，搜索无结果默认 Search；禁止把所有角色、用户、会话空状态都套用素材图片图标。图标继承文字色，SVG 不承担按钮的可访问名称，不使用全局滤镜或外发光。
+只使用本地锁定的 Lucide React，`packages/ui/src/icons.tsx` 统一语义映射及静态导入，禁止重新手写不规则齿轮、混用多库或运行时加载整库。使用 24×24 viewBox、1.75 线宽、圆端点；默认 18px，辅助图标 14–17px，空状态 26px。角色档案与用户管理分别使用 ContactRound / UsersRound；外观入口用 Palette，反馈错误用 CircleAlert。空状态由 `Empty.icon` 明确指定业务语义，搜索无结果默认 Search；禁止把所有角色、用户、会话空状态都套用素材图片图标。图标继承文字色，SVG 不承担按钮的可访问名称，不使用全局滤镜或外发光。
 
 品牌字母是应用身份标记，管理员锁代表当前鉴权身份，二者不伪装成可点击动作。小型标记保留定向内顶高光和弱蓝灰轮廓，避免整圈同亮描边、深色粗外环或向外泛白；文字与 SVG 不模糊。导航及操作图标不得逐个套玻璃球底座。视觉验收必须同时看亮/暗背景下的常态、悬停与键盘焦点，不能仅检查 SVG 已渲染。具体选型、反例和验证见 [图标库选型与视觉修正](../../docs/图标库选型与视觉修正.md)。
 
@@ -36,18 +36,21 @@
 
 | 路径 | 规范落实位置 |
 | --- | --- |
-| `apps/admin/src/ui.tsx` | Button、Field、Select、Glass、Dialog 等 React 受控适配与标签/焦点/销毁管理 |
-| `apps/admin/src/skill.ts` | 本地通用 ES module 加载及缓存，不访问外部项目 |
-| `apps/admin/src/styles.css` | 应用网格、字号、正文阅读、状态和响应式布局 |
-| `apps/admin/public/design/components/ui.js` | 通用玻璃表面及展示组件 |
-| `apps/admin/public/design/components/select.js`、`apps/admin/public/design/components/select.css` | 深色展开菜单、键盘与视口定位 |
-| `apps/admin/public/design/admin/ui.js`、`apps/admin/public/design/admin/admin.css` | 弹窗与后台组件、焦点及确认交互 |
-| `apps/admin/public/design/material-presets.js` | 独立弹窗推荐参数 |
-| `apps/admin/public/design/background/background.js` | 抽象背景控制器与预设入口 |
-| `apps/admin/public/design/qa/probe.js` | 白名单样式及状态的只读验证探针 |
-| `apps/admin/design-assets.json`、`apps/admin/scripts/verify-assets.mjs` | 随包资源 SHA-256 核验；业务控制器与资源生命周期分离 |
+| `packages/ui/src/components/controls.tsx`、`data-table.tsx` | 通用操作、输入、反馈、Tabs/Accordion、受控数据表与分页 |
+| `packages/ui/src/components/selection.tsx`、`overlays.tsx` | Base UI Select/Combobox、Dialog/Drawer、Menu/Popover/Tooltip 与统一视觉接口 |
+| `packages/ui/src/motion/overlay-motion.ts`、`src/provider.tsx` | 浮层绘制生命周期、权限交互停用、共享 Portal 与减少动态偏好 |
+| `packages/ui/src/styles`、`src/components/*.css` | 字体层级、Token、通用几何和交互状态样式 |
+| `packages/ui/src/materials/{glass,background}.tsx` | 受控玻璃与抽象背景 React 生命周期 |
+| `packages/ui/src/materials/runtime` | 唯一自包含字体、光学配方、折射和八种程序背景资源 |
+| `packages/ui/design-assets.json`、`packages/ui/scripts/verify-assets.mjs` | 实际字节、来源 SHA-256、完整清单与本地依赖闭包核验 |
+| `packages/ui/playground`、`tests` | 独立开发场景、构造状态及自动化；不进入后台生产入口 |
+| `apps/admin/src/styles.css`、`motion.tsx`、`reader-motion.tsx` | 业务布局、路由和文档切换，不重复共享控件或浮层控制器 |
+| `apps/admin/src/pages`、`state.tsx`、`api.ts` | 业务数据、鉴权、草稿、保存与冲突处理 |
+| `apps/admin/design-assets.json`、`apps/admin/scripts/verify-assets.mjs` | 指向共享清单并拒绝后台重复设计目录 |
 
-资源说明和第三方许可保留在 [素材与实现说明](../../apps/admin/public/design/ASSET-SOURCES.md)。资源属于自包含的脱敏实现，不能引导使用者去读取其他内部项目。组件加载失败必须提供明确错误及可关闭/可恢复界面，不能让待确认操作失去入口。
+资源说明及公共字体许可保留在 [共享素材说明](../../packages/ui/src/materials/runtime/ASSET-SOURCES.md)。改变运行资源时核对实际字节、来源 hash 和许可，再同步清单；不要直接重新生成 hash 掩盖来源不明的改动。Base UI 与共享包装只管理交互和视觉，不在组件内部请求业务服务、读取运行凭据、存储业务草稿或伪造保存成功。React 为共享 peer dependency，禁止在子包引入第二份运行时。
+
+`npm run dev:ui` 调试正式源码的 playground，`npm run build:ui-playground` 独立构建，`npm run test:ui:browser` 构建并执行 UI 浏览器回归。工作台可保留明确的测试数据、模拟延迟与故障开关，但不得随后台发布；真实页面验收不能被工作台通过替代。旧 `apps/admin/src/ui.tsx`、`src/skill.ts`、`public/design` 与 `?qa=1` 探针不再作为当前组件或验证入口。
 
 ## 保存、权限与异常恢复
 
@@ -55,7 +58,7 @@
 
 配置编辑基于打开时版本。409 保留草稿与对照信息，不静默覆盖；同一本世界书被他人修改时不能自动合并未知字段。扩展 JSON 是完整的附加字段对象，删除键意味着明确删除，不能递归合并回旧值。保存成功后刷新失败应说明已提交，避免重复写入；忙碌状态防重复操作，失败不清空用户输入。
 
-关闭、切换、离开、刷新及登录失效都需保护未保存内容。删除、禁用、暂停和断开连接在确认中解释真实作用范围。鉴权由服务端 Cookie、Origin 和 CSRF 落实；管理员私有角色正文、世界书、内部提示与诊断不进入普通用户状态、聊天消息、SSE 或 TTS。敏感密钥不可读取和回显，QA 探针不导出业务正文或表单值。
+关闭、切换、离开、刷新及登录失效都需保护未保存内容。删除、禁用、暂停和断开连接在确认中解释真实作用范围。鉴权由服务端 Cookie、Origin 和 CSRF 落实；管理员私有角色正文、世界书、内部提示与诊断不进入普通用户状态、聊天消息、SSE 或 TTS。敏感密钥不可读取和回显，开发验证工具不得导出业务正文或表单值。
 
 ## 端到端图验
 
@@ -63,4 +66,4 @@
 
 先做真实浏览器操作，再截取目标页面并亲自查看像素：检查文字实际强弱、中文字体、玻璃中心与折射边缘、悬停/当前项高亮、展开菜单和长文可读性。发现问题要修改、重新截图、重新观察，并按 `ui-ux-self-check` 七项清单记录证据。静态检查、构建、DOM 断言和截图文件生成不能单独作为视觉验收通过依据。
 
-证据需区分真实接口、隔离响应模拟、合成模型与未覆盖能力，保存代码版本、视口、执行命令和实际修正。自动化截图位于忽略目录 `artifacts/browser/admin`；人工视觉证据同样不提交用户数据。当前结果以 [本次验收报告](../../docs/后台玻璃工作台重写与验收.md) 为准，不把历史旧界面验收套到新实现。
+证据需区分真实接口、隔离响应模拟、合成模型与未覆盖能力，保存代码版本、视口、执行命令和实际修正。UI 自动化证据位于忽略目录 `artifacts/browser/ui`，业务回归位于 `artifacts/browser/admin`；人工视觉证据同样不提交用户数据。每次组件迁移均须重新验收当前构建，不把旧界面报告的截图、数字或“通过”结论套到新实现。结束后恢复测试设置，并从普通业务入口复验，精确回收本次自有临时数据、模拟接线与故障覆盖，保留用户记录、草稿和回归 fixture。

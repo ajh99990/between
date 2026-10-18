@@ -1,12 +1,25 @@
+import {
+  AmbientBackground,
+  Button,
+  Dialog,
+  Toast as FeedbackToast,
+  Field,
+  Glass,
+  Icon,
+  IconButton,
+  Input,
+  Select,
+  Spinner,
+  Switch,
+  UiInteractionProvider,
+} from "@between/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type AdminState, ApiError, type Config, getState, login, logout, saveConfig } from "./api";
-import { FeedbackToast, RouteContent } from "./motion";
+import { RouteContent } from "./motion";
 import BooksPage from "./pages/Books";
 import { DiagnosticsPage, ModelsPage, ResourcesPage, SessionsPage, UsersPage } from "./pages/Operations";
 import RolesPage from "./pages/Roles";
-import { type BackgroundController, designModule } from "./skill";
 import { AdminProvider } from "./state";
-import { Button, Dialog, Field, Glass, Icon, Select, UiInteractionProvider } from "./ui";
 
 const navigation = [
   { route: "/roles", label: "角色卡", icon: "roles", group: "内容管理" },
@@ -74,7 +87,7 @@ function Login({
           }}
         >
           <Field label="管理员口令">
-            <input
+            <Input
               className="text-input"
               type="password"
               autoComplete="current-password"
@@ -118,10 +131,7 @@ export default function App() {
     [motion, setMotion] = useState(false);
   const [toast, setToast] = useState<{ message: string; tone: string } | null>(null),
     [refreshing, setRefreshing] = useState(false);
-  const backgroundElement = useRef<HTMLDivElement>(null),
-    background = useRef<BackgroundController | null>(null),
-    root = useRef<HTMLDivElement>(null),
-    stateRef = useRef(state),
+  const stateRef = useRef(state),
     dirtyRef = useRef(dirty),
     routeRef = useRef(route),
     saving = useRef(false);
@@ -203,45 +213,6 @@ export default function App() {
     // Keep the isolated preview identifiable without repeating a QA badge in every workspace.
     document.title = state?.model.mode === "demo" ? "Between · 管理后台（示例）" : "Between · 管理后台";
   }, [state?.model.mode]);
-  useEffect(() => {
-    let disposed = false;
-    void designModule("background/background.js")
-      .then(async (module) => {
-        if (disposed || !backgroundElement.current) return;
-        background.current = module.createAmbientBackground({
-          element: backgroundElement.current,
-          preset: "terrace",
-          motion: false,
-          intensity: 1,
-        });
-        if (new URL(location.href).searchParams.has("qa")) {
-          const probeModule = await designModule("qa/probe.js");
-          if (!disposed && root.current) {
-            (window as unknown as Record<string, unknown>).uiEvidence = probeModule.createVisualProbe({
-              root: root.current,
-              background: background.current,
-              backgroundHost: "#admin-background",
-              roles: [
-                {
-                  name: "field-label",
-                  selector: ".gw-admin-field-label",
-                  expected: { fontSize: 14, lineHeight: 22 },
-                },
-              ],
-              foregroundSelectors: ["#admin-foreground"],
-            });
-          }
-        }
-      })
-      .catch(() => notify("背景资源未完成加载，当前使用静态底色。", "error"));
-    return () => {
-      disposed = true;
-      background.current?.destroy();
-      background.current = null;
-      delete (window as unknown as Record<string, unknown>).uiEvidence;
-    };
-  }, [notify]);
-  useEffect(() => background.current?.update({ preset, motion }), [preset, motion]);
   const navigate = useCallback((next: string) => {
     const action = () => {
       setDirtyValue(false);
@@ -303,8 +274,8 @@ export default function App() {
                   ? DiagnosticsPage
                   : null;
   return (
-    <div className="glass-workbench app-shell" data-glass-style="zoned" ref={root}>
-      <div className="gw-atmosphere" id="admin-background" ref={backgroundElement} aria-hidden="true" />
+    <div className="glass-workbench app-shell" data-glass-style="zoned">
+      <AmbientBackground preset={preset} motion={motion} intensity={1} />
       {state && (
         <UiInteractionProvider enabled={!expired}>
           <AdminProvider value={{ state, refresh, save, notify, navigate, setDirty }}>
@@ -330,13 +301,14 @@ export default function App() {
                     <small>管理员工作台</small>
                   </span>
                 </button>
-                <button
+                <IconButton
+                  variant="ghost"
                   className="sidebar-close icon-button"
-                  aria-label="关闭导航"
+                  label="关闭导航"
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon name="close" />
-                </button>
+                </IconButton>
                 <nav aria-label="后台主导航">
                   {["内容管理", "运行管理"].map((group) => (
                     <div className="nav-group" key={group}>
@@ -364,9 +336,10 @@ export default function App() {
                     <Icon name="lock" size={16} />
                   </span>
                   <strong>管理员</strong>
-                  <button
+                  <IconButton
+                    variant="ghost"
                     className="icon-button"
-                    aria-label="退出管理员登录"
+                    label="退出管理员登录"
                     onClick={() => {
                       const action = async () => {
                         try {
@@ -383,30 +356,31 @@ export default function App() {
                     }}
                   >
                     <Icon name="logout" size={17} />
-                  </button>
+                  </IconButton>
                 </footer>
               </Glass>
               <div className="main-workspace">
                 <header className="topbar">
                   <div className="breadcrumb">
-                    <button
+                    <IconButton
+                      variant="ghost"
                       className="icon-button mobile-menu"
-                      aria-label={sidebarOpen ? "关闭导航" : "打开导航"}
+                      label={sidebarOpen ? "关闭导航" : "打开导航"}
                       aria-expanded={sidebarOpen}
                       onClick={() => setSidebarOpen(!sidebarOpen)}
                     >
                       <Icon name="menu" />
-                    </button>
+                    </IconButton>
                     <span>管理工作台</span>
                     <span aria-hidden="true">/</span>
                     <strong>{current?.label || "页面不存在"}</strong>
                   </div>
                   <div className="topbar-actions">
-                    <button
+                    <IconButton
+                      variant="ghost"
                       className="icon-button topbar-refresh"
-                      aria-label="刷新后台数据"
-                      aria-busy={refreshing}
-                      disabled={refreshing}
+                      label="刷新后台数据"
+                      loading={refreshing}
                       onClick={() =>
                         void refresh()
                           .then(() => notify("后台数据已刷新。"))
@@ -414,14 +388,15 @@ export default function App() {
                       }
                     >
                       <Icon name="refresh" />
-                    </button>
-                    <button
+                    </IconButton>
+                    <IconButton
+                      variant="ghost"
                       className="icon-button"
-                      aria-label="工作台外观"
+                      label="工作台外观"
                       onClick={() => setAppearance(true)}
                     >
                       <Icon name="appearance" />
-                    </button>
+                    </IconButton>
                   </div>
                 </header>
                 <RouteContent key={current?.route + route.split("/").slice(2).join("/")}>
@@ -474,14 +449,7 @@ export default function App() {
                 <Field label="背景">
                   <Select label="背景" value={preset} options={backgrounds} onChange={setPreset} />
                 </Field>
-                <label className="checkbox-row">
-                  <input
-                    type="checkbox"
-                    checked={motion}
-                    onChange={(event) => setMotion(event.target.checked)}
-                  />
-                  <span>动态背景</span>
-                </label>
+                <Switch label="动态背景" checked={motion} onChange={setMotion} />
                 <p className="field-description">刷新页面后恢复默认。动态效果遵循系统的减少动态设置。</p>
               </div>
             </Dialog>
@@ -490,7 +458,7 @@ export default function App() {
       )}
       {initializing ? (
         <div className="login-stage" role="status">
-          <span className="spinner" />
+          <Spinner />
           正在验证管理员会话…
         </div>
       ) : (

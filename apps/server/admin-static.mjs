@@ -19,7 +19,7 @@ export async function serveAdmin(req,res,pathname){
   let bytes;try{bytes=await fs.readFile(filename);}catch(e){if(e.code!=='ENOENT'&&e.code!=='EISDIR')throw e;throw Object.assign(new Error(index?'管理员前端尚未构建，请按管理端 README 安装并构建':'页面不存在'),{status:index?503:404});}
   if(index){
     const nonce=crypto.randomBytes(18).toString('base64');
-    // Ant Design uses nonce-protected style elements and React layout style attributes.
+    // Base UI uses nonce-protected style elements and React layout style attributes.
     // This policy applies only to /admin; the chat frontend keeps its original CSP.
     res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'nonce-${nonce}'; style-src-attr 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; media-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`);
     res.setHeader('Content-Type','text/html; charset=utf-8');

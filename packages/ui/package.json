@@ -1,0 +1,47 @@
+{
+  "name": "@between/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "共享深色玻璃 React 组件与隔离工作台",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles/index.css"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 0",
+    "build:playground": "node scripts/verify-assets.mjs && vite build",
+    "typecheck": "node scripts/verify-assets.mjs && tsc --noEmit",
+    "lint": "biome check src playground vite.config.ts",
+    "test": "vitest run",
+    "verify-assets": "node scripts/verify-assets.mjs",
+    "setup": "npm run verify-assets",
+    "test:browser": "node tests/browser.mjs",
+    "preview:playground": "vite preview --host 127.0.0.1 --port 0"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "lucide-react": "1.58.0",
+    "motion": "14.3.0"
+  },
+  "peerDependencies": {
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.3",
+    "@playwright/test": "1.61.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

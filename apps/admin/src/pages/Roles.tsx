@@ -1,8 +1,19 @@
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Dialog,
+  Empty,
+  Field,
+  Icon,
+  Input,
+  PageHeader,
+  Textarea,
+} from "@between/ui";
 import { type ReactNode, useMemo, useState } from "react";
 import type { Config, Role } from "../api";
 import { readerScrollBehavior, useReaderTransition } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
-import { Badge, Button, Dialog, Empty, Field, Icon, PageHeader } from "../ui";
 
 export const roleSections = [
   {
@@ -194,7 +205,7 @@ export default function RolesPage() {
           </div>
           <div className="search-box">
             <Icon name="search" />
-            <input
+            <Input
               className="search-input"
               aria-label="搜索角色全文"
               placeholder="搜索名称、设定、对话…"
@@ -286,7 +297,7 @@ export default function RolesPage() {
                             label="角色名称"
                             error={error && !editor.role.name.trim() ? "请输入角色名称" : undefined}
                           >
-                            <input
+                            <Input
                               className="text-input"
                               required
                               maxLength={10000}
@@ -295,7 +306,7 @@ export default function RolesPage() {
                             />
                           </Field>
                           <Field label="标签">
-                            <input
+                            <Input
                               className="text-input"
                               maxLength={10000}
                               value={editor.role.tag}
@@ -303,7 +314,7 @@ export default function RolesPage() {
                             />
                           </Field>
                           <Field label="角色标记" description="最多16个字符；不会加载外部图片。">
-                            <input
+                            <Input
                               className="text-input"
                               maxLength={16}
                               value={editor.role.icon || ""}
@@ -311,7 +322,7 @@ export default function RolesPage() {
                             />
                           </Field>
                           <Field label="原始关键词" description="逗号分隔。实际世界书注入由下方绑定决定。">
-                            <input
+                            <Input
                               className="text-input"
                               value={editor.role.keys.join(", ")}
                               onChange={(e) =>
@@ -330,21 +341,24 @@ export default function RolesPage() {
                           <p className="muted">勾选供此角色使用的世界书。</p>
                           <div className="binding-list">
                             {state.config.books.map((book) => (
-                              <label key={book.id} className="checkbox-row">
-                                <input
-                                  type="checkbox"
-                                  checked={editor.role.bookIds.includes(book.id)}
-                                  onChange={(e) =>
-                                    update({
-                                      bookIds: e.target.checked
-                                        ? [...editor.role.bookIds, book.id]
-                                        : editor.role.bookIds.filter((id) => id !== book.id),
-                                    })
-                                  }
-                                />
-                                <span>{book.name}</span>
-                                <span className="meta">{book.entries?.length ?? 1} 条目</span>
-                              </label>
+                              <Checkbox
+                                key={book.id}
+                                className="checkbox-row"
+                                label={
+                                  <>
+                                    {book.name}
+                                    <span className="meta">{book.entries?.length ?? 1} 条目</span>
+                                  </>
+                                }
+                                checked={editor.role.bookIds.includes(book.id)}
+                                onChange={(checked) =>
+                                  update({
+                                    bookIds: checked
+                                      ? [...editor.role.bookIds, book.id]
+                                      : editor.role.bookIds.filter((id) => id !== book.id),
+                                  })
+                                }
+                              />
                             ))}
                             {!state.config.books.length && (
                               <p className="muted">当前没有世界书。可先保存角色，再在世界书页面创建。</p>
@@ -370,7 +384,7 @@ export default function RolesPage() {
                             </span>
                           </div>
                           <p className="field-description">{activeSection.hint}</p>
-                          <textarea
+                          <Textarea
                             className={`text-area long-editor ${activeSection.key === "examples" ? "dialogue-editor" : ""}`}
                             aria-label={activeSection.label}
                             maxLength={24000}
@@ -429,7 +443,7 @@ export default function RolesPage() {
                 <div className="document-toolbar">
                   <div className="search-box">
                     <Icon name="search" />
-                    <input
+                    <Input
                       className="search-input"
                       aria-label="在角色卡中查找"
                       placeholder="在全文中定位…"

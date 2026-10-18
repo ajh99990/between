@@ -1,0 +1,51 @@
+.bt-ui-dialog-portal { position: fixed; inset: 0; z-index: 1000; pointer-events: none; background: transparent; }
+.bt-ui-dialog-scrim { position: absolute; inset: 0; background: rgb(4 7 11 / var(--bt-dialog-scrim)); pointer-events: auto; }
+.bt-ui-dialog-viewport { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 24px; overflow: hidden; pointer-events: none; overscroll-behavior: contain; }
+.bt-ui-dialog-viewport--drawer { align-items: stretch; justify-content: flex-end; padding: 0; }
+.glass-workbench .bt-ui-modal { position: relative; display: flex; flex-direction: column; width: 560px; max-width: 100%; max-height: min(760px, 100%); min-width: 0; border: 1px solid rgb(196 217 235 / 20%); border-radius: 12px; background: transparent; color: var(--gw-text); box-shadow: 0 24px 80px rgb(4 7 11 / 36%); pointer-events: auto; outline-offset: -3px; }
+.glass-workbench .bt-ui-modal[data-size="sm"] { width: 400px; }
+.glass-workbench .bt-ui-modal[data-size="lg"] { width: 760px; }
+.glass-workbench .bt-ui-modal[data-kind="drawer"] { width: 480px; height: 100%; max-height: 100%; border-block: 0; border-right: 0; border-radius: 12px 0 0 12px; }
+.glass-workbench .bt-ui-modal[data-kind="drawer"][data-size="sm"] { width: 360px; }
+.glass-workbench .bt-ui-modal[data-kind="drawer"][data-size="lg"] { width: 680px; }
+.bt-ui-modal-header, .bt-ui-modal-body, .bt-ui-modal-footer { position: relative; z-index: 0; background: rgb(21 24 29 / var(--bt-dialog-content-wash)); }
+.bt-ui-modal-header { display: flex; align-items: flex-start; gap: 16px; flex: 0 0 auto; padding: 18px 20px 16px; border-bottom: 1px solid rgb(170 178 188 / 13%); border-radius: inherit; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.bt-ui-modal-heading { min-width: 0; flex: 1; }
+.bt-ui-modal-title { margin: 0; color: var(--gw-text); font: 600 16px/24px var(--gw-font); overflow-wrap: anywhere; }
+.bt-ui-modal-description { margin: 5px 0 0; color: var(--gw-text-tertiary); font: 12px/20px var(--gw-font); white-space: pre-wrap; overflow-wrap: anywhere; }
+.bt-ui-modal-close { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 30px; height: 30px; margin: -4px -6px -4px 0; padding: 0; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--gw-text-secondary); cursor: pointer; transition: color 120ms, background-color 120ms; }
+.bt-ui-modal-close:hover { background: rgb(255 255 255 / 6%); color: var(--gw-text); }
+.bt-ui-modal-close:disabled { opacity: .4; cursor: not-allowed; }
+.bt-ui-modal-close:focus-visible { outline: 2px solid #a4bfd4; outline-offset: 2px; }
+.bt-ui-modal-body { flex: 1 1 auto; min-height: 0; min-width: 0; padding: 20px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.bt-ui-modal-body:last-child { border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
+.bt-ui-modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 0 0 auto; min-width: 0; max-height: min(35dvh, 240px); padding: 12px 20px; overflow: auto; border-top: 1px solid rgb(170 178 188 / 13%); border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
+.bt-ui-modal[data-kind="drawer"] .bt-ui-modal-header { padding-top: 22px; }
+.bt-ui-modal[data-kind="drawer"] .bt-ui-modal-footer { padding-block: 16px; }
+.bt-ui-confirm-description { margin: 0; font: 14px/1.85 var(--gw-font); color: var(--gw-text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; }
+.bt-ui-dialog-viewport[inert] .bt-ui-modal { pointer-events: none; }
+.bt-ui-popup-positioner { z-index: 1100; max-width: var(--available-width); outline: none; }
+.bt-ui-tooltip-positioner { z-index: 1200; }
+.bt-ui-popup { box-sizing: border-box; min-width: 160px; max-width: min(360px, var(--available-width)); max-height: var(--available-height); overflow: auto; border: 1px solid rgb(196 217 235 / 20%); border-radius: 10px; background: linear-gradient(125deg, rgb(219 234 247 / 3%), transparent 65%), rgb(28 34 42 / 90%); color: var(--gw-text); box-shadow: 0 12px 34px rgb(0 0 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 5%); backdrop-filter: blur(12px) saturate(1.12); -webkit-backdrop-filter: blur(12px) saturate(1.12); font: 13px/1.5 var(--gw-font); outline: none; opacity: 1; transition: opacity 170ms cubic-bezier(.23,1,.32,1); }
+.bt-ui-popup[data-starting-style], .bt-ui-popup[data-ending-style] { opacity: 0; }
+.bt-ui-popup[data-ending-style] { transition-duration: 120ms; pointer-events: none; }
+.bt-ui-popup[data-reduced-motion] { transition-duration: 60ms; }
+.bt-ui-menu { padding: 5px; }
+.bt-ui-menu-item { display: flex; align-items: center; gap: 9px; min-height: 32px; padding: 6px 10px; border-radius: 6px; color: var(--gw-text-secondary); cursor: pointer; outline: none; overflow-wrap: anywhere; transition: color 120ms, background-color 120ms; }
+.bt-ui-menu-item[data-highlighted] { background: rgb(255 255 255 / 8%); color: var(--gw-text); }
+.bt-ui-menu-item[data-danger] { color: #d98c8d; }
+.bt-ui-menu-item[data-danger][data-highlighted] { background: rgb(202 93 97 / 12%); }
+.bt-ui-menu-item[data-disabled] { opacity: .4; cursor: not-allowed; }
+.bt-ui-menu-icon { display: flex; align-items: center; width: 16px; }
+.bt-ui-popover { min-width: 240px; padding: 16px; }
+.bt-ui-tooltip { width: max-content; min-width: 0; max-width: min(300px, var(--available-width)); padding: 6px 10px; border-radius: 7px; font-size: 12px; line-height: 1.6; }
+html[data-input-modality="keyboard"] .bt-ui-popup { transition-duration: 0ms; }
+@media (max-width: 600px) {
+  .bt-ui-dialog-viewport { padding: 12px; }
+  .bt-ui-dialog-viewport--drawer { padding: 0; }
+  .glass-workbench .bt-ui-modal[data-kind="drawer"] { width: min(480px, calc(100% - 12px)); }
+  .bt-ui-modal-header, .bt-ui-modal-body { padding: 16px; }
+  .bt-ui-modal-footer { flex-wrap: wrap; padding: 12px 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .bt-ui-popup { transition-duration: 60ms; } }
+@media (prefers-reduced-transparency: reduce) { .bt-ui-popup { background: var(--gw-surface-muted, #20262e); backdrop-filter: none; -webkit-backdrop-filter: none; } }

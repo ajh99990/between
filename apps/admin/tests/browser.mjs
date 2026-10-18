@@ -36,13 +36,13 @@ const planProvider = fictionalPlanProvider();
 const checks = [], errors = [], csp = [], blockedRequests = [], screenshots = [], responseInjections = [], observations = [], requestCounts = {};
 const startedAt = new Date().toISOString();
 const selectedScenario = process.env.BETWEEN_ADMIN_BROWSER_ONLY || '';
-assert(['', 'portal-expiry', 'dialog-load-failure', 'state-recovery'].includes(selectedScenario), 'Unknown browser scenario selection');
+assert(['', 'portal-expiry', 'dialog-dismissal', 'state-recovery'].includes(selectedScenario), 'Unknown browser scenario selection');
 let app, browser, page, upstream, context, userContext, otherContext;
 let stage = 'bootstrap', upstreamCalls = 0, controlledTurn = false;
 const intervals = new Set();
 const pass = name => { checks.push(name); console.log('PASS', name); };
 const step = async (name, operation) => {
-  const chosen = { 'portal-expiry': 'expired-login-suspends-private-portals-and-restores-book-draft', 'dialog-load-failure': 'dialog-resource-failure-is-cancellable-without-business-write', 'state-recovery': 'initial-loading-first-failure-and-refresh-error-retain-state' };
+  const chosen = { 'portal-expiry': 'expired-login-suspends-private-portals-and-restores-book-draft', 'dialog-dismissal': 'confirmation-dismissal-preserves-draft-without-business-write', 'state-recovery': 'initial-loading-first-failure-and-refresh-error-retain-state' };
   const allowed = selectedScenario === 'state-recovery' ? [chosen[selectedScenario]] : ['login-real-failure-and-recovery', chosen[selectedScenario]];
   if (selectedScenario && !allowed.includes(name)) return;
   stage = name; await operation(); pass(name);
@@ -286,7 +286,7 @@ try {
     await expect(visibleDialog()).toHaveCount(0);
     await expect(create).toBeFocused();
     await create.click();
-    await page.getByLabel('新世界书名称').fill('待绑定后删除的虚构书');
+    await page.getByRole('dialog', { name: '新建世界书', exact: true }).getByLabel('世界书名称', { exact: true }).fill('待绑定后删除的虚构书');
     await choose('内容结构', '简单世界书 · 一份全文与关键词');
     await page.getByRole('button', { name: '创建草稿', exact: true }).click();
     await page.getByLabel('世界书全文', { exact: true }).fill('这份虚构全文用于绑定与删除验收。');
@@ -489,6 +489,9 @@ try {
 
   await step('expired-login-suspends-private-portals-and-restores-book-draft', async () => {
     await nav('/books', '世界书');
+    // Capture before the modal correctly removes the background from the accessibility tree.
+    const refreshControl = await page.getByRole('button', { name: '刷新后台数据', exact: true }).elementHandle();
+    assert(refreshControl);
     await page.getByRole('button', { name: '编辑世界书', exact: true }).click();
     const privateDraft = '仅管理员可见的虚构世界书草稿：过期期间不得留在弹窗。';
     const privateServer = '仅管理员可见的虚构服务端版本：不可出现在登录屏幕。';
@@ -519,7 +522,7 @@ try {
       // Invoke the application's real refresh handler while its modal is open.
       // This models an asynchronous auth response, not a physical click through
       // the modal scrim. The one 401 response is explicitly synthetic evidence.
-      await page.getByRole('button', { name: '刷新后台数据', exact: true }).evaluate(button => button.click());
+      await refreshControl.evaluate(button => button.click());
       await expect(page.getByRole('heading', { name: '重新验证管理员身份', exact: true })).toBeVisible();
       assert.equal(injected, true);
       await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -541,55 +544,43 @@ try {
     } finally { await context.unroute('**/api/admin/state', expireNextState); }
   });
 
-  await step('dialog-resource-failure-is-cancellable-without-business-write', async () => {
-    const isolated = await browser.newContext({ viewport: { width: 1000, height: 900 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
-    await attachRestrictions(isolated);
-    let injected = false;
-    await isolated.route('**/admin/design/admin/ui.js', async route => {
-      if (!injected) {
-        injected = true;
-        responseInjections.push({ stage, method: 'GET', path: '/admin/design/admin/ui.js', status: 503, scope: 'Single synthetic dialog module load failure in an isolated browser context' });
-        await route.fulfill({ status: 503, contentType: 'text/javascript', body: 'Synthetic dialog-module load failure' });
-      } else await route.fallback();
-    });
-    const target = await isolated.newPage();
-    const pageErrors = [];
-    target.on('pageerror', error => pageErrors.push(error.message));
+  await step('confirmation-dismissal-preserves-draft-without-business-write', async () => {
+    // Shared dialogs are bundled with the app: the former optional UI module
+    // no longer exists. Exercise actual cancellation and write isolation instead.
+    await nav('/models', '模型与提示词');
+    const writes = [];
+    const capture = request => {
+      if (new URL(request.url()).pathname.startsWith('/api/admin/') && !['GET', 'HEAD'].includes(request.method())) writes.push({ method: request.method(), path: new URL(request.url()).pathname });
+    };
+    page.on('request', capture);
     try {
-      await target.goto(`${app.url}/admin/#/models`);
-      await target.getByLabel(/^管理员口令/).fill(syntheticPassword);
-      await target.getByRole('button', { name: '登录', exact: true }).click();
-      await expect(target.getByRole('heading', { name: '模型与提示词', exact: true, level: 1 })).toBeVisible();
-      await expect.poll(() => injected).toBe(true);
-      const writes = [];
-      target.on('request', request => {
-        if (new URL(request.url()).pathname.startsWith('/api/admin/') && !['GET', 'HEAD'].includes(request.method())) writes.push({ method: request.method(), path: new URL(request.url()).pathname });
-      });
       const before = (await state()).config;
-      const draft = 'Dialog资源加载失败时应保留的虚构全局提示草稿。';
-      await target.getByRole('button', { name: '编辑预设', exact: true }).click();
-      await target.getByLabel('全局历史后指令', { exact: true }).fill(draft);
-      const saveButton = target.getByRole('button', { name: '保存设置', exact: true });
+      const draft = '确认取消后仍应保留的虚构全局提示草稿。';
+      await page.getByRole('button', { name: '编辑预设', exact: true }).click();
+      await page.getByLabel('全局历史后指令', { exact: true }).fill(draft);
+      const saveButton = page.getByRole('button', { name: '保存设置', exact: true });
       await saveButton.click();
-      const fallback = target.getByRole('dialog', { name: '保存提示预设？', exact: true });
-      await expect(fallback).toBeVisible();
-      await expect(fallback.getByRole('alert')).toHaveText('窗口暂时无法加载，当前修改仍保留。请取消返回，再刷新页面重试。');
-      await expect(fallback.getByRole('button', { name: '确认保存', exact: true })).toHaveCount(0);
-      await shot('dialog-resource-failure', target);
-      await fallback.getByRole('button', { name: '取消返回', exact: true }).click();
-      await expect(fallback).toHaveCount(0);
-      await expect(target.getByLabel('全局历史后指令', { exact: true })).toHaveValue(draft);
+      const confirmation = page.getByRole('dialog', { name: '保存提示预设？', exact: true });
+      await expect(confirmation).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(confirmation).toHaveCount(0);
+      await expect(page.getByLabel('全局历史后指令', { exact: true })).toHaveValue(draft);
       await expect(saveButton).toBeFocused();
       await saveButton.click();
-      await expect(fallback).toBeVisible();
-      await target.keyboard.press('Escape');
-      await expect(fallback).toHaveCount(0);
-      await expect(target.getByLabel('全局历史后指令', { exact: true })).toHaveValue(draft);
-      assert.deepEqual(writes, [], 'A failed confirmation resource must not execute a business mutation');
+      await expect(confirmation).toBeVisible();
+      await shot('confirmation-cancel-preserves-draft');
+      await confirmation.getByRole('button', { name: '取消', exact: true }).click();
+      await expect(confirmation).toHaveCount(0);
+      await expect(page.getByLabel('全局历史后指令', { exact: true })).toHaveValue(draft);
+      assert.deepEqual(writes, [], 'Dismissing confirmation must not execute a business mutation');
       assert.equal((await state()).config.version, before.version);
       assert.equal((await state()).config.preset.postHistory, before.preset.postHistory);
-      assert.deepEqual(pageErrors, [], 'Resource failure must be caught and surfaced, not become an uncaught exception');
-    } finally { await isolated.close(); }
+      await page.getByRole('button', { name: '取消编辑', exact: true }).click();
+      const discard = page.getByRole('dialog', { name: '放弃未保存的修改？', exact: true });
+      await expect(discard).toBeVisible();
+      await discard.getByRole('button', { name: '放弃修改', exact: true }).click();
+      await expect(discard).toHaveCount(0);
+    } finally { page.off('request', capture); }
   });
 
   await step('initial-loading-first-failure-and-refresh-error-retain-state', async () => {

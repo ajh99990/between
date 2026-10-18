@@ -13,27 +13,32 @@
   "workspaces": [
     "apps/admin",
     "apps/server",
-    "packages/role-engine"
+    "packages/role-engine",
+    "packages/ui"
   ],
   "scripts": {
     "dev": "npm run dev --workspace @between/admin",
     "setup": "npm run setup --workspace @between/admin",
     "build": "npm run build --workspace @between/admin",
-    "typecheck": "npm run setup && npm run typecheck --workspace @between/admin && node scripts/check-modules.mjs",
-    "lint": "npm run lint --workspace @between/admin",
-    "test": "npm run test --workspace @between/role-engine && npm run test --workspace @between/server && npm run test:plan --workspace @between/server && npm run test:local --workspace @between/server && npm run test --workspace @between/admin && npm run test:smoke",
+    "typecheck": "npm run setup && npm run typecheck --workspace @between/admin && npm run typecheck --workspace @between/ui && node scripts/check-modules.mjs",
+    "lint": "npm run lint --workspace @between/admin && npm run lint --workspace @between/ui",
+    "test": "npm run test --workspace @between/ui && npm run test --workspace @between/role-engine && npm run test --workspace @between/server && npm run test:plan --workspace @between/server && npm run test:local --workspace @between/server && npm run test --workspace @between/admin && npm run test:smoke",
     "test:engine": "npm run test --workspace @between/role-engine",
     "test:app": "npm run test --workspace @between/server",
     "test:plan": "npm run test:plan --workspace @between/server",
     "test:local": "npm run test:local --workspace @between/server",
-    "test:browser": "npm run test:browser --workspace @between/admin && node tests/browser/chat.mjs && node tests/browser/oauth.mjs",
+    "test:browser": "npm run test:ui:browser && npm run test:browser --workspace @between/admin && node tests/browser/chat.mjs && node tests/browser/oauth.mjs",
     "check": "npm run typecheck && npm run lint && npm run build && npm test",
     "start": "node apps/server/server.mjs",
     "start:demo": "node apps/server/server.mjs --demo",
     "start:local": "node apps/server/local-start.mjs",
     "preview": "node apps/admin/tests/preview.mjs",
     "licenses": "node scripts/collect-licenses.mjs",
-    "test:smoke": "node tests/smoke.mjs"
+    "test:smoke": "node tests/smoke.mjs",
+    "dev:ui": "npm run dev --workspace @between/ui",
+    "build:ui-playground": "npm run build:playground --workspace @between/ui",
+    "test:ui:browser": "npm run build:ui-playground && npm run test:browser --workspace @between/ui",
+    "preview:ui": "npm run preview:playground --workspace @between/ui"
   },
   "devDependencies": {
     "acorn": "8.16.0"

@@ -6,15 +6,16 @@
 
 | 路径 | 职责 |
 | --- | --- |
-| `apps/admin` | React / TypeScript / Tailwind CSS / Vite 管理员后台，源码页面在 `src/pages`，构建到 `dist`；旧后台已整体替换 |
+| `apps/admin` | React / TypeScript / Tailwind CSS / Vite 管理员后台；页面、业务状态、API 与草稿，构建到 `dist` |
 | `apps/server` | 聊天静态页面、HTTP API、管理员鉴权、角色卡/世界书/会话管理、套餐兼容服务与本机启动器 |
 | `packages/role-engine` | 角色上下文组装、世界书、会话事务/隔离、模型流、多模态与语音适配；`vendor` 保存实际复用的上游代码 |
+| `packages/ui` | 私有 `@between/ui`：Base UI 交互、通用 React 组件、图标、字体、玻璃、背景与动画；含独立开发 playground |
 | `scripts/vendor` | 从外部固定 SillyTavern checkout 重新抽取源码的开发工具，不是另一套运行应用 |
-| `tests/browser` | 聊天入口的隔离浏览器回归；后台完整浏览器回归在 `apps/admin/tests` |
+| `tests/browser` | 聊天入口的隔离浏览器回归；后台回归在 `apps/admin/tests`，共享 UI 回归在 `packages/ui/tests` |
 | `docs`、`design-system` | 当前协作、配置、结构决策与后台设计规范 |
 | `licenses` | 已安装依赖的许可证/版权通知及目标平台覆盖范围 |
 
-依赖方向为 `apps/server → @between/role-engine`；后台只通过同源 HTTP API 调用服务。服务同时提供 `/` 聊天和 `/admin/` 后台，后台不能读取运行时模型凭据。根 npm workspaces 和唯一 `package-lock.json` 管理全部第一方包。Electron、Qwen Host、独立 MCP、旧 Skills 产品及原酒馆完整应用已删除；追溯使用 Git 历史。
+运行代码共四个 npm workspace。依赖方向为 `apps/server → @between/role-engine`、`apps/admin → @between/ui`；后台只通过同源 HTTP API 调用服务。服务同时提供 `/` 聊天和 `/admin/` 后台，后台不能读取运行时模型凭据。根 npm workspaces 和唯一 `package-lock.json` 管理全部第一方包。Electron、Qwen Host、独立 MCP、旧 Skills 产品及原酒馆完整应用已删除；追溯使用 Git 历史。
 
 ## 开发与验证
 
@@ -25,7 +26,7 @@ npm ci
 npm run check
 ```
 
-`.npmrc` 禁止依赖安装脚本；`setup` 校验随包设计资源的 SHA-256，`typecheck` 先执行该校验，再运行后台 TypeScript 检查与服务/引擎模块解析。`check` 顺序运行上述检查、Biome lint、Vite 后台构建与离线测试。不要先运行依赖后台静态产物的测试再构建。界面交付还须在实际浏览器操作、截图并查看像素效果，自动化结果不能代替视觉验收。
+`.npmrc` 禁止依赖安装脚本；`setup` 校验 `packages/ui` 运行资源的 SHA-256、完整清单与本地引用闭包，并拒绝后台重复的 `public/design`。`typecheck` 执行资源校验、后台和 UI 包的 TypeScript 检查，再运行服务/引擎模块解析。`check` 顺序运行上述检查、Biome lint、Vite 后台构建与离线测试。不要先运行依赖后台静态产物的测试再构建。界面交付还须在实际浏览器操作、截图并查看像素效果，自动化结果不能代替视觉验收。
 
 ```sh
 npm run build
@@ -34,12 +35,16 @@ npm run test:engine
 npm run test:app
 npm run test:plan
 npm run test:local
+npm run build:ui-playground
+npm run test:ui:browser
 CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test:browser
 ```
 
-也可安装 Playwright Chromium 后省略 `CHROMIUM_PATH`。浏览器保留 sandbox，仅访问本次随机回环服务。测试用虚构角色、临时数据和模拟服务验证管理员登录、全文查看/编辑、版本冲突、会话隔离、套餐协议、上下文隐私与启动清理；不读真实授权、不发收费模型请求。输出在被忽略的 `artifacts` / `evidence` 中。CI 使用同一 `npm run check` 与浏览器入口，不部署。
+也可安装 Playwright Chromium 后省略 `CHROMIUM_PATH`。浏览器保留 sandbox，仅访问本次随机回环服务。根 `test:browser` 先构建并测试共享 UI，再运行后台、聊天及 OAuth 浏览器回归。UI 回归使用隔离组件场景；后台测试用虚构角色、临时数据和模拟服务验证管理员登录、全文查看/编辑、版本冲突、会话隔离、套餐协议、上下文隐私与启动清理；不读真实授权、不发收费模型请求。输出在被忽略的 `artifacts` / `evidence` 中。CI 使用同一 `npm run check` 与浏览器入口，不部署。
 
 `npm run dev` 启动后台开发服务器 `127.0.0.1:8888/admin/`；API 目标由 `BETWEEN_ADMIN_DEV_API` 设置为自己已启动的回环服务，例如 `http://127.0.0.1:8799`。只允许显式指定回环地址，代理保留管理员同源请求约束。开发服务器不是完整应用入口。后台目录职责、组件与接口见 [后台说明](apps/admin/README.md)。
+
+`npm run dev:ui` 启动独立组件工作台，仅监听回环地址并输出实际随机端口。它直接使用 `@between/ui` 正式源码，提供基础控件、长表单、菜单、表格、草稿与故障场景；状态只在本页内存，不连接业务 API。`npm run build:ui-playground` 只生成 `packages/ui/dist-playground`，不发布到 `/admin/`。组件接口与开发入口见 [UI 包说明](packages/ui/README.md)，本轮架构、迁移清理、实测证据和待验边界见 [共享组件库与验收](docs/共享组件库与验收.md)。
 
 ## 启动
 
@@ -71,7 +76,7 @@ unset between_password
 
 保留真实文本聊天、角色卡/世界书管理和全文、管理员鉴权、模型设置、套餐兼容后端、用户与会话隔离、流式停止/重试及上下文组装。角色设定、世界书和内部字段仅参与模型上下文，不能进入用户 API/SSE 的可见消息或朗读输入；回归覆盖该边界。角色/世界书/预设修改作用于新会话，既有快照不被重写。
 
-后台围绕角色库、世界书、社区素材、模型与提示词、会话与任务、用户与全局、诊断七个工作区组织。角色提供 11 个正文字段的全文阅读、字段定位与编辑；世界书区分简单模式和独立条目模式，提供正文搜索、触发配置与完整原始字段。保存等待服务器确认，配置版本冲突保留草稿；世界书冲突不自动覆盖或合并同一本书。导航、按钮与弹窗采用不同玻璃配方，长正文保留稳定阅读衬底。通用字体、玻璃组件、抽象背景与只读验证探针来自自包含的 `glass-workbench-ui` 资源，不依赖其他业务仓库。交互研究与参考许可见 [管理员内容编辑调研](docs/管理员内容编辑调研.md)。
+后台围绕角色库、世界书、社区素材、模型与提示词、会话与任务、用户与全局、诊断七个工作区组织。角色提供 11 个正文字段的全文阅读、字段定位与编辑；世界书区分简单模式和独立条目模式，提供正文搜索、触发配置与完整原始字段。保存等待服务器确认，配置版本冲突保留草稿；世界书冲突不自动覆盖或合并同一本书。导航、按钮与弹窗采用不同玻璃配方，长正文保留稳定阅读衬底。通用组件、图标、字体、玻璃、抽象背景与浮层动画统一从 `@between/ui` 引入；底层材质保留自包含的 `glass-workbench-ui` 来源与归因，不访问其他业务仓库。应用保留角色/世界书等业务组合、接口、权限、草稿、保存与冲突处理，不复制另一套通用组件或材质。交互研究与参考许可见 [管理员内容编辑调研](docs/管理员内容编辑调研.md)。
 
 当前 API 只支持固定社区目录导入，不支持任意文件上传、外部 URL 导入或角色卡导出；会话管理只提供元数据、停止任务和删除，没有管理员聊天正文查看接口。后台不能读取或修改模型密钥，保存连接配置不会试跑推理。世界书最终纳入上下文的运行诊断尚未接通，不能把关键词搜索命中解释为实际激活。全局暂停阻止后续生成，不会自动停止正在运行的任务；禁止新用户只影响尚未初始化的浏览器身份。审计记录为当前进程内存记录。
 
@@ -81,6 +86,6 @@ unset between_password
 
 真实聊天、授权、密钥、运行配置和构建产物不得提交。数据目录包含身份材料和聊天，禁止放入 Git；所有权锁存在时先核实进程，不盲删、不自动迁移旧数据。结构重组不影响其他检出或现存服务。
 
-SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。新后台未沿用旧模板 UI；通用设计资源的来源、Geist 字体 OFL 及随包公开对照模块 MIT 见 [设计资源说明](apps/admin/public/design/ASSET-SOURCES.md)。本次对 SillyTavern、RisuAI 和 Lorebook Manager 的编辑体验研究不复制其 UI 代码，不改变各项目原有许可。四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
+SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。新后台未沿用旧模板 UI；当前通用设计资源的来源及 Geist 字体 OFL 见 [共享设计资源说明](packages/ui/src/materials/runtime/ASSET-SOURCES.md)。本次对 SillyTavern、RisuAI 和 Lorebook Manager 的编辑体验研究不复制其 UI 代码，不改变各项目原有许可。四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
 
-只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前后台的实际视觉修正、七项自查和实测范围见 [玻璃工作台验收](docs/后台玻璃工作台重写与验收.md)；浮层、切换与保存动效见 [过渡动画验收](docs/后台过渡动画与视觉验收.md)；研发文案与预览残留清理见 [产品内容验收](docs/后台产品内容清理与验收.md)；早先目录重组记录见 [历史重组验收](docs/项目结构重组与验收.md)。
+只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前组件结构与验收要求见 [UI 包说明](packages/ui/README.md) 和 [设计规范](design-system/between-admin/MASTER.md)。以下报告保存对应历史版本的证据，不能作为本次组件迁移已通过的证明：[玻璃工作台验收](docs/后台玻璃工作台重写与验收.md)；浮层、切换与保存动效历史见 [过渡动画验收](docs/后台过渡动画与视觉验收.md)；研发文案与预览残留清理见 [产品内容验收](docs/后台产品内容清理与验收.md)；早先目录重组记录见 [历史重组验收](docs/项目结构重组与验收.md)。
