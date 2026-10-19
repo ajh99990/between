@@ -85,6 +85,24 @@ export interface Conversation {
   createdAt: string;
   configVersion: number;
 }
+export interface ConversationMessage {
+  index: number;
+  name: string;
+  role: "user" | "assistant";
+  text: string;
+  images: { id: string; url: string }[];
+}
+export interface ConversationTranscript {
+  id: string;
+  userId: string;
+  title: string;
+  character: string;
+  createdAt: string;
+  configVersion: number;
+  revision: number;
+  active: boolean;
+  messages: ConversationMessage[];
+}
 export interface User {
   id: string;
   createdAt: string;

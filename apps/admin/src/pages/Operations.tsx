@@ -23,6 +23,7 @@ import { api } from "../api";
 import { readerScrollBehavior } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
 import type { Config, PlanConfig, Preset } from "../types";
+import { ConversationReader } from "./ConversationReader";
 
 const clone = <T,>(value: T): T => structuredClone(value);
 const date = (value: string) => {
@@ -666,6 +667,8 @@ export function SessionsPage() {
   const sessions = state.users.flatMap((user) =>
     user.conversations.map((conversation) => ({ ...conversation, userId: user.id })),
   );
+  const [reading, setReading] = useState<(typeof sessions)[number] | null>(null);
+  const [readerOpen, setReaderOpen] = useState(false);
   const filtered = sessions.filter(
     (item) =>
       (role === "all" || item.role === role) && match(query, item.title, item.name, item.id, item.userId),
@@ -792,12 +795,21 @@ export function SessionsPage() {
     },
     {
       key: "actions",
-      width: 110,
-      minWidth: 100,
+      width: 180,
+      minWidth: 170,
       sticky: "end",
       header: "操作",
       render: (item) => (
-        <>
+        <div className="inline-actions">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setReading(item);
+              setReaderOpen(true);
+            }}
+          >
+            查看记录
+          </Button>
           <Button
             variant="danger"
             disabled={busy}
@@ -829,13 +841,13 @@ export function SessionsPage() {
           >
             删除
           </Button>
-        </>
+        </div>
       ),
     },
   ];
   return (
     <div className="page-stack">
-      <PageHeader title="会话与任务" description="查看会话、停止生成或删除会话。" />
+      <PageHeader title="会话与任务" description="阅读聊天记录、停止生成或删除会话。" />
       {error && <ErrorNotice>{error}</ErrorNotice>}
       <Panel className="section-card task-overview">
         <div className="toolbar">
@@ -966,8 +978,8 @@ export function SessionsPage() {
             }
           />
         )}
-        <p className="muted">此处仅显示会话信息，不含聊天正文。配置版本为会话创建时的版本。</p>
       </Panel>
+      <ConversationReader conversation={reading} open={readerOpen} onClose={() => setReaderOpen(false)} />
       {dialog}
     </div>
   );

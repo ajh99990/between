@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/xiyuailove/xiyuai",
+  "commit": "06928e2dbccf438109a9eeae80086bb12f729fd3",
+  "files": {
+    "src/companion.mjs": "468fd2851af4928af60c07fab23b7f343c0516af4c8d8db450d70e8e3e6b06a7",
+    "src/bot.mjs": "3611dbbe18714231f1be4f4aa1848902a2915951c90d9bb91861a0830fac2215",
+    "src/inner_os.mjs": "444c03e864bea1457979f4bc65f2bde68315b25851823af29635bb8b95e3ba40",
+    "src/persona_guard.mjs": "f51606096643867f3814ec6ae9ea356a5befa5fa728bb686434712b714d42979",
+    "src/ai.mjs": "564ee8dd739920334c423fdab2900245717e547e952286f4e1c716aeda937285",
+    "src/db.mjs": "8625c44fe9dc98a32b14c2264d3a5242a14a1b5599ba7f9c55c80f1df71296bf",
+    "src/moderation.mjs": "c33fd5f3a33905751f9b91a1d8051c87c71c359085d1868bffa001c7a00f5ff4",
+    "src/emotion_state.mjs": "88ce84c8861dc80686d56565d8e1e15d496365406f208e87d84da2f1f95179fc",
+    "src/text_similarity.mjs": "7d1a94f48f11bfac1fe757b84db701a1fff0e67df3ba80f5f613edc2bd20fe0b",
+    "package.json": "edea38868357e5f2c63c50a680d56eb034c4ba4c16c8cd813770783f6796d77e",
+    "LICENSE": "e73a9b4db4f13df013a1cb7fefdab899beb62d3925de8291a5375ce638cf2fab"
+  }
+}

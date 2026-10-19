@@ -1,0 +1,88 @@
+{
+  "repository": "https://github.com/Mai-with-u/MaiBot",
+  "commit": "f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb",
+  "files": [
+    {
+      "path": "original/prompts/zh-CN/maisaka_replyer.prompt",
+      "sha256": "79fc57654b27d88c9c322c080bcce8b79d949f5aaf886fd2759c47879f5d4122",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/prompts/zh-CN/maisaka_replyer.prompt"
+    },
+    {
+      "path": "original/prompts/zh-CN/reply_attachments.prompt",
+      "sha256": "2202c362fb17fd6fc9b3ad0616bcbf2ca1a0fd24b3c9c1f6723852960293567d",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/prompts/zh-CN/reply_attachments.prompt"
+    },
+    {
+      "path": "original/src/chat/replyer/maisaka_generator_base.py",
+      "sha256": "39582aaa6d14bab62433d5b81940e241a8adc5f98b5b9f5e52016ac06a36b95e",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/chat/replyer/maisaka_generator_base.py"
+    },
+    {
+      "path": "original/src/chat/replyer/maisaka_generator.py",
+      "sha256": "d5863b42285329b800d69573a8ea26ebf7dd8fe460217671930f384f0b607fc4",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/chat/replyer/maisaka_generator.py"
+    },
+    {
+      "path": "original/src/chat/replyer/retro_prompt.py",
+      "sha256": "36ebeb0be6e6e7a7ff3582f7cfc0f03307eab60e918031e4292b605dfbff2b6f",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/chat/replyer/retro_prompt.py"
+    },
+    {
+      "path": "original/src/config/official_configs.py",
+      "sha256": "796cf132a019b4a956b521140f0974cde24e51e2992287aabd0b7e1d5a955ff0",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/config/official_configs.py"
+    },
+    {
+      "path": "original/src/common/prompt_i18n.py",
+      "sha256": "a34b3240bec6e55a165b09f7e0607c68e7983fc0bbfd84cff63a76b0b3739cac",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/common/prompt_i18n.py"
+    },
+    {
+      "path": "original/src/maisaka/context/messages.py",
+      "sha256": "9d728ae53d7a13fd83aa682b92b36520bea15efcccd4297a6d87b10ebc48d611",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/context/messages.py"
+    },
+    {
+      "path": "original/src/maisaka/context/message_adapter.py",
+      "sha256": "f8a2d4ac2bf05b7f39ad98581d2eaeaa116e6f9c354cb0090244f7a548147077",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/context/message_adapter.py"
+    },
+    {
+      "path": "original/src/maisaka/context/message_id_alias.py",
+      "sha256": "e09f1eb5bc78792440a8c7e7bcf38379231a2a25b7a1e964f15fa6b42b81ef63",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/context/message_id_alias.py"
+    },
+    {
+      "path": "original/src/maisaka/context/history.py",
+      "sha256": "497b910c9ea1d98f9c0fc13ecd699916c08fbb86434c8b311349ee4fa088d092",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/context/history.py"
+    },
+    {
+      "path": "original/src/maisaka/attention_drift.py",
+      "sha256": "48f0a314622d3e6d095679bcb23a1283156b34f5c13e87ca3e5f56eb54afdbc0",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/attention_drift.py"
+    },
+    {
+      "path": "original/src/maisaka/builtin_tool/reply.py",
+      "sha256": "6263c9930dc34f367919c2fdb3241c0aae4a929445b1881ca27d694caa0b3a57",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/maisaka/builtin_tool/reply.py"
+    },
+    {
+      "path": "original/src/chat/utils/utils.py",
+      "sha256": "a7d6bc64fe756c28910c0452ce91a184ae8faa5cf9b35fa4ea524859814bd950",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/src/chat/utils/utils.py"
+    },
+    {
+      "path": "original/LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "https://github.com/Mai-with-u/MaiBot/blob/f01f2c22df5e0ba3cb1c5bc3b6ced5d5ec39c1cb/LICENSE"
+    }
+  ],
+  "derivedFiles": [
+    {
+      "path": "defaults.json",
+      "derivedFrom": "original/src/config/official_configs.py",
+      "sha256": "0440f09d1a5e491a0809534a686e029a45cecc2271c7814bfdcce0e29c3d59f8"
+    }
+  ]
+}

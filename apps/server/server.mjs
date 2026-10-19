@@ -60,6 +60,7 @@ export async function createApp(options={}){
       if(origin&&!hosts.some(h=>origin==='http://'+h))throw httpError(403,'跨来源请求已拒绝');
       if(!['GET','HEAD'].includes(req.method)&&!hosts.some(h=>origin==='http://'+h))throw httpError(403,'请求缺少有效 Origin');
       const url=new URL(req.url,'http://'+req.headers.host),p=url.pathname;
+      if(options.readOnly&&!['GET','HEAD'].includes(req.method)&&!['/api/admin/login','/api/admin/logout'].includes(p))throw httpError(403,'当前实例仅供查看聊天记录');
       if(req.method!=='GET'&&(p==='/api/conversations'||['/api/admin/plan','/api/admin/community/import','/api/admin/config','/api/admin/model','/api/admin/user','/api/admin/conversation'].includes(p))){const identity=p.startsWith('/api/admin/')?getAdmin(req):getUser(req).u;if(req.headers['x-csrf-token']!==identity.csrf)throw httpError(403,'请求校验失败');parsedBody=await jsonBody(req);releaseMutation=await acquireMutation();}
       if(await serveAdmin(req,res,p))return;
       if(!p.startsWith('/api/')){const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css'};const file=files[p];if(!file||req.method!=='GET')throw httpError(404,'页面不存在');res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript; charset=utf-8':file.endsWith('.css')?'text/css; charset=utf-8':'text/html; charset=utf-8');res.end(await fs.readFile(path.join(publicRoot,file)));return;}
@@ -76,6 +77,18 @@ export async function createApp(options={}){
         const a=getAdmin(req);if(req.method!=='GET'&&req.headers['x-csrf-token']!==a.csrf)throw httpError(403,'管理员请求校验失败');const b=req.method==='GET'?{}:await readBody();
         if(p==='/api/admin/logout'&&req.method==='POST'){admins.delete(hash(cookie(req,'between_admin')));res.setHeader('Set-Cookie','between_admin=; HttpOnly; SameSite=Strict; Path=/api/admin; Max-Age=0');send(200,{ok:true});return;}
         if(p==='/api/admin/state'&&req.method==='GET'){send(200,{csrf:a.csrf,config,community,model:{...bridge.status,credentialConfigured:!!options.key},plan:await plan.status(planPrincipal,config.planBackend.model,config.planBackend.reasoningEffort),users:[...users.values()].map(u=>({id:u.id,createdAt:u.createdAt,disabled:u.disabled,conversations:u.conversations})),tasks:[...tasks.values()].map(t=>({id:t.id,userId:t.userId,conversation:t.conversation,mode:t.mode,startedAt:t.startedAt})),audit,diagnostics:{langfuse:'未接入',audit:'仅保留本次运行的最近200条记录，重启后清空；不可用作不可篡改审计',storage:'本机私有目录；按用户隔离',plan:'所有用户共用管理员授权与模型额度；会话内容按用户隔离。',modelVerified:bridge.status.connection==='connected',version:serviceVersion}});return;}
+        if(p==='/api/admin/conversation'&&req.method==='GET'){
+          const userId=url.searchParams.get('userId'),conversation=url.searchParams.get('conversation');
+          if(!safeId(userId)||!safeId(conversation)||url.searchParams.getAll('userId').length!==1||url.searchParams.getAll('conversation').length!==1)throw httpError(400,'请选择有效的用户与会话');
+          const u=[...users.values()].find(item=>item.id===userId);if(!u)throw httpError(404,'会话不存在');
+          const item=own(u,conversation);let s;
+          try{s=await client(u).snapshot(conversation)}catch(e){if(e.message==='Conversation not found')throw httpError(404,'会话不存在');throw e;}
+          // A read may wait behind a turn/delete transaction. Recheck its live
+          // ownership and administrator session before returning private text.
+          getAdmin(req);own(u,conversation);
+          const messages=s.chat.flatMap((m,index)=>m.is_system||typeof m.mes!=='string'?[]:[{index,name:typeof m.name==='string'?m.name:'',role:m.is_user?'user':'assistant',text:m.mes,images:(Array.isArray(m.extra?.media)?m.extra.media:[]).filter(media=>media.type==='image'&&typeof media.url==='string'&&/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(media.url)&&media.url.length<=12*1024*1024).map((media,mediaIndex)=>({id:`${index}-${mediaIndex}`,url:media.url}))}]);
+          send(200,{id:item.id,userId:u.id,title:item.title,character:item.name,createdAt:item.createdAt,configVersion:item.configVersion,revision:s.revision,active:tasks.has(taskKey(u,conversation)),messages});return;
+        }
         if(p==='/api/admin/community/import'&&req.method==='POST'){confirm(b);if(b.expectedVersion!==config.version)throw httpError(409,'配置已变更，请刷新');if(config.roles.length>=20)throw httpError(400,'角色库已满');const imported=await importCommunity(b.id);if(config.roles.some(r=>r.id===imported.role.id))throw httpError(409,'此素材已导入');if(imported.book&&config.books.some(x=>x.id===imported.book.id))throw httpError(409,'此世界书ID已存在，请先处理现有书；不会覆盖或重复绑定');if(imported.book&&config.books.length>=100)throw httpError(400,'世界书库已满');const updated={...config,roles:[...config.roles,imported.role],books:imported.book?[...config.books,imported.book]:config.books,version:config.version+1};await atomic(path.join(root,'settings.json'),updated);config=updated;log('admin','community.import',b.id);send(201,{roleId:imported.role.id,bookId:imported.book?.id,version:config.version});return;}
         if(p==='/api/admin/config'&&req.method==='PUT'){
           confirm(b);if(b.expectedVersion!==config.version)throw httpError(409,'配置已变更，请刷新后重试');const next=b.config;

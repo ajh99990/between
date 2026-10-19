@@ -486,6 +486,31 @@ try {
       assert.equal((await ordinaryRequest(userContext, `/api/conversations/${conversation}`)).data.chat.length, 1);
     } finally { controlledTurn = false; }
     assert.equal(upstreamCalls, 1);
+    const transcriptRow = page.getByRole('row').filter({ hasText: conversation });
+    let failRead = true;
+    const transcriptPattern = '**/api/admin/conversation?*';
+    const failOnce = async route => {
+      if (failRead && route.request().method() === 'GET') {
+        failRead = false;
+        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: '聊天记录读取暂时失败' }) });
+      } else await route.fallback();
+    };
+    await page.route(transcriptPattern, failOnce);
+    try {
+      await transcriptRow.getByRole('button', { name: '查看记录', exact: true }).click();
+      await expect(visibleDialog().getByRole('alert')).toContainText('聊天记录读取暂时失败');
+      await visibleDialog().getByRole('button', { name: '刷新记录', exact: true }).click();
+      await expect(visibleDialog().getByRole('region', { name: '聊天记录', exact: true })).toBeVisible();
+      await expect(visibleDialog().locator('.conversation-message-text')).toHaveText(created.data.chat.map(item => item.mes));
+      const search = visibleDialog().getByRole('searchbox', { name: '在聊天记录中查找', exact: true });
+      await search.fill(created.data.chat[0].mes.slice(0, 4));
+      await search.press('Enter');
+      await expect(visibleDialog().locator('mark[data-current=true]')).toBeVisible();
+      await shot('sessions-saved-transcript-reader');
+      await page.keyboard.press('Escape');
+      await expect(visibleDialog()).toHaveCount(0);
+      await expect(transcriptRow.getByRole('button', { name: '查看记录', exact: true })).toBeFocused();
+    } finally { await page.unroute(transcriptPattern, failOnce); }
     await page.getByLabel('搜索会话', { exact: true }).fill('不存在的虚构会话');
     await expect(page.getByRole('heading', { name: '没有匹配的会话', exact: true })).toBeVisible();
     await page.getByRole('region', { name: '会话筛选', exact: true }).getByRole('button', { name: '清除筛选', exact: true }).click();

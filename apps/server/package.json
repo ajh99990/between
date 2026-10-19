@@ -12,7 +12,7 @@
     "dev": "node --watch server.mjs",
     "start:demo": "node server.mjs --demo",
     "start:local": "node local-start.mjs",
-    "test": "node test/read-body.mjs && node test/app.mjs && node test/connection.mjs && node test/app-independent-review.mjs && node test/community.mjs && node test/community-independent-review.mjs",
+    "test": "node test/read-body.mjs && node test/app.mjs && node test/admin-transcript.mjs && node test/connection.mjs && node test/app-independent-review.mjs && node test/community.mjs && node test/community-independent-review.mjs",
     "test:app": "npm test",
     "test:plan": "node test/chatgpt-plan.mjs && node test/plan-shared.mjs && node test/plan-oauth.mjs && node test/plan-reasoning.mjs",
     "test:local": "node test/local-start.mjs"
