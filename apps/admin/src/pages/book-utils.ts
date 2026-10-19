@@ -1,3 +1,4 @@
+import { analyzeJsonText, type JsonNode } from "@between/ui";
 import type { Book, BookEntry, Config } from "../api";
 
 const commonEntryFields = new Set([
@@ -79,7 +80,60 @@ function keywords(text: string, original: string[]) {
   return values;
 }
 
+/** Compare exact base-ten values, not binary floating-point expansions. 0.1,
+ * 1e3 and harmless trailing zeroes remain valid; rewritten significant digits do not.
+ */
+function normalizedDecimal(literal: string) {
+  const match = /^(-?)(\d+)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/.exec(literal);
+  if (!match) return undefined;
+  const fraction = match[3] || "";
+  const coefficient = `${match[2]}${fraction}`.replace(/^0+/, "");
+  if (!coefficient) return "0";
+  const digits = coefficient.replace(/0+$/, "");
+  const exponent = (match[4] || "0").replace(/^([+-]?)0+(?=\d)/, "$1");
+  // The source itself is capped at 2M characters. A finite nonzero value cannot
+  // need a decimal exponent with dozens of significant digits to offset it.
+  if (exponent.replace(/^[+-]/, "").length > 12) return undefined;
+  const scale = BigInt(exponent) - BigInt(fraction.length) + BigInt(coefficient.length - digits.length);
+  return `${match[1]}${digits}e${scale}`;
+}
+
+function validateJsonNumbers(text: string, root: JsonNode) {
+  const pending = [root];
+  while (pending.length) {
+    const node = pending.pop();
+    if (!node) continue;
+    if (node.children) pending.push(...node.children);
+    if (node.kind !== "number") continue;
+    const literal = text.slice(node.start, node.end);
+    const number = Number(literal);
+    const prefix = "扩展配置中的数值无法无损保存，草稿原文已保留。";
+    if (!Number.isFinite(number)) throw new Error(`${prefix}数值超出可表示范围，请使用字符串保存。`);
+    if (number === 0 && /[1-9]/.test(literal.split(/[eE]/, 1)[0]))
+      throw new Error(`${prefix}此数值下溢为 0，请使用字符串保存。`);
+    if (Object.is(number, -0)) throw new Error(`${prefix}负零会在提交时变为 0，请改用 0 或字符串保存。`);
+    if (Number.isInteger(number) && !Number.isSafeInteger(number))
+      throw new Error(`${prefix}整数超出安全范围，请使用字符串保存。`);
+    if (normalizedDecimal(literal) !== normalizedDecimal(JSON.stringify(number)))
+      throw new Error(`${prefix}此数值会发生精度丢失或下溢，请使用字符串保存。`);
+  }
+}
+
 function extraFields(text: string): Record<string, unknown> {
+  const analysis = analyzeJsonText(text);
+  if (!analysis.valid || !analysis.root)
+    throw new Error(
+      analysis.limited
+        ? "扩展配置结构过大或过深，无法安全校验；草稿原文已保留，请缩减后重试。"
+        : "扩展配置必须是有效的 JSON 对象。",
+    );
+  if (analysis.duplicates.length) {
+    const issue = analysis.duplicates[0];
+    throw new Error(
+      `扩展配置含有重复键（第 ${issue.line} 行，第 ${issue.column} 列），草稿原文已保留；请明确每个键的值后保存。`,
+    );
+  }
+  validateJsonNumbers(text, analysis.root);
   let value: unknown;
   try {
     value = JSON.parse(text, (key, item) => {

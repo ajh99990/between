@@ -2,18 +2,27 @@ import {
   Badge,
   Button,
   Checkbox,
+  CollectionList,
   Dialog,
+  DiffViewer,
+  DocumentReader,
   Empty,
   Field,
+  HighlightText,
   Icon,
   Input,
+  JSONEditor,
+  JSONViewer,
+  LongTextEditor,
+  NumberField,
   PageHeader,
   Select,
-  Textarea,
+  SplitPane,
+  TagInput,
 } from "@between/ui";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Book, BookEntry } from "../api";
-import { readerScrollBehavior, useReaderTransition } from "../reader-motion";
+import { useReaderTransition } from "../reader-motion";
 import { useAdmin, useDirtyGuard } from "../state";
 import type { BookDraft, EntryDraft } from "./book-utils";
 import {
@@ -22,7 +31,6 @@ import {
   changedBookFields,
   draftChanged,
   makeBookDraft,
-  matchingBookEntries,
   newEntry,
   replaceBook,
   serializeBookDraft,
@@ -42,25 +50,6 @@ const logics = [
   { value: "3", label: "AND ALL · 全部二级词匹配" },
 ];
 const entryTitle = (entry: BookEntry, index: number) => entry.comment?.trim() || `条目 ${index + 1}`;
-
-function Marked({ text, query }: { text: string; query: string }) {
-  if (!query.trim()) return <>{text}</>;
-  const needle = query.trim().toLocaleLowerCase(),
-    lower = text.toLocaleLowerCase();
-  const result = [];
-  let cursor = 0,
-    found = lower.indexOf(needle);
-  while (found >= 0) {
-    result.push(
-      text.slice(cursor, found),
-      <mark key={found}>{text.slice(found, found + needle.length)}</mark>,
-    );
-    cursor = found + needle.length;
-    found = lower.indexOf(needle, cursor);
-  }
-  result.push(text.slice(cursor));
-  return <>{result}</>;
-}
 
 export default function BooksPage() {
   const { state, save, refresh, notify } = useAdmin();
@@ -86,7 +75,10 @@ export default function BooksPage() {
   const [reviewBook, setReviewBook] = useState<Book>();
   const [conflictBackups, setConflictBackups] = useState<{ book: Book; version: number }[]>([]);
   const pending = useRef<(() => void) | undefined>(undefined);
-  const dirty = Boolean(draft && draftChanged(draft));
+  const [keywordDrafts, setKeywordDrafts] = useState<Record<string, string>>({});
+  const pendingKeywords = useRef<Record<string, string>>({});
+  const hasPendingKeyword = Object.values(keywordDrafts).some((value) => value.trim());
+  const dirty = Boolean(draft && (draftChanged(draft) || hasPendingKeyword));
   useDirtyGuard(dirty || conflictBackups.length > 0);
 
   useEffect(() => {
@@ -104,7 +96,6 @@ export default function BooksPage() {
   const versionChanged = Boolean(draft && draft.base.version !== config.version);
   const latestBook = draft && config.books.find((book) => book.id === draft.book.id);
   const currentEntry = draft?.entries?.[activeEntry];
-  const readMatches = display ? matchingBookEntries(display, readQuery) : [];
   const readerTransition = useReaderTransition(`${display?.id ?? ""}:${draft ? "edit" : "read"}`);
   const entryTransition = useReaderTransition(String(currentEntry?.entry.uid ?? ""));
 
@@ -116,6 +107,8 @@ export default function BooksPage() {
     } else action();
   }
   function clearDraft() {
+    pendingKeywords.current = {};
+    setKeywordDrafts({});
     setDraft(undefined);
     setSaveFailed(false);
     setFormError("");
@@ -129,6 +122,8 @@ export default function BooksPage() {
     });
   }
   function startEdit(book: Book) {
+    pendingKeywords.current = {};
+    setKeywordDrafts({});
     setDraft(makeBookDraft(book, config));
     setActiveEntry(0);
     setFormError("");
@@ -164,7 +159,19 @@ export default function BooksPage() {
     );
     setFormError("");
   }
+  function setKeywordDraft(key: string, value: string) {
+    pendingKeywords.current[key] = value;
+    setKeywordDrafts((current) => (current[key] === value ? current : { ...current, [key]: value }));
+  }
+  function allowEntryChange() {
+    if (Object.values(pendingKeywords.current).some((value) => value.trim())) {
+      setFormError("请先完成或移除正在输入的关键词，再切换条目。");
+      return false;
+    }
+    return true;
+  }
   function appendEntry() {
+    if (!allowEntryChange()) return;
     if (!draft?.entries || draft.entries.length >= 100) return;
     const entry = newEntry(draft.entries);
     setDraft({ ...draft, entries: [...draft.entries, { entry, keys: "", secondary: "", extra: "{}" }] });
@@ -187,6 +194,10 @@ export default function BooksPage() {
   }
   async function persist(useLatest = false) {
     if (!draft || saving) return;
+    if (Object.values(pendingKeywords.current).some((value) => value.trim())) {
+      setFormError("请先完成或移除正在输入的关键词，再保存。");
+      return;
+    }
     let book: Book;
     try {
       book = serializeBookDraft(draft);
@@ -225,6 +236,7 @@ export default function BooksPage() {
     }
   }
   function compareVersions() {
+    if (!allowEntryChange()) return;
     if (!draft) return;
     try {
       setReviewBook(serializeBookDraft(draft));
@@ -234,6 +246,7 @@ export default function BooksPage() {
     }
   }
   function loadLatestWithBackup() {
+    if (!allowEntryChange()) return;
     if (!draft || !reviewBook) return;
     setConflictBackups((current) => [
       ...current,
@@ -287,11 +300,6 @@ export default function BooksPage() {
       setSaving(false);
     }
   }
-  function jumpToEntry(index: number) {
-    document
-      .getElementById(`book-entry-${index}`)
-      ?.scrollIntoView({ behavior: readerScrollBehavior(), block: "start" });
-  }
 
   return (
     <div className="page-stack library-page books-page">
@@ -316,84 +324,78 @@ export default function BooksPage() {
           </Button>
         }
       />
-      <div className="split-workspace">
-        <aside className="collection-list" aria-label="世界书列表">
-          <div className="collection-heading">
-            <span>世界书库</span>
-            <span className="meta" aria-live="polite">
-              {filtered.length} / {config.books.length}
-            </span>
-          </div>
-          <div className="book-library-search">
-            <label className="bt-field-label" htmlFor="book-library-search">
-              管理库全文搜索
-            </label>
-            <div className="search-box">
-              <Icon name="search" size={16} />
-              <Input
-                id="book-library-search"
-                type="search"
-                className="search-input"
-                aria-label="管理库全文搜索"
-                placeholder="搜索名称、正文、关键词…"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              {query && (
-                <button
-                  type="button"
-                  className="icon-button"
-                  aria-label="清空世界书搜索"
-                  onClick={() => setQuery("")}
-                >
-                  <Icon name="close" size={14} />
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="collection-scroll">
-            {filtered.map((book) => (
-              <button
-                type="button"
-                className={`collection-item ${book.id === selectedId ? "is-selected" : ""}`}
-                key={book.id}
-                aria-current={book.id === selectedId ? "true" : undefined}
-                onClick={() => selectBook(book.id)}
-              >
-                <span className="collection-copy">
-                  <strong>
-                    <Marked text={book.name} query={query} />
-                  </strong>
-                  <small>
-                    {book.entries !== undefined
-                      ? `条目世界书 · ${book.entries.length} 个条目`
-                      : "简单世界书 · 1 条设定"}
-                  </small>
-                  <span className="meta">
-                    {config.roles.filter((role) => role.bookIds.includes(book.id)).length} 个角色绑定
+      <SplitPane
+        className="admin-library-split"
+        label="世界书库与全文"
+        sidebarLabel="世界书库"
+        defaultSidebarWidth={280}
+        minSidebarWidth={220}
+        maxSidebarWidth={420}
+        minContentWidth={420}
+        sidebar={
+          <CollectionList
+            label="世界书列表"
+            selectedId={selectedId}
+            onSelect={selectBook}
+            items={filtered.map((book) => ({
+              id: book.id,
+              title: <HighlightText text={book.name} query={query} />,
+              description:
+                book.entries !== undefined
+                  ? `条目世界书 · ${book.entries.length} 个条目`
+                  : "简单世界书 · 1 条设定",
+              meta: `${config.roles.filter((role) => role.bookIds.includes(book.id)).length} 个角色绑定`,
+            }))}
+            header={
+              <>
+                <div className="collection-heading">
+                  <span>世界书库</span>
+                  <span className="meta" aria-live="polite">
+                    {filtered.length} / {config.books.length}
                   </span>
-                </span>
-                <Icon name="arrow" size={14} />
-              </button>
-            ))}
-            {filtered.length === 0 && (
+                </div>
+                <div className="book-library-search">
+                  <label className="bt-field-label" htmlFor="book-library-search">
+                    管理库全文搜索
+                  </label>
+                  <div className="search-box">
+                    <Icon name="search" size={16} />
+                    <Input
+                      id="book-library-search"
+                      type="search"
+                      className="search-input"
+                      aria-label="管理库全文搜索"
+                      placeholder="搜索名称、正文、关键词…"
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                    />
+                    {query && (
+                      <button
+                        type="button"
+                        className="icon-button"
+                        aria-label="清空世界书搜索"
+                        onClick={() => setQuery("")}
+                      >
+                        <Icon name="close" size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </>
+            }
+            empty={
               <Empty
                 icon={query ? "search" : "book"}
                 title={query ? "没有匹配的世界书" : "还没有世界书"}
                 description={
                   query ? "尝试名称、正文中的词句或条目关键词。" : "创建第一本世界书，再在角色页中绑定。"
                 }
-                action={
-                  query ? (
-                    <Button variant="secondary" onClick={() => setQuery("")}>
-                      清空搜索
-                    </Button>
-                  ) : undefined
-                }
+                action={query ? <Button onClick={() => setQuery("")}>清空搜索</Button> : undefined}
               />
-            )}
-          </div>
-        </aside>
+            }
+          />
+        }
+      >
         <section className="reader-pane book-reader" aria-label={draft ? "编辑世界书" : "世界书全文"}>
           <div className="reader-transition-content" ref={readerTransition}>
             {!display ? (
@@ -407,7 +409,7 @@ export default function BooksPage() {
                 <header className="document-header">
                   <div>
                     <h2>
-                      <Marked text={display.name || "未命名世界书"} query={draft ? "" : readQuery} />
+                      <HighlightText text={display.name || "未命名世界书"} query={draft ? "" : readQuery} />
                     </h2>
                     {draft && (
                       <div className="inline-actions">
@@ -455,19 +457,14 @@ export default function BooksPage() {
                   <details className="book-meta-item">
                     <summary>世界书原始元数据（只读）</summary>
                     <p className="muted">查看书级关键词、正文与来源。各条目的正文和配置在下方展开。</p>
-                    <Field label="世界书原始元数据 JSON">
-                      <Textarea
-                        className="text-area"
-                        aria-label="世界书原始元数据 JSON"
-                        rows={12}
-                        readOnly
-                        value={JSON.stringify(
-                          Object.fromEntries(Object.entries(display).filter(([key]) => key !== "entries")),
-                          null,
-                          2,
-                        )}
-                      />
-                    </Field>
+                    <JSONViewer
+                      label="世界书原始元数据 JSON"
+                      text={JSON.stringify(
+                        Object.fromEntries(Object.entries(display).filter(([key]) => key !== "entries")),
+                        null,
+                        2,
+                      )}
+                    />
                   </details>
                 </div>
                 {draft ? (
@@ -509,15 +506,10 @@ export default function BooksPage() {
                             <Button variant="secondary" onClick={() => copyBackup(backup.book)}>
                               复制完整旧草稿
                             </Button>
-                            <Field label={`旧草稿 ${index + 1} 完整 JSON`}>
-                              <Textarea
-                                className="text-area"
-                                aria-label={`旧草稿 ${index + 1} 完整 JSON`}
-                                rows={18}
-                                readOnly
-                                value={JSON.stringify(backup.book, null, 2)}
-                              />
-                            </Field>
+                            <JSONViewer
+                              label={`旧草稿 ${index + 1} 完整 JSON`}
+                              text={JSON.stringify(backup.book, null, 2)}
+                            />
                           </details>
                         ))}
                       </section>
@@ -554,7 +546,9 @@ export default function BooksPage() {
                               variant={index === activeEntry ? "primary" : "ghost"}
                               disabled={saving}
                               aria-pressed={index === activeEntry}
-                              onClick={() => setActiveEntry(index)}
+                              onClick={() => {
+                                if (allowEntryChange()) setActiveEntry(index);
+                              }}
                             >
                               {index + 1}. {entryTitle(item.entry, index)}
                             </Button>
@@ -582,20 +576,15 @@ export default function BooksPage() {
                                   onChange={(event) => updateEntry({ comment: event.target.value })}
                                 />
                               </Field>
-                              <Field
+                              <LongTextEditor
                                 label="条目全文"
-                                description={`${currentEntry.entry.content.length.toLocaleString()} / 24,000 字；内容只进入角色上下文。`}
-                              >
-                                <Textarea
-                                  className="text-area long-editor"
-                                  aria-label="条目全文"
-                                  rows={16}
-                                  maxLength={24000}
-                                  disabled={saving}
-                                  value={currentEntry.entry.content}
-                                  onChange={(event) => updateEntry({ content: event.target.value })}
-                                />
-                              </Field>
+                                description="内容只进入角色上下文。"
+                                rows={16}
+                                maxLength={24000}
+                                disabled={saving}
+                                value={currentEntry.entry.content}
+                                onChange={(content) => updateEntry({ content })}
+                              />
                               <section className="section-card">
                                 <h3>运行时触发条件</h3>
                                 <p className="muted">
@@ -618,30 +607,28 @@ export default function BooksPage() {
                                   />
                                   <Field
                                     label="主触发关键词"
-                                    description="每行一个；普通条目至少命中一个主词才有机会触发。"
+                                    description="输入完整关键词后按 Enter 添加；普通条目至少命中一个主词才有机会触发。"
                                   >
-                                    <Textarea
-                                      className="text-area"
-                                      aria-label="主触发关键词"
-                                      rows={4}
+                                    <TagInput
+                                      label="主触发关键词"
+                                      key={`${currentEntry.entry.uid}-primary`}
+                                      onDraftChange={(value) => setKeywordDraft("primary", value)}
                                       disabled={saving}
-                                      value={currentEntry.keys}
-                                      onChange={(event) => updateEntryBuffer({ keys: event.target.value })}
+                                      value={currentEntry.keys ? currentEntry.keys.split("\n") : []}
+                                      onChange={(keys) => updateEntryBuffer({ keys: keys.join("\n") })}
                                     />
                                   </Field>
                                   <Field
                                     label="二级触发关键词"
-                                    description="每行一个；启用二级条件后按所选逻辑进一步筛选。"
+                                    description="输入完整关键词后按 Enter 添加；启用二级条件后按所选逻辑进一步筛选。"
                                   >
-                                    <Textarea
-                                      className="text-area"
-                                      aria-label="二级触发关键词"
-                                      rows={4}
+                                    <TagInput
+                                      label="二级触发关键词"
+                                      key={`${currentEntry.entry.uid}-secondary`}
+                                      onDraftChange={(value) => setKeywordDraft("secondary", value)}
                                       disabled={saving}
-                                      value={currentEntry.secondary}
-                                      onChange={(event) =>
-                                        updateEntryBuffer({ secondary: event.target.value })
-                                      }
+                                      value={currentEntry.secondary ? currentEntry.secondary.split("\n") : []}
+                                      onChange={(keys) => updateEntryBuffer({ secondary: keys.join("\n") })}
                                     />
                                   </Field>
                                   <Checkbox
@@ -668,47 +655,33 @@ export default function BooksPage() {
                                     onChange={(checked) => updateEntry({ useProbability: checked })}
                                   />
                                   <Field label="触发概率（%）">
-                                    <Input
-                                      type="number"
-                                      className="text-input"
-                                      aria-label="触发概率（%）"
+                                    <NumberField
+                                      label="触发概率（%）"
                                       min={0}
                                       max={100}
+                                      step={1}
                                       disabled={saving || !currentEntry.entry.useProbability}
                                       value={
                                         Number.isFinite(currentEntry.entry.probability)
                                           ? currentEntry.entry.probability
-                                          : ""
+                                          : null
                                       }
-                                      onChange={(event) =>
-                                        updateEntry({
-                                          probability:
-                                            event.target.value === ""
-                                              ? Number.NaN
-                                              : Number(event.target.value),
-                                        })
+                                      onChange={(probability) =>
+                                        updateEntry({ probability: probability ?? Number.NaN })
                                       }
                                     />
                                   </Field>
                                   <Field label="条目排序" description="用于条目优先级与注入排序。">
-                                    <Input
-                                      type="number"
-                                      className="text-input"
-                                      aria-label="条目排序"
+                                    <NumberField
+                                      label="条目排序"
+                                      step={1}
                                       disabled={saving}
                                       value={
                                         Number.isFinite(currentEntry.entry.order)
                                           ? currentEntry.entry.order
-                                          : ""
+                                          : null
                                       }
-                                      onChange={(event) =>
-                                        updateEntry({
-                                          order:
-                                            event.target.value === ""
-                                              ? Number.NaN
-                                              : Number(event.target.value),
-                                        })
-                                      }
+                                      onChange={(order) => updateEntry({ order: order ?? Number.NaN })}
                                     />
                                   </Field>
                                   <Field label="注入位置">
@@ -729,17 +702,13 @@ export default function BooksPage() {
                                   是只读的条目标识；常用触发条件请在上方编辑。向量匹配、自动化和 outlet
                                   暂不支持。
                                 </p>
-                                <Field label="扩展配置（完整 JSON 对象）">
-                                  <Textarea
-                                    className="text-area"
-                                    aria-label="扩展配置（JSON 对象）"
-                                    spellCheck={false}
-                                    rows={14}
-                                    disabled={saving}
-                                    value={currentEntry.extra}
-                                    onChange={(event) => updateEntryBuffer({ extra: event.target.value })}
-                                  />
-                                </Field>
+                                <JSONEditor
+                                  label="扩展配置（JSON 对象）"
+                                  minRows={14}
+                                  disabled={saving}
+                                  value={currentEntry.extra}
+                                  onChange={(extra) => updateEntryBuffer({ extra })}
+                                />
                               </details>
                             </div>
                           ) : (
@@ -758,31 +727,25 @@ export default function BooksPage() {
                       </>
                     ) : (
                       <>
-                        <Field
+                        <LongTextEditor
                           label="世界书全文"
-                          description={`${draft.book.content.length.toLocaleString()} / 20,000 字；简单世界书按一条设定参与上下文。`}
-                        >
-                          <Textarea
-                            className="text-area long-editor"
-                            aria-label="世界书全文"
-                            rows={20}
-                            maxLength={20000}
-                            disabled={saving}
-                            value={draft.book.content}
-                            onChange={(event) => updateBook({ content: event.target.value })}
-                          />
-                        </Field>
+                          description="简单世界书按一条设定参与上下文。"
+                          rows={20}
+                          maxLength={20000}
+                          disabled={saving}
+                          value={draft.book.content}
+                          onChange={(content) => updateBook({ content })}
+                        />
                         <Field
                           label="运行时触发关键词"
-                          description="每行一个。与管理库搜索独立；简单世界书的触发规则由服务默认条目提供。"
+                          description="输入完整关键词后按 Enter 添加。简单世界书的触发规则由服务默认条目提供。"
                         >
-                          <Textarea
-                            className="text-area"
-                            aria-label="运行时触发关键词"
-                            rows={4}
+                          <TagInput
+                            label="运行时触发关键词"
+                            onDraftChange={(value) => setKeywordDraft("simple", value)}
                             disabled={saving}
-                            value={draft.keys}
-                            onChange={(event) => setDraft({ ...draft, keys: event.target.value })}
+                            value={draft.keys ? draft.keys.split("\n") : []}
+                            onChange={(keys) => setDraft({ ...draft, keys: keys.join("\n") })}
                           />
                         </Field>
                       </>
@@ -812,150 +775,95 @@ export default function BooksPage() {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <div className="document-toolbar">
-                      <div className="search-box">
-                        <Icon name="search" size={16} />
-                        <Input
-                          className="search-input"
-                          type="search"
-                          aria-label="在此书全文中查找"
-                          placeholder="在此书全文中查找…"
-                          value={readQuery}
-                          onChange={(event) => setReadQuery(event.target.value)}
-                        />
-                        {readQuery && (
-                          <button
-                            type="button"
-                            className="icon-button"
-                            aria-label="清空书内查找"
-                            onClick={() => setReadQuery("")}
-                          >
-                            <Icon name="close" size={14} />
-                          </button>
-                        )}
-                      </div>
-                      {readQuery && <span className="meta">{readMatches.length} 个匹配条目</span>}
-                    </div>
-                    <div className="book-reading-content">
-                      {display.entries !== undefined ? (
-                        <>
-                          {readQuery.trim() && (
-                            <nav className="book-entry-index" aria-label="搜索命中条目">
-                              <h3>搜索命中条目 · {readMatches.length}</h3>
-                              <p className="muted">按正文、标题及主次触发关键词匹配，点击直接跳转。</p>
-                              <div className="inline-actions">
-                                {readMatches.map((index) => {
-                                  const match = display.entries?.[index];
-                                  return match ? (
-                                    <Button
-                                      key={match.uid}
-                                      variant="secondary"
-                                      onClick={() => jumpToEntry(index)}
-                                    >
-                                      {index + 1}. {entryTitle(match, index)}
-                                      <Icon name="arrow" />
-                                    </Button>
-                                  ) : null;
-                                })}
-                              </div>
-                              {readMatches.length === 0 && (
-                                <p className="muted">条目中没有匹配词句；可继续查看书名与原始元数据。</p>
-                              )}
-                            </nav>
-                          )}
-                          <nav className="book-entry-index" aria-label="世界书条目目录">
-                            <h3>条目目录</h3>
-                            <div className="inline-actions">
-                              {display.entries.map((entry, index) => (
-                                <Button key={entry.uid} variant="ghost" onClick={() => jumpToEntry(index)}>
-                                  {index + 1}. <Marked text={entryTitle(entry, index)} query={readQuery} />
-                                  {readMatches.includes(index) && <Badge tone="info">匹配</Badge>}
-                                </Button>
-                              ))}
-                            </div>
-                            {display.entries.length === 0 && <p className="muted">暂无条目。</p>}
-                          </nav>
-                          {display.entries.map((entry, index) => (
-                            <section className="reading-section" id={`book-entry-${index}`} key={entry.uid}>
-                              <div className="toolbar">
-                                <h3>
-                                  {index + 1}. <Marked text={entryTitle(entry, index)} query={readQuery} />
-                                </h3>
-                                <div className="inline-actions">
-                                  <Badge tone={entry.disable ? "neutral" : "success"}>
-                                    {entry.disable ? "已停用" : "已启用"}
-                                  </Badge>
-                                  {entry.constant && <Badge>常驻</Badge>}
-                                  <span className="meta">UID {entry.uid}</span>
-                                </div>
-                              </div>
-                              <p className="meta">
-                                主触发词：
-                                <Marked text={entry.key.join("、") || "无"} query={readQuery} />
-                                {entry.selective && (
-                                  <>
-                                    {" "}
-                                    · 二级触发词：
-                                    <Marked text={entry.keysecondary.join("、") || "无"} query={readQuery} />
-                                  </>
-                                )}
-                              </p>
-                              <p className="meta">
-                                {positions.find((position) => position.value === String(entry.position))
-                                  ?.label ?? `原始位置 ${entry.position}`}{" "}
-                                · 排序 {entry.order} ·{" "}
-                                {entry.useProbability ? `触发概率 ${entry.probability}%` : "概率筛选关闭"}
-                              </p>
-                              <div className="prose">
-                                <Marked text={entry.content || "此条目尚无内容。"} query={readQuery} />
-                              </div>
+                  <DocumentReader
+                    label="世界书内容"
+                    searchLabel="在此书全文中查找"
+                    clearSearchLabel="清空书内查找"
+                    outlineLabel="世界书条目目录"
+                    query={readQuery}
+                    onQueryChange={setReadQuery}
+                    emptyTitle="这本世界书暂无条目"
+                    sections={
+                      display.entries !== undefined
+                        ? display.entries.map((entry, index) => ({
+                            id: String(entry.uid),
+                            domId: `book-entry-${index}`,
+                            title: entryTitle(entry, index),
+                            content: entry.content || <span className="empty-value">此条目尚无内容。</span>,
+                            searchText: [...entry.key, ...entry.keysecondary].join("\n"),
+                            meta: (
+                              <>
+                                <Badge tone={entry.disable ? "neutral" : "success"}>
+                                  {entry.disable ? "已停用" : "已启用"}
+                                </Badge>
+                                {entry.constant && <Badge>常驻</Badge>}
+                                <span>UID {entry.uid}</span>
+                              </>
+                            ),
+                            description: (
+                              <>
+                                <p>
+                                  主触发词：
+                                  <HighlightText text={entry.key.join("、") || "无"} query={readQuery} />
+                                  {entry.selective && (
+                                    <>
+                                      {" "}
+                                      · 二级触发词：
+                                      <HighlightText
+                                        text={entry.keysecondary.join("、") || "无"}
+                                        query={readQuery}
+                                      />
+                                    </>
+                                  )}
+                                </p>
+                                <p>
+                                  {positions.find((position) => position.value === String(entry.position))
+                                    ?.label ?? `原始位置 ${entry.position}`}{" "}
+                                  · 排序 {entry.order} ·{" "}
+                                  {entry.useProbability ? `触发概率 ${entry.probability}%` : "概率筛选关闭"}
+                                </p>
+                              </>
+                            ),
+                            footer: (
                               <details className="book-meta-item">
                                 <summary>全部触发配置与原始字段（只读）</summary>
-                                <Field label={`条目 ${index + 1} 完整配置 JSON`}>
-                                  <Textarea
-                                    className="text-area"
-                                    aria-label={`条目 ${index + 1} 完整配置 JSON`}
-                                    rows={12}
-                                    readOnly
-                                    value={JSON.stringify(
-                                      Object.fromEntries(
-                                        Object.entries(entry).filter(([key]) => key !== "content"),
-                                      ),
-                                      null,
-                                      2,
-                                    )}
-                                  />
-                                </Field>
+                                <JSONViewer
+                                  label={`条目 ${index + 1} 完整配置 JSON`}
+                                  text={JSON.stringify(
+                                    Object.fromEntries(
+                                      Object.entries(entry).filter(([key]) => key !== "content"),
+                                    ),
+                                    null,
+                                    2,
+                                  )}
+                                />
                               </details>
-                            </section>
-                          ))}
-                        </>
-                      ) : (
-                        <section className="reading-section">
-                          <p className="meta">
-                            运行时触发词：
-                            <Marked text={display.keys.join("、") || "无"} query={readQuery} />
-                          </p>
-                          <div className="prose">
-                            <Marked text={display.content || "此世界书尚无内容。"} query={readQuery} />
-                          </div>
-                        </section>
-                      )}
-                      {readQuery.trim() &&
-                        !bookSearchText(display).includes(readQuery.trim().toLocaleLowerCase()) && (
-                          <p className="notice" role="status">
-                            这本世界书中没有匹配文字。
-                          </p>
-                        )}
-                    </div>
-                  </>
+                            ),
+                          }))
+                        : [
+                            {
+                              id: "content",
+                              title: "世界设定",
+                              description: (
+                                <>
+                                  运行时触发词：
+                                  <HighlightText text={display.keys.join("、") || "无"} query={readQuery} />
+                                </>
+                              ),
+                              searchText: display.keys.join("\n"),
+                              content: display.content || (
+                                <span className="empty-value">此世界书尚无内容。</span>
+                              ),
+                            },
+                          ]
+                    }
+                  />
                 )}
               </>
             )}
           </div>
         </section>
-      </div>
+      </SplitPane>
       <Dialog
         open={createOpen}
         title="新建世界书"
@@ -1087,6 +995,8 @@ export default function BooksPage() {
               onClick={() => {
                 if (draft?.entries && deleteEntry !== undefined) {
                   const entries = draft.entries.filter((_, index) => index !== deleteEntry);
+                  pendingKeywords.current = {};
+                  setKeywordDrafts({});
                   setDraft({ ...draft, entries });
                   setActiveEntry(Math.max(0, Math.min(activeEntry, entries.length - 1)));
                 }
@@ -1153,35 +1063,29 @@ export default function BooksPage() {
             本页变化字段：
             {draft && reviewBook ? changedBookFields(draft.original, reviewBook).join("、") || "无" : "无"}
           </p>
-          <div className="field-grid">
-            <Field label="开始编辑时的完整版本">
-              <Textarea
-                className="text-area"
-                aria-label="开始编辑时的完整版本"
-                readOnly
-                rows={18}
-                value={draft ? JSON.stringify(draft.original, null, 2) : ""}
-              />
-            </Field>
-            <Field label="服务端当前完整版本">
-              <Textarea
-                className="text-area"
-                aria-label="服务端当前完整版本"
-                readOnly
-                rows={18}
-                value={latestBook ? JSON.stringify(latestBook, null, 2) : "服务端尚无此书。"}
-              />
-            </Field>
-            <Field label="本页完整草稿">
-              <Textarea
-                className="text-area"
-                aria-label="本页完整草稿"
-                readOnly
-                rows={18}
-                value={reviewBook ? JSON.stringify(reviewBook, null, 2) : ""}
-              />
-            </Field>
-          </div>
+          <DiffViewer
+            label="服务端变更"
+            beforeLabel="开始编辑时"
+            afterLabel="服务端当前"
+            before={draft ? JSON.stringify(draft.original, null, 2) : ""}
+            after={latestBook ? JSON.stringify(latestBook, null, 2) : "服务端尚无此书。"}
+          />
+          <DiffViewer
+            label="草稿修改"
+            beforeLabel="开始编辑时"
+            afterLabel="本页草稿"
+            before={draft ? JSON.stringify(draft.original, null, 2) : ""}
+            after={reviewBook ? JSON.stringify(reviewBook, null, 2) : ""}
+          />
+          <JSONViewer
+            label="开始编辑时的完整版本"
+            text={draft ? JSON.stringify(draft.original, null, 2) : ""}
+          />
+          <JSONViewer
+            label="服务端当前完整版本"
+            text={latestBook ? JSON.stringify(latestBook, null, 2) : "服务端尚无此书。"}
+          />
+          <JSONViewer label="本页完整草稿" text={reviewBook ? JSON.stringify(reviewBook, null, 2) : ""} />
           {formError && (
             <p className="notice" role="alert">
               {formError}

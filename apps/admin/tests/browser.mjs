@@ -51,6 +51,13 @@ const visibleDialog = () => page.getByRole('dialog').filter({ visible: true });
 const sourceRole = () => initial.roles[0];
 const roleId = sourceRole().id;
 
+async function readJSON(scope, label) {
+  const viewer = scope.getByRole('region', { name: label, exact: true });
+  const toggle = viewer.getByRole('button', { name: '显示全文', exact: true });
+  if (await toggle.count()) await toggle.click();
+  return viewer.locator('pre').textContent();
+}
+
 async function startUpstream() {
   const instance = http.createServer(async (request, response) => {
     if (request.url !== '/v1/chat/completions' || request.method !== 'POST') { response.writeHead(404); response.end(); return; }
@@ -174,18 +181,34 @@ try {
   });
 
   await step('role-eleven-fields-full-read-and-write', async () => {
-    for (const [key] of roleFields) assert.equal(await page.locator(`#role-${key} .prose`).textContent(), sourceRole()[key], key);
+    for (const [key] of roleFields) assert.equal(await page.locator(`#role-${key} .bt-document-content`).textContent(), sourceRole()[key], key);
     await page.getByRole('button', { name: '编辑角色', exact: true }).click();
     for (const [key, label] of roleFields) {
       const field = await editRoleField(label);
       await expect(field).toHaveValue(sourceRole()[key]);
       await field.fill(longText(key, 'edited'));
     }
-    await page.getByRole('button', { name: '保存角色', exact: true }).click();
+    let releaseSave, intercepted = false;
+    const savingGate = new Promise(resolve => { releaseSave = resolve; });
+    const holdRoleSave = async route => {
+      if (route.request().method() !== 'PUT') return route.fallback();
+      intercepted = true;
+      await savingGate;
+      await route.continue();
+    };
+    await context.route('**/api/admin/config', holdRoleSave);
+    try {
+      await page.getByRole('button', { name: '保存角色', exact: true }).click();
+      await expect.poll(() => intercepted).toBe(true);
+      await expect(page.getByRole('textbox', { name: '原始世界设定', exact: true })).toBeDisabled();
+      await expect(page.getByRole('button', { name: '退出编辑', exact: true })).toBeDisabled();
+      await expect(page.getByRole('list', { name: '角色卡列表' }).getByRole('button').first()).toBeDisabled();
+    } finally { releaseSave(); await context.unroute('**/api/admin/config', holdRoleSave); }
+
     await expect(page.getByRole('button', { name: '编辑角色', exact: true })).toBeVisible();
     const current = (await state()).config;
     const role = current.roles.find(item => item.id === roleId);
-    for (const [key] of roleFields) { assert.equal(role[key], longText(key, 'edited')); assert.equal(await page.locator(`#role-${key} .prose`).textContent(), role[key]); }
+    for (const [key] of roleFields) { assert.equal(role[key], longText(key, 'edited')); assert.equal(await page.locator(`#role-${key} .bt-document-content`).textContent(), role[key]); }
     assert.deepEqual(role.qaRoleExtension, unknownFields);
     assert.deepEqual(role.source, sourceRole().source);
     assert.deepEqual(current.qaConfigExtension, unknownFields);
@@ -196,8 +219,9 @@ try {
     await expect(page.getByRole('heading', { name: '没有匹配的角色', exact: true })).toBeVisible();
     await page.getByRole('button', { name: '清空搜索', exact: true }).click();
     await page.getByLabel('在角色卡中查找').fill('没有匹配的虚构段落');
-    await expect(page.getByRole('heading', { name: '全文中没有匹配内容', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: '清空查找', exact: true }).click();
+    await expect(page.getByRole('status').filter({ hasText: '无匹配内容' })).toBeVisible();
+    assert.equal(await page.locator('#role-detail .bt-document-content').textContent(), longText('detail', 'edited'), 'No matches must retain the complete original document');
+    await page.getByRole('button', { name: '清空全文查找', exact: true }).click();
     await page.getByRole('button', { name: '编辑角色', exact: true }).click();
     const field = await editRoleField('角色设定');
     await field.fill('应被取消的虚构内容');
@@ -224,10 +248,12 @@ try {
 
   await step('worldbook-simple-fulltext-save-and-unknown-fields', async () => {
     await nav('/books', '世界书');
-    assert.equal(await page.locator('.reader-pane .prose').textContent(), initial.books[0].content);
+    assert.equal(await page.locator('.reader-pane .bt-document-content').textContent(), initial.books[0].content);
     await page.getByRole('button', { name: '编辑世界书', exact: true }).click();
     await page.getByLabel('世界书全文', { exact: true }).fill(longText('simple', 'edited'));
-    await page.getByLabel('运行时触发关键词', { exact: true }).fill('灯塔\n虚构触发');
+    const keywords = page.getByLabel('运行时触发关键词', { exact: true });
+    await keywords.fill('虚构触发');
+    await keywords.press('Enter');
     await page.getByRole('button', { name: '保存世界书', exact: true }).click();
     await expect(page.getByRole('button', { name: '编辑世界书', exact: true })).toBeVisible();
     const book = (await state()).config.books.find(item => item.id === 'mira-world');
@@ -242,10 +268,19 @@ try {
 
   await step('worldbook-multientry-advanced-validation-edit-and-delete', async () => {
     await page.getByRole('button', { name: /虚构多条目世界书/ }).click();
-    for (const [index, entry] of initial.books[2].entries.entries()) assert.equal(await page.locator(`#book-entry-${index} .prose`).textContent(), entry.content);
+    for (const [index, entry] of initial.books[2].entries.entries()) assert.equal(await page.locator(`#book-entry-${index} .bt-document-content`).textContent(), entry.content);
     await page.getByRole('button', { name: '编辑世界书', exact: true }).click();
     await page.getByLabel('条目全文', { exact: true }).fill(longText('entry_0', 'edited'));
     await page.getByText('高级配置与原始扩展', { exact: true }).click();
+    const primaryKeyword = page.getByRole('textbox', { name: '主触发关键词', exact: true });
+    await primaryKeyword.fill('灯塔');
+    await page.getByRole('navigation', { name: '编辑条目目录' }).getByRole('button', { name: /^2\./ }).click();
+    await expect(primaryKeyword).toHaveValue('灯塔');
+    await expect(page.getByLabel('条目全文', { exact: true })).toHaveValue(longText('entry_0', 'edited'));
+    await page.getByRole('button', { name: '新增条目', exact: true }).click();
+    await expect(page.getByRole('navigation', { name: '编辑条目目录' }).getByRole('button')).toHaveCount(3);
+    await expect(primaryKeyword).toHaveValue('灯塔');
+    await primaryKeyword.fill('');
     const advanced = page.getByLabel(/^扩展配置（(?:完整 )?JSON 对象）$/);
     const originalExtra = JSON.parse(await advanced.inputValue());
     await advanced.fill('{broken');
@@ -296,10 +331,23 @@ try {
     assert(book);
     await nav('/roles', '角色卡');
     await page.getByRole('button', { name: '编辑角色', exact: true }).click();
-    await page.getByRole('checkbox', { name: /待绑定后删除的虚构书/ }).check();
+    const bindings = page.getByRole('combobox', { name: '供此角色使用的世界书', exact: true });
+    await bindings.fill('待绑定后删除');
+    await page.getByRole('option', { name: /待绑定后删除的虚构书/ }).click();
+    await bindings.press('Escape');
+    const roleKeywords = page.getByLabel('原始关键词', { exact: true });
+    await roleKeywords.fill('雨后, 港口');
+    await roleKeywords.press('Enter');
+    await roleKeywords.fill('雨后, 港口');
+    await page.getByRole('navigation', { name: '角色编辑字段' }).getByRole('button', { name: /^角色设定/ }).click();
+    await expect(roleKeywords).toHaveValue('雨后, 港口');
+    await expect(page.getByText('请先完成或移除正在输入的关键词，再切换字段。', { exact: true })).toBeVisible();
+    await roleKeywords.fill('尚未寄出 的信');
     await page.getByRole('button', { name: '保存角色', exact: true }).click();
     await expect(page.getByRole('button', { name: '编辑角色', exact: true })).toBeVisible();
     assert((await state()).config.roles[0].bookIds.includes(book.id));
+    assert((await state()).config.roles[0].keys.includes('雨后, 港口'));
+    assert((await state()).config.roles[0].keys.includes('尚未寄出 的信'), 'Clicking save must first commit the pending complete keyword');
     await nav('/books', '世界书');
     await page.getByRole('button', { name: /待绑定后删除的虚构书/ }).click();
     await page.getByRole('button', { name: '删除', exact: true }).click();
@@ -389,7 +437,7 @@ try {
     await nav('/users', '用户与全局');
     await page.getByLabel('搜索用户', { exact: true }).fill('不存在的虚构用户');
     await expect(page.getByRole('heading', { name: '没有匹配的用户', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: '清除筛选', exact: true }).click();
+    await page.getByRole('region', { name: '用户筛选', exact: true }).getByRole('button', { name: '清除筛选', exact: true }).click();
     const row = page.getByRole('row').filter({ hasText: userId });
     await row.getByRole('button', { name: '停用', exact: true }).click();
     await visibleDialog().getByRole('button', { name: '取消', exact: true }).click();
@@ -440,7 +488,7 @@ try {
     assert.equal(upstreamCalls, 1);
     await page.getByLabel('搜索会话', { exact: true }).fill('不存在的虚构会话');
     await expect(page.getByRole('heading', { name: '没有匹配的会话', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: '清除筛选', exact: true }).click();
+    await page.getByRole('region', { name: '会话筛选', exact: true }).getByRole('button', { name: '清除筛选', exact: true }).click();
     const row = page.getByRole('row').filter({ hasText: conversation });
     await row.getByRole('button', { name: '删除', exact: true }).click();
     await visibleDialog().getByRole('button', { name: '取消', exact: true }).click();
@@ -468,7 +516,7 @@ try {
     await expect(page.getByRole('row').filter({ hasText: '导入社区素材' })).toBeVisible();
     await page.getByLabel('搜索操作记录', { exact: true }).fill('不可能匹配的虚构审计对象');
     await expect(page.getByRole('heading', { name: '没有匹配的记录', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: '清除筛选', exact: true }).click();
+    await page.getByRole('region', { name: '操作记录筛选', exact: true }).getByRole('button', { name: '清除筛选', exact: true }).click();
     assert.equal(planProvider.calls.generate, 0); assert.equal(upstreamCalls, 1);
   });
 
@@ -507,8 +555,8 @@ try {
     await expect(comparison).toBeVisible();
     const comparisonElement = await comparison.elementHandle();
     assert(comparisonElement);
-    assert((await comparison.getByLabel('本页完整草稿', { exact: true }).inputValue()).includes(privateDraft));
-    assert((await comparison.getByLabel('服务端当前完整版本', { exact: true }).inputValue()).includes(privateServer));
+    assert((await readJSON(comparison, '本页完整草稿')).includes(privateDraft));
+    assert((await readJSON(comparison, '服务端当前完整版本')).includes(privateServer));
     let injected = false;
     const expireNextState = async route => {
       if (!injected && route.request().method() === 'GET') {
@@ -527,14 +575,15 @@ try {
       assert.equal(injected, true);
       await expect(page.getByRole('dialog')).toHaveCount(0);
       await expect.poll(() => comparisonElement.isVisible()).toBe(false);
-      await expect(page.getByRole('textbox', { name: '本页完整草稿', exact: true })).toHaveCount(0);
+      await expect(page.getByRole('region', { name: '本页完整草稿', exact: true })).toHaveCount(0);
+      await expect(page.getByRole('region', { name: '服务端变更', exact: true })).toHaveCount(0);
       const password = page.getByLabel(/^管理员口令/);
       await password.fill(syntheticPassword);
       await expect(password).toBeFocused();
       await expect(password).toHaveValue(syntheticPassword);
       await page.getByRole('button', { name: '登录', exact: true }).click();
       await expect(comparison).toBeVisible();
-      assert((await comparison.getByLabel('本页完整草稿', { exact: true }).inputValue()).includes(privateDraft));
+      assert((await readJSON(comparison, '本页完整草稿')).includes(privateDraft));
       await comparison.getByRole('button', { name: '返回草稿', exact: true }).click();
       await expect(page.getByLabel('世界书全文', { exact: true })).toHaveValue(privateDraft);
       await page.getByRole('button', { name: '取消编辑', exact: true }).click();

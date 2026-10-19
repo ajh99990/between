@@ -35,8 +35,23 @@ import {
   UiProvider,
 } from "@between/ui";
 import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from "react";
+import { AdvancedControlsDemo } from "./advanced-controls-demo";
+import { DataTableExtendedDemo } from "./data-table-extended-demo";
+import { DocumentsDemo } from "./documents-demo";
+import { StructuredDataDemo } from "./structured-data-demo";
 
-type Group = "basics" | "forms" | "selection" | "overlays" | "feedback" | "data" | "scenarios";
+type Group =
+  | "basics"
+  | "forms"
+  | "selection"
+  | "overlays"
+  | "feedback"
+  | "data"
+  | "scenarios"
+  | "advanced-controls"
+  | "documents"
+  | "structured-data"
+  | "data-extended";
 type TestState = "normal" | "disabled" | "loading" | "error";
 type Feedback = { message: string; tone: "success" | "error" | "neutral" } | null;
 type Task = { id: string; title: string; owner: string; status: string; priority: string; due: string };
@@ -53,6 +68,15 @@ const groups: {
   { id: "overlays", label: "弹窗与菜单", icon: "menu", description: "浮层开合、嵌套与焦点" },
   { id: "feedback", label: "状态与反馈", icon: "alert", description: "等待、失败、恢复与结果" },
   { id: "data", label: "数据与筛选", icon: "sessions", description: "排序、跨页选择与分页" },
+  {
+    id: "advanced-controls",
+    label: "多选与参数",
+    icon: "check",
+    description: "多选、完整词组与精确数字输入",
+  },
+  { id: "documents", label: "阅读与编辑", icon: "edit", description: "全文查找、可调分栏与稳定的长文编辑" },
+  { id: "structured-data", label: "JSON 与差异", icon: "sessions", description: "原文、语法定位与版本差异" },
+  { id: "data-extended", label: "高级表格", icon: "sessions", description: "列宽、显隐、固定操作与复合筛选" },
   { id: "scenarios", label: "组合场景", icon: "roles", description: "长表单、编辑与玻璃阅读" },
 ];
 const stateOptions = [
@@ -621,7 +645,9 @@ export function Playground() {
                 title={current.label}
                 description={current.description}
                 actions={
-                  group === "data" || group === "scenarios" ? undefined : (
+                  ["data", "scenarios", "documents", "structured-data", "data-extended"].includes(
+                    group,
+                  ) ? undefined : (
                     <div className="pg-header-state">
                       <LabeledSelect
                         label="组件测试状态"
@@ -633,6 +659,12 @@ export function Playground() {
                   )
                 }
               />
+              {group === "advanced-controls" && (
+                <AdvancedControlsDemo disabled={disabled} error={testState === "error"} long={longContent} />
+              )}
+              {group === "documents" && <DocumentsDemo />}
+              {group === "structured-data" && <StructuredDataDemo />}
+              {group === "data-extended" && <DataTableExtendedDemo />}
               {group === "basics" && (
                 <div className="pg-example-grid">
                   <Example title="按钮" description="主要动作保持克制，忙碌与禁用不改变按钮宽度。">

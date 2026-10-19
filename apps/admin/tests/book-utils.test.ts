@@ -118,6 +118,79 @@ describe('conflict review and optimistic saves', () => {
 });
 
 describe('server capability limits', () => {
+  it.each([
+    '{"extension":900719925474099312345}',
+    '{"extension":9007199254740993}',
+    '{"extension":9007199254740992}',
+    '{"extension":1e400}',
+    '{"extension":1e-999}',
+    '{"extension":0.10000000000000001}',
+    '{"extension":-0.10000000000000001}',
+    '{"extension":-0}',
+    '{"extension":{"nested":[1,2,1.234567890123456789]}}',
+  ])('rejects lossy numeric conversion and leaves the exact input draft untouched: %s', extra => {
+    const original = book(), before = structuredClone(original), draft = makeBookDraft(original, config(original));
+    draft.entries![0].extra = extra;
+    expect(() => serializeBookDraft(draft)).toThrow('数值无法无损保存');
+    expect(draft.entries![0].extra).toBe(extra);
+    expect(original).toEqual(before);
+    expect(draft.entries![0].entry.unknown).toEqual(before.entries![0].unknown);
+  });
+
+  it.each([
+    ['0.1', 0.1],
+    ['1e3', 1000],
+    ['1.2300e3', 1230],
+    ['1.0000000000000000', 1],
+    ['-12.75', -12.75],
+    ['1e-7', 1e-7],
+    ['0.000000000000000001', 1e-18],
+    ['0e000000000000000000000000000001', 0],
+    ['9007199254740991', 9007199254740991],
+  ] as const)('allows an exactly round-tripping ordinary JSON number %s', (literal, expected) => {
+    const original = book(), draft = makeBookDraft(original, config(original));
+    const extra = `{ "extension": ${literal}, "unrelated": { "keep": true } }`;
+    draft.entries![0].extra = extra;
+    const saved = serializeBookDraft(draft).entries![0];
+    expect(saved.extension).toBe(expected);
+    expect(saved.unrelated).toEqual({ keep: true });
+    expect(saved.content).toBe(original.entries![0].content);
+    expect(draft.entries![0].extra).toBe(extra);
+  });
+
+  it.each([
+    '{"duplicate":"first","duplicate":"last"}',
+    '{"a":1,"\\u0061":2}',
+    '{"extension":{"nested":1,"nested":2}}',
+  ])('refuses duplicate-key business saves rather than silently dropping a field: %s', extra => {
+    const original = book(), draft = makeBookDraft(original, config(original));
+    draft.entries![0].extra = extra;
+    expect(() => serializeBookDraft(draft)).toThrow('重复键');
+    expect(draft.entries![0].extra).toBe(extra);
+    expect(original.entries![0].unknown).toEqual({ keep: true });
+  });
+
+  it('allows the same key in different objects, numeric-looking strings and unknown extensions without mutation', () => {
+    const original = book(), draft = makeBookDraft(original, config(original));
+    const extra = '{"a":1,"child":{"a":2},"exactId":"900719925474099312345","scientificLabel":"1e400","unknown":{"keep":true}}';
+    draft.entries![0].extra = extra;
+    const saved = serializeBookDraft(draft).entries![0];
+    expect(saved.child).toEqual({ a: 2 });
+    expect(saved.exactId).toBe('900719925474099312345');
+    expect(saved.scientificLabel).toBe('1e400');
+    expect(saved.unknown).toEqual(original.entries![0].unknown);
+    expect(draft.entries![0].extra).toBe(extra);
+  });
+
+  it('rejects a very long underflow exponent without constructing a huge BigInt or changing source', () => {
+    const original = book(), draft = makeBookDraft(original, config(original));
+    const extra = `{"extension":1e-${'9'.repeat(100_000)}}`;
+    draft.entries![0].extra = extra;
+    expect(() => serializeBookDraft(draft)).toThrow('下溢为 0');
+    expect(draft.entries![0].extra).toBe(extra);
+    expect(original.entries![0].unknown).toEqual({ keep: true });
+  });
+
   it('searches actual full entry content and secondary trigger keywords', () => {
     const value = book();
     expect(bookSearchText(value)).toContain('全文中才能查到的灯塔');

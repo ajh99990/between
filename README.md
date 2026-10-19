@@ -44,7 +44,7 @@ CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm
 
 `npm run dev` 启动后台开发服务器 `127.0.0.1:8888/admin/`；API 目标由 `BETWEEN_ADMIN_DEV_API` 设置为自己已启动的回环服务，例如 `http://127.0.0.1:8799`。只允许显式指定回环地址，代理保留管理员同源请求约束。开发服务器不是完整应用入口。后台目录职责、组件与接口见 [后台说明](apps/admin/README.md)。
 
-`npm run dev:ui` 启动独立组件工作台，仅监听回环地址并输出实际随机端口。它直接使用 `@between/ui` 正式源码，提供基础控件、长表单、菜单、表格、草稿与故障场景；状态只在本页内存，不连接业务 API。`npm run build:ui-playground` 只生成 `packages/ui/dist-playground`，不发布到 `/admin/`。组件接口与开发入口见 [UI 包说明](packages/ui/README.md)，本轮架构、迁移清理、实测证据和待验边界见 [共享组件库与验收](docs/共享组件库与验收.md)。
+`npm run dev:ui` 启动独立组件工作台，仅监听回环地址并输出实际随机端口。它直接使用 `@between/ui` 正式源码，提供基础控件、长表单、菜单、表格、草稿与故障场景；状态只在本页内存，不连接业务 API。`npm run build:ui-playground` 只生成 `packages/ui/dist-playground`，不发布到 `/admin/`。组件接口与开发入口见 [UI 包说明](packages/ui/README.md)，本轮架构、迁移清理、实测证据和待验边界见 [共享组件库与验收](docs/共享组件库与验收.md)。本轮新增阅读、长文、多选、数字、JSON/差异、列布局与复合筛选，组件工作台扩为 11 组，当前范围与验收记录见 [共享组件扩展与验收](docs/共享组件扩展与验收.md)。
 
 ## 启动
 

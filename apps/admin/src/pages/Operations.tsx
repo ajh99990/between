@@ -2,17 +2,21 @@ import {
   Badge,
   Button,
   Checkbox,
+  ColumnVisibilityControl,
+  type DataColumn,
   DataTable,
   Dialog,
   Empty,
   ErrorNotice,
   Field,
+  FilterBar,
   Input,
+  LongTextEditor,
+  NumberField,
   PageHeader,
   Pagination,
   Panel,
   Select,
-  Textarea,
 } from "@between/ui";
 import { type FormEvent, type ReactNode, useRef, useState } from "react";
 import { api } from "../api";
@@ -29,7 +33,7 @@ const message = (error: unknown) => (error instanceof Error ? error.message : "�
 const normalized = (value: string) => value.trim().toLocaleLowerCase();
 const match = (query: string, ...values: unknown[]) =>
   values.join(" ").toLocaleLowerCase().includes(normalized(query));
-const numberValue = (value: number) => (Number.isFinite(value) ? value : "");
+const numberValue = (value: number) => (Number.isFinite(value) ? value : null);
 
 type Confirmation = {
   title: string;
@@ -167,6 +171,15 @@ function usePagination<T>(rows: T[]) {
       rows.length > pageSize ? (
         <Pagination page={current} total={rows.length} pageSize={pageSize} onPageChange={setPage} />
       ) : null,
+  };
+}
+
+function useTableLayout() {
+  const [widths, setWidths] = useState<Record<string, number>>({});
+  const [visibility, setVisibility] = useState<Record<string, boolean>>({});
+  return {
+    table: { columnWidths: widths, onColumnWidthsChange: setWidths, columnVisibility: visibility },
+    visibility: { value: visibility, onChange: setVisibility },
   };
 }
 
@@ -558,46 +571,46 @@ export function ModelsPage() {
                 <div className="page-stack">
                   <div className="field-grid">
                     <Field label="上下文预算" description="两种后端均遵循，最多 128000 tokens。">
-                      <Input
-                        className="text-input"
-                        type="number"
+                      <NumberField
+                        label="上下文预算"
+                        allowOutOfRange
                         min={2}
                         max={128000}
                         step={1}
                         required
                         value={numberValue(editor.value.context)}
-                        onChange={(event) => {
-                          const context = event.target.valueAsNumber;
+                        onChange={(value) => {
+                          const context = value ?? Number.NaN;
                           setEditor({ ...editor, value: { ...editor.value, context } });
                         }}
                       />
                     </Field>
                     <Field label="回复 Token 上限" description="须小于上下文预算，套餐模式忽略此项。">
-                      <Input
-                        className="text-input"
-                        type="number"
+                      <NumberField
+                        label="回复 Token 上限"
+                        allowOutOfRange
                         min={1}
-                        max={numberValue(editor.value.context - 1)}
+                        max={numberValue(editor.value.context - 1) ?? undefined}
                         step={1}
                         required
                         value={numberValue(editor.value.maxTokens)}
-                        onChange={(event) => {
-                          const maxTokens = event.target.valueAsNumber;
+                        onChange={(value) => {
+                          const maxTokens = value ?? Number.NaN;
                           setEditor({ ...editor, value: { ...editor.value, maxTokens } });
                         }}
                       />
                     </Field>
                     <Field label="生成温度" description="0–2，套餐模式忽略此项。">
-                      <Input
-                        className="text-input"
-                        type="number"
+                      <NumberField
+                        label="生成温度"
+                        allowOutOfRange
                         min={0}
                         max={2}
                         step="any"
                         required
                         value={numberValue(editor.value.temperature)}
-                        onChange={(event) => {
-                          const temperature = event.target.valueAsNumber;
+                        onChange={(value) => {
+                          const temperature = value ?? Number.NaN;
                           setEditor({ ...editor, value: { ...editor.value, temperature } });
                         }}
                       />
@@ -612,18 +625,16 @@ export function ModelsPage() {
                       }}
                     />
                   </div>
-                  <Field label="全局历史后指令" description="最多 10000 字符，仅进入新会话的模型上下文。">
-                    <Textarea
-                      className="text-area"
-                      rows={12}
-                      maxLength={10000}
-                      value={editor.value.postHistory}
-                      onChange={(event) => {
-                        const postHistory = event.target.value;
-                        setEditor({ ...editor, value: { ...editor.value, postHistory } });
-                      }}
-                    />
-                  </Field>
+                  <LongTextEditor
+                    label="全局历史后指令"
+                    description="最多 10000 字符，仅进入新会话的模型上下文。"
+                    rows={12}
+                    maxLength={10000}
+                    value={editor.value.postHistory}
+                    onChange={(postHistory) => {
+                      setEditor({ ...editor, value: { ...editor.value, postHistory } });
+                    }}
+                  />
                 </div>
               )}
               {validation && <ErrorNotice>{validation}</ErrorNotice>}
@@ -650,6 +661,8 @@ export function SessionsPage() {
   const { ask, dialog } = useConfirmation();
   const [query, setQuery] = useState("");
   const [role, setRole] = useState("all");
+  const taskLayout = useTableLayout();
+  const sessionLayout = useTableLayout();
   const sessions = state.users.flatMap((user) =>
     user.conversations.map((conversation) => ({ ...conversation, userId: user.id })),
   );
@@ -668,6 +681,158 @@ export function SessionsPage() {
     image: "生成图片",
     caption: "图像描述",
   };
+  const taskColumns: DataColumn<(typeof state.tasks)[number]>[] = [
+    {
+      key: "task",
+      width: 310,
+      minWidth: 220,
+      required: true,
+      wrap: true,
+      header: "任务 / 会话",
+      render: (task) => (
+        <>
+          <div className="meta">{task.id}</div>
+          <div className="meta muted">{task.conversation}</div>
+        </>
+      ),
+    },
+    {
+      key: "user",
+      width: 210,
+      minWidth: 160,
+      header: "用户",
+      render: (task) => <span className="meta">{task.userId}</span>,
+    },
+    {
+      key: "mode",
+      width: 120,
+      minWidth: 100,
+      header: "类型",
+      render: (task) => <>{modes[task.mode] ?? task.mode}</>,
+    },
+    {
+      key: "started",
+      width: 210,
+      minWidth: 180,
+      header: "开始时间",
+      render: (task) => <>{date(task.startedAt)}</>,
+    },
+    {
+      key: "actions",
+      width: 150,
+      minWidth: 130,
+      sticky: "end",
+      header: "操作",
+      render: (task) => (
+        <>
+          <Button
+            variant="danger"
+            disabled={busy}
+            onClick={() =>
+              ask({
+                title: "停止此生成任务？",
+                description: (
+                  <>
+                    <p className="meta">{task.id}</p>
+                    <p>未完成的本轮内容不会保存。</p>
+                  </>
+                ),
+                label: "停止任务",
+                danger: true,
+                action: () => run(() => api("/stop", "POST", { taskId: task.id }), "停止请求已发送。"),
+              })
+            }
+          >
+            停止任务
+          </Button>
+        </>
+      ),
+    },
+  ];
+  const sessionColumns: DataColumn<(typeof sessions)[number]>[] = [
+    {
+      key: "session",
+      width: 300,
+      minWidth: 200,
+      required: true,
+      wrap: true,
+      header: "会话",
+      render: (item) => (
+        <>
+          <div>{item.title}</div>
+          <div className="meta muted">{item.id}</div>
+        </>
+      ),
+    },
+    { key: "role", width: 150, minWidth: 110, header: "角色", render: (item) => <>{item.name}</> },
+    {
+      key: "user",
+      width: 220,
+      minWidth: 170,
+      header: "所属用户",
+      render: (item) => <span className="meta">{item.userId}</span>,
+    },
+    {
+      key: "version",
+      width: 120,
+      minWidth: 110,
+      header: "配置版本",
+      render: (item) => (
+        <>
+          <Badge>v{item.configVersion}</Badge>
+        </>
+      ),
+    },
+    {
+      key: "created",
+      width: 210,
+      minWidth: 180,
+      header: "创建时间",
+      render: (item) => <>{date(item.createdAt)}</>,
+    },
+    {
+      key: "actions",
+      width: 110,
+      minWidth: 100,
+      sticky: "end",
+      header: "操作",
+      render: (item) => (
+        <>
+          <Button
+            variant="danger"
+            disabled={busy}
+            onClick={() =>
+              ask({
+                title: `删除「${item.title}」？`,
+                description: (
+                  <>
+                    <p className="meta">{item.id}</p>
+                    <p>
+                      会停止此会话的任务并永久删除本机保存的聊天、媒体与幂等记录。不能撤销，不删除外部服务数据。
+                    </p>
+                  </>
+                ),
+                label: "永久删除会话",
+                danger: true,
+                action: () =>
+                  run(
+                    () =>
+                      api("/conversation", "DELETE", {
+                        userId: item.userId,
+                        conversation: item.id,
+                        confirm: true,
+                      }),
+                    "会话已删除。",
+                  ),
+              })
+            }
+          >
+            删除
+          </Button>
+        </>
+      ),
+    },
+  ];
   return (
     <div className="page-stack">
       <PageHeader title="会话与任务" description="查看会话、停止生成或删除会话。" />
@@ -678,57 +843,20 @@ export function SessionsPage() {
             <h2>正在运行的任务</h2>
             <p className="muted">停止后，本轮未完成内容不会保存。</p>
           </div>
-          <Badge tone={state.tasks.length ? "info" : "neutral"}>{state.tasks.length} 个任务</Badge>
+          <div className="inline-actions">
+            <Badge tone={state.tasks.length ? "info" : "neutral"}>{state.tasks.length} 个任务</Badge>
+            <ColumnVisibilityControl label="任务显示列" columns={taskColumns} {...taskLayout.visibility} />
+          </div>
         </div>
         {state.tasks.length ? (
           <DataTable
+            {...taskLayout.table}
+            stickyHeader
+            maxHeight={420}
             label="正在运行的生成任务"
             rows={state.tasks}
             getRowKey={(task) => task.id}
-            columns={[
-              {
-                key: "task",
-                header: "任务 / 会话",
-                render: (task) => (
-                  <>
-                    <div className="meta">{task.id}</div>
-                    <div className="meta muted">{task.conversation}</div>
-                  </>
-                ),
-              },
-              { key: "user", header: "用户", render: (task) => <span className="meta">{task.userId}</span> },
-              { key: "mode", header: "类型", render: (task) => <>{modes[task.mode] ?? task.mode}</> },
-              { key: "started", header: "开始时间", render: (task) => <>{date(task.startedAt)}</> },
-              {
-                key: "actions",
-                header: "操作",
-                render: (task) => (
-                  <>
-                    <Button
-                      variant="danger"
-                      disabled={busy}
-                      onClick={() =>
-                        ask({
-                          title: "停止此生成任务？",
-                          description: (
-                            <>
-                              <p className="meta">{task.id}</p>
-                              <p>未完成的本轮内容不会保存。</p>
-                            </>
-                          ),
-                          label: "停止任务",
-                          danger: true,
-                          action: () =>
-                            run(() => api("/stop", "POST", { taskId: task.id }), "停止请求已发送。"),
-                        })
-                      }
-                    >
-                      停止任务
-                    </Button>
-                  </>
-                ),
-              },
-            ]}
+            columns={taskColumns}
           />
         ) : (
           <Empty icon="sessions" title="当前没有生成任务" description="任务运行时会出现在这里。" />
@@ -741,7 +869,48 @@ export function SessionsPage() {
             {filtered.length} / {sessions.length} 个会话
           </span>
         </div>
-        <div className="field-grid">
+        <FilterBar
+          label="会话筛选"
+          resultCount={filtered.length}
+          actions={
+            <ColumnVisibilityControl
+              label="会话显示列"
+              columns={sessionColumns}
+              {...sessionLayout.visibility}
+            />
+          }
+          activeFilters={[
+            ...(query
+              ? [
+                  {
+                    key: "query",
+                    label: `搜索：${query}`,
+                    onRemove: () => {
+                      setQuery("");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+            ...(role !== "all"
+              ? [
+                  {
+                    key: "role",
+                    label: `角色：${roleOptions.find((item) => item.value === role)?.label ?? role}`,
+                    onRemove: () => {
+                      setRole("all");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+          ]}
+          onClear={() => {
+            setQuery("");
+            setRole("all");
+            pagination.reset();
+          }}
+        >
           <Search
             label="搜索会话"
             value={query}
@@ -762,81 +931,17 @@ export function SessionsPage() {
               }}
             />
           </Field>
-        </div>
+        </FilterBar>
         {filtered.length ? (
           <>
             <DataTable
+              {...sessionLayout.table}
+              stickyHeader
+              maxHeight={520}
               label="已保存的会话"
               rows={pagination.rows}
               getRowKey={(item) => `${item.userId}:${item.id}`}
-              columns={[
-                {
-                  key: "session",
-                  wrap: true,
-                  header: "会话",
-                  render: (item) => (
-                    <>
-                      <div>{item.title}</div>
-                      <div className="meta muted">{item.id}</div>
-                    </>
-                  ),
-                },
-                { key: "role", header: "角色", render: (item) => <>{item.name}</> },
-                {
-                  key: "user",
-                  header: "所属用户",
-                  render: (item) => <span className="meta">{item.userId}</span>,
-                },
-                {
-                  key: "version",
-                  header: "配置版本",
-                  render: (item) => (
-                    <>
-                      <Badge>v{item.configVersion}</Badge>
-                    </>
-                  ),
-                },
-                { key: "created", header: "创建时间", render: (item) => <>{date(item.createdAt)}</> },
-                {
-                  key: "actions",
-                  header: "操作",
-                  render: (item) => (
-                    <>
-                      <Button
-                        variant="danger"
-                        disabled={busy}
-                        onClick={() =>
-                          ask({
-                            title: `删除「${item.title}」？`,
-                            description: (
-                              <>
-                                <p className="meta">{item.id}</p>
-                                <p>
-                                  会停止此会话的任务并永久删除本机保存的聊天、媒体与幂等记录。不能撤销，不删除外部服务数据。
-                                </p>
-                              </>
-                            ),
-                            label: "永久删除会话",
-                            danger: true,
-                            action: () =>
-                              run(
-                                () =>
-                                  api("/conversation", "DELETE", {
-                                    userId: item.userId,
-                                    conversation: item.id,
-                                    confirm: true,
-                                  }),
-                                "会话已删除。",
-                              ),
-                          })
-                        }
-                      >
-                        删除
-                      </Button>
-                    </>
-                  ),
-                },
-              ]}
+              columns={sessionColumns}
             />
             {pagination.control}
           </>
@@ -874,6 +979,7 @@ export function UsersPage() {
   const { ask, dialog } = useConfirmation();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+  const userLayout = useTableLayout();
   const users = state.users.filter(
     (user) =>
       (status === "all" || (status === "disabled" ? user.disabled : !user.disabled)) && match(query, user.id),
@@ -899,6 +1005,85 @@ export function UsersPage() {
       action: () => save({ ...config, [key]: value }),
     });
   };
+  const userColumns: DataColumn<(typeof users)[number]>[] = [
+    {
+      key: "user",
+      width: 250,
+      minWidth: 190,
+      required: true,
+      header: "用户 ID",
+      render: (user) => <span className="meta">{user.id}</span>,
+    },
+    {
+      key: "status",
+      width: 130,
+      minWidth: 110,
+      header: "状态",
+      render: (user) => (
+        <>
+          <Badge tone={user.disabled ? "warning" : "success"}>{user.disabled ? "已停用" : "正常"}</Badge>
+        </>
+      ),
+    },
+    {
+      key: "sessions",
+      width: 110,
+      minWidth: 100,
+      header: "会话数",
+      render: (user) => <>{user.conversations.length}</>,
+    },
+    {
+      key: "created",
+      width: 210,
+      minWidth: 180,
+      header: "创建时间",
+      render: (user) => <>{date(user.createdAt)}</>,
+    },
+    {
+      key: "actions",
+      width: 120,
+      minWidth: 105,
+      sticky: "end",
+      header: "操作",
+      render: (user) => (
+        <>
+          <Button
+            variant={user.disabled ? "secondary" : "danger"}
+            disabled={busy}
+            onClick={() =>
+              ask({
+                title: user.disabled ? "恢复此用户？" : "停用此用户？",
+                description: (
+                  <>
+                    <p className="meta">{user.id}</p>
+                    <p>
+                      {user.disabled
+                        ? "恢复后，该浏览器身份可继续访问自己的会话。"
+                        : "会停止该用户正在运行的任务并禁止访问，不删除已有会话。"}
+                    </p>
+                  </>
+                ),
+                label: user.disabled ? "恢复用户" : "停用用户",
+                danger: !user.disabled,
+                action: () =>
+                  run(
+                    () =>
+                      api("/user", "PUT", {
+                        userId: user.id,
+                        disabled: !user.disabled,
+                        confirm: true,
+                      }),
+                    user.disabled ? "用户已恢复。" : "用户已停用。",
+                  ),
+              })
+            }
+          >
+            {user.disabled ? "恢复" : "停用"}
+          </Button>
+        </>
+      ),
+    },
+  ];
   return (
     <div className="page-stack">
       <PageHeader title="用户与全局" description="管理浏览器用户，以及新用户进入和生成请求。" />
@@ -946,7 +1131,44 @@ export function UsersPage() {
             {state.users.filter((user) => user.disabled).length} 已停用
           </span>
         </div>
-        <div className="field-grid">
+        <FilterBar
+          label="用户筛选"
+          resultCount={users.length}
+          actions={
+            <ColumnVisibilityControl label="用户显示列" columns={userColumns} {...userLayout.visibility} />
+          }
+          activeFilters={[
+            ...(query
+              ? [
+                  {
+                    key: "query",
+                    label: `搜索：${query}`,
+                    onRemove: () => {
+                      setQuery("");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+            ...(status !== "all"
+              ? [
+                  {
+                    key: "status",
+                    label: `状态：${status === "disabled" ? "已停用" : "正常"}`,
+                    onRemove: () => {
+                      setStatus("all");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+          ]}
+          onClear={() => {
+            setQuery("");
+            setStatus("all");
+            pagination.reset();
+          }}
+        >
           <Search
             label="搜索用户"
             value={query}
@@ -971,70 +1193,17 @@ export function UsersPage() {
               }}
             />
           </Field>
-        </div>
+        </FilterBar>
         {users.length ? (
           <>
             <DataTable
+              {...userLayout.table}
+              stickyHeader
+              maxHeight={520}
               label="浏览器身份用户"
               rows={pagination.rows}
               getRowKey={(user) => user.id}
-              columns={[
-                { key: "user", header: "用户 ID", render: (user) => <span className="meta">{user.id}</span> },
-                {
-                  key: "status",
-                  header: "状态",
-                  render: (user) => (
-                    <>
-                      <Badge tone={user.disabled ? "warning" : "success"}>
-                        {user.disabled ? "已停用" : "正常"}
-                      </Badge>
-                    </>
-                  ),
-                },
-                { key: "sessions", header: "会话数", render: (user) => <>{user.conversations.length}</> },
-                { key: "created", header: "创建时间", render: (user) => <>{date(user.createdAt)}</> },
-                {
-                  key: "actions",
-                  header: "操作",
-                  render: (user) => (
-                    <>
-                      <Button
-                        variant={user.disabled ? "secondary" : "danger"}
-                        disabled={busy}
-                        onClick={() =>
-                          ask({
-                            title: user.disabled ? "恢复此用户？" : "停用此用户？",
-                            description: (
-                              <>
-                                <p className="meta">{user.id}</p>
-                                <p>
-                                  {user.disabled
-                                    ? "恢复后，该浏览器身份可继续访问自己的会话。"
-                                    : "会停止该用户正在运行的任务并禁止访问，不删除已有会话。"}
-                                </p>
-                              </>
-                            ),
-                            label: user.disabled ? "恢复用户" : "停用用户",
-                            danger: !user.disabled,
-                            action: () =>
-                              run(
-                                () =>
-                                  api("/user", "PUT", {
-                                    userId: user.id,
-                                    disabled: !user.disabled,
-                                    confirm: true,
-                                  }),
-                                user.disabled ? "用户已恢复。" : "用户已停用。",
-                              ),
-                          })
-                        }
-                      >
-                        {user.disabled ? "恢复" : "停用"}
-                      </Button>
-                    </>
-                  ),
-                },
-              ]}
+              columns={userColumns}
             />
             {pagination.control}
           </>
@@ -1230,6 +1399,7 @@ export function DiagnosticsPage() {
   const { state, refresh, notify } = useAdmin();
   const [query, setQuery] = useState("");
   const [result, setResult] = useState("all");
+  const auditLayout = useTableLayout();
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const audit = [...state.audit]
@@ -1253,6 +1423,45 @@ export function DiagnosticsPage() {
       setRefreshing(false);
     }
   };
+  const auditColumns: DataColumn<(typeof audit)[number]>[] = [
+    { key: "at", width: 210, minWidth: 180, header: "时间", render: (item) => <>{date(item.at)}</> },
+    {
+      key: "action",
+      width: 190,
+      minWidth: 140,
+      required: true,
+      header: "操作",
+      render: (item) => <>{auditLabels[item.action] ?? item.action}</>,
+    },
+    {
+      key: "actor",
+      width: 230,
+      minWidth: 170,
+      header: "操作者",
+      render: (item) => <span className="meta">{item.actor}</span>,
+    },
+    {
+      key: "target",
+      width: 270,
+      minWidth: 180,
+      header: "对象",
+      render: (item) => <span className="meta">{item.target}</span>,
+    },
+    {
+      key: "result",
+      width: 110,
+      minWidth: 100,
+      sticky: "end",
+      header: "结果",
+      render: (item) => (
+        <>
+          <Badge tone={item.result === "ok" ? "success" : "danger"}>
+            {item.result === "ok" ? "成功" : "失败"}
+          </Badge>
+        </>
+      ),
+    },
+  ];
   return (
     <div className="page-stack">
       <PageHeader
@@ -1289,7 +1498,44 @@ export function DiagnosticsPage() {
           <h2>最近操作记录</h2>
           <span className="meta">本进程最近 {state.audit.length} 条</span>
         </div>
-        <div className="field-grid">
+        <FilterBar
+          label="操作记录筛选"
+          resultCount={audit.length}
+          actions={
+            <ColumnVisibilityControl label="记录显示列" columns={auditColumns} {...auditLayout.visibility} />
+          }
+          activeFilters={[
+            ...(query
+              ? [
+                  {
+                    key: "query",
+                    label: `搜索：${query}`,
+                    onRemove: () => {
+                      setQuery("");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+            ...(result !== "all"
+              ? [
+                  {
+                    key: "result",
+                    label: `结果：${result === "ok" ? "成功" : "失败"}`,
+                    onRemove: () => {
+                      setResult("all");
+                      pagination.reset();
+                    },
+                  },
+                ]
+              : []),
+          ]}
+          onClear={() => {
+            setQuery("");
+            setResult("all");
+            pagination.reset();
+          }}
+        >
           <Search
             label="搜索操作记录"
             value={query}
@@ -1314,42 +1560,17 @@ export function DiagnosticsPage() {
               }}
             />
           </Field>
-        </div>
+        </FilterBar>
         {audit.length ? (
           <>
             <DataTable
+              {...auditLayout.table}
+              stickyHeader
+              maxHeight={520}
               label="最近操作记录"
               rows={pagination.rows}
               getRowKey={(item) => String(item.sequence)}
-              columns={[
-                { key: "at", header: "时间", render: (item) => <>{date(item.at)}</> },
-                {
-                  key: "action",
-                  header: "操作",
-                  render: (item) => <>{auditLabels[item.action] ?? item.action}</>,
-                },
-                {
-                  key: "actor",
-                  header: "操作者",
-                  render: (item) => <span className="meta">{item.actor}</span>,
-                },
-                {
-                  key: "target",
-                  header: "对象",
-                  render: (item) => <span className="meta">{item.target}</span>,
-                },
-                {
-                  key: "result",
-                  header: "结果",
-                  render: (item) => (
-                    <>
-                      <Badge tone={item.result === "ok" ? "success" : "danger"}>
-                        {item.result === "ok" ? "成功" : "失败"}
-                      </Badge>
-                    </>
-                  ),
-                },
-              ]}
+              columns={auditColumns}
             />
             {pagination.control}
           </>

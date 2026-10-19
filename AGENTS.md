@@ -18,6 +18,7 @@
 - `apps/admin` 保留业务页面和业务组件、同源 API、权限、草稿、保存及 409 冲突。复杂但通用的表格、选择器和浮层仍归 UI 包，判断边界依据业务依赖，不是组件大小。
 - `npm run dev:ui` 启动独立 playground；`npm run build:ui-playground` 构建它，`npm run test:ui:browser` 构建并执行 UI 浏览器回归。根 `test:browser` 包含 UI 与业务浏览器入口。工作台使用正式源码，构造数据、故障开关及延迟不进入后台生产构建。
 - 改共享资源时核对 `packages/ui/design-assets.json` 与 `packages/ui/scripts/verify-assets.mjs`；保留实际字节 hash、来源 hash、字体和许可。后台 `design-assets.json` 只指向共享清单，不恢复 `apps/admin/public/design`。
+- 阅读、多选、数字、JSON/差异及列布局使用共享包现有组件；API 与限制见 [UI 包说明](packages/ui/README.md)，本轮具体反例与证据见 [组件扩展验收](docs/共享组件扩展与验收.md)。关键词的未提交输入也属于草稿，不能只追踪已提交 tags；失焦提交不抢焦，非法词组切换前保持输入。JSON 格式化无损不等于业务对象/数值提交无损，保存前另行拒绝重复键及精度损失。
 - 类型、自动化和 playground 通过均不替代真实后台验收。操作长文、未保存、失败/409、路由与权限路径，实际截图目视并检查正常速度录屏；交付前恢复测试设置，精确回收本次临时数据与模拟接线，保护用户记录、草稿和回归 fixture。
 
 ## 后台产品内容约束
@@ -39,4 +40,4 @@
 4. **反馈不能改变业务真实性。** 保存请求与结果立即按接口契约处理，禁止为了展示动画延迟业务、增加假等待或把通知出现当成保存成功。保持按钮宽度及禁用/忙碌语义；失败和 409 冲突不得丢草稿。需要看清忙碌时只在隔离预览临时增加网络延迟，并在验收后恢复。键盘高频操作与减少动态偏好必须生效，包括正文定位滚动；不能只处理一个媒体查询后就宣称覆盖所有入口。
 5. **正常速度验收覆盖完整过程。** 实际操作弹窗/菜单进入、退出、中断重开、嵌套 Esc、焦点恢复，角色/条目/字段切换、长文编辑、保存成功/失败和适用窄屏；截图后亲自看像素。录屏必须真正包含这些目标操作，保留原始时间戳并按正常 1× 编码/播放。只构建、检查 DOM、生成截图、审查静帧或只录动态背景，均不能代替正常速度的实际操作与视觉验收。使用 `ui-ux-self-check` 七项说明本次覆盖、修正和未测边界。
 6. **先分清捕获伪影与页面问题。** 遇到菜单外硬边模糊块等异常，对照普通截图、默认视口/缩放和实际像素尺寸录屏，确认来源后再改 CSS；禁止为单一 CDP 覆盖视口/缩放伪影破坏已验证的玻璃配方。结束后恢复测试设置，包括视口、缩放、媒体偏好、离线/延迟及临时动态背景，隔离测试数据与运行服务仍遵守上文约束。
-7. **复用实现并限制结论。** 通用组件、浮层和菜单先查 `packages/ui/src/components/{controls,selection,overlays,data-table}.tsx` 及对应 CSS，浮层生命周期查 `packages/ui/src/motion/overlay-motion.ts`，材质查 `packages/ui/src/materials`；业务阅读与路由切换查 `apps/admin/src/{motion.tsx,motion.css,reader-motion.tsx,reader-motion.css}`。修改共享运行资源时同步 `packages/ui/design-assets.json`，运行 UI 单元/浏览器回归及受影响后台路径，并查看最终构建的真实过渡；不要复活已删除的旧 `src/ui.tsx` 或 `public/design` 控制器。边框/阴影颜色可能发生绘制，禁止无证据声称“全 GPU”；录帧采样数不是渲染 FPS；已提交中文输入不等于原生 IME 候选窗全过程、跨浏览器或真实手机验收。报告分别标明实操、自动化、代码推断与未验证内容。
+7. **复用实现并限制结论。** 通用组件、浮层和菜单先查 `packages/ui/src/components/{controls,selection,overlays,data-table,advanced-controls,documents,structured-data}.tsx` 及对应 CSS，浮层生命周期查 `packages/ui/src/motion/overlay-motion.ts`，材质查 `packages/ui/src/materials`；业务阅读与路由切换查 `apps/admin/src/{motion.tsx,motion.css,reader-motion.tsx,reader-motion.css}`。修改共享运行资源时同步 `packages/ui/design-assets.json`，运行 UI 单元/浏览器回归及受影响后台路径，并查看最终构建的真实过渡；不要复活已删除的旧 `src/ui.tsx` 或 `public/design` 控制器。边框/阴影颜色可能发生绘制，禁止无证据声称“全 GPU”；录帧采样数不是渲染 FPS；已提交中文输入不等于原生 IME 候选窗全过程、跨浏览器或真实手机验收。报告分别标明实操、自动化、代码推断与未验证内容。

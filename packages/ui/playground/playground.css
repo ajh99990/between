@@ -6,3 +6,7 @@ html,body,#root{min-width:320px;min-height:100%;margin:0}body{color-scheme:dark}
 /* A menu keeps every category discoverable at narrow widths. */
 .pg-mobile-navigation{display:none}
 @media(max-width:700px){.pg-sidebar{padding-bottom:16px}.pg-brand{padding-bottom:0;gap:10px}.pg-brand>span:nth-child(2){min-width:0}.pg-brand strong{font-size:13px}.pg-mobile-navigation{display:block;margin-left:auto;flex:none}.pg-mobile-navigation .bt-button{font-size:12px;padding-inline:10px}.pg-sidebar nav{display:none}}
+
+.pg-sidebar>nav{min-height:0;overflow:auto;flex:1;scrollbar-width:thin}.pg-sidebar>.pg-sidebar-note{flex:none}
+
+@media(min-width:701px){.pg-app{overflow:clip}.pg-layout,.pg-sidebar{min-height:0}.pg-sidebar>.pg-brand{flex:none}}

@@ -6,3 +6,7 @@
 @import "../components/data-table.css";
 @import "../components/overlays.css";
 @import "../components/selection.css";
+
+@import "../components/advanced-controls.css";
+@import "../components/documents.css";
+@import "../components/structured-data.css";
