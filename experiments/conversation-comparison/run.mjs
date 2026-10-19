@@ -9,7 +9,6 @@ import { openPlanCredentials } from '../../apps/server/plan-credentials.mjs';
 import { startCompatibilityServer, createCompatibilityPlanProvider } from '../../apps/server/plan-service.mjs';
 import { toResponses } from '../../apps/server/chatgpt-plan.mjs';
 import { DEFAULT_PLAN_MODEL, DEFAULT_PLAN_REASONING } from '../../apps/server/plan-config.mjs';
-import { profiles, inputs, compileRequest, verifySources } from './profiles.mjs';
 
 process.umask(0o077);
 const args = process.argv.slice(2);
@@ -17,9 +16,14 @@ const live = args.includes('--live');
 const review = args.includes('--review');
 const rootArg = args[args.indexOf('--root') + 1];
 if (live === review || !args.includes('--root') || !rootArg || !path.isAbsolute(rootArg)) {
-  throw new Error('Use --live --root /new/private/directory or --review --root /existing/private/directory');
+  throw new Error('Use --live --root /new/private/directory or --review --root /existing/private/directory; optional --suite negative-examples');
 }
 if (Number(process.versions.node.split('.')[0]) !== 24) throw new Error('Use Node 24');
+const suiteName = args.includes('--suite') ? args[args.indexOf('--suite') + 1] : 'core-prompts';
+if (!['core-prompts', 'negative-examples'].includes(suiteName)) throw new Error('Unknown comparison suite');
+const suiteDefinition = await import(suiteName === 'negative-examples' ? './negative-examples.mjs' : './profiles.mjs');
+const { profiles, inputs, compileRequest, verifySources } = suiteDefinition;
+const expectedCount = inputs.length * profiles.length;
 const root = path.resolve(rootArg);
 const repository = fileURLToPath(new URL('../../', import.meta.url));
 const contained = (parent, child) => {
@@ -54,8 +58,8 @@ try {
     await write('admin-password.txt', password + '\n');
     const baseline = profiles[0].role;
     await write('settings.json', { version: 1, roles: profiles.map(p => p.role),
-      books: [{ id: 'mira-world', name: '米拉的世界', keys: baseline.keys, content: baseline.world }],
-      preset: { context: 8192, maxTokens: 512, temperature: 0.7, pinExamples: false,
+      books: suiteName === 'core-prompts' ? [{ id: 'mira-world', name: '米拉的世界', keys: baseline.keys, content: baseline.world }] : [],
+      preset: suiteDefinition.preset ?? { context: 8192, maxTokens: 512, temperature: 0.7, pinExamples: false,
         postHistory: '用中文自然回应，避免重复上一条回复。' },
       acceptNew: true, paused: false, model: null,
       planBackend: { enabled: true, model: DEFAULT_PLAN_MODEL, reasoningEffort: DEFAULT_PLAN_REASONING } });
@@ -71,6 +75,7 @@ try {
     service = await startCompatibilityServer({ localKey, getAccessToken: () => owner.credentials.getAccessToken(), inspectGrant, port: 0 });
     const originalProvider = await createCompatibilityPlanProvider({ baseUrl: service.baseUrl, localKey });
     planProvider = { ...originalProvider, async generate(request) {
+      if (activeRequests >= expectedCount) throw new Error('The authorized automated comparison request limit has been reached');
       const compiled = compileRequest(request);
       const sequence = ++activeRequests;
       const file = `evidence/${String(sequence).padStart(3, '0')}-${compiled.id}.json`;
@@ -123,9 +128,10 @@ try {
         ...(profile.id === 'between' ? {} : { userName: '用户' }) }, identity)).json();
       conversations.push({ profile: profile.id, label: profile.label, id: created.id });
     }
-    const result = { scope: 'fixed-scenario 15-turn core-prompt comparison, not complete upstream products',
+    const result = { suite: suiteDefinition.suiteId ?? 'core-prompts',
+      scope: suiteDefinition.scope ?? 'fixed-scenario 15-turn core-prompt comparison, not complete upstream products',
       model: DEFAULT_PLAN_MODEL, reasoningEffort: DEFAULT_PLAN_REASONING, startedAt: new Date().toISOString(),
-      automatedInputs: [...inputs], conversations, completed: 0, status: 'running',
+      automatedInputs: [...inputs], conversations, expectedCount, completed: 0, status: 'running',
       sampling: 'The existing plan transport omits temperature/top_p/output caps; upstream sampling is recorded but not applied.' };
     await write('suite.json', result);
     try {
@@ -158,8 +164,8 @@ try {
       transcripts.push({ ...conversation, chat: saved.chat });
     }
     await write('transcripts.json', { ...result, transcripts });
-    let md = '# 核心提示词多轮聊天对比记录\n\n用户消息为预设场景；回复为实际模型输出。原文、每轮请求、哈希与未接入范围另存于私有 evidence 目录。\n\n';
-    md += `模型：${result.model}；思考档位：${result.reasoningEffort}；完成请求：${result.completed}/45。\n\n`;
+    let md = `# ${suiteDefinition.title ?? '核心提示词多轮聊天对比记录'}\n\n用户消息为预设场景；回复为实际模型输出。提示词、每轮请求、哈希与未接入范围另存于私有 evidence 目录。\n\n`;
+    md += `模型：${result.model}；思考档位：${result.reasoningEffort}；完成请求：${result.completed}/${expectedCount}。\n\n`;
     for (const c of transcripts) {
       md += `## ${c.label}\n\n`;
       for (const m of c.chat) if (m.mes) md += `**${m.is_user ? '用户' : '回复'}**\n\n${m.mes}\n\n`;

@@ -52,6 +52,40 @@ assert.throws(() => compileRequest({ messages: [
 assert.throws(() => compileRequest({ messages: [{ role: 'system', content: profiles[1].marker }] }), /latest user/);
 console.log('PASS invalid/ambiguous routing rejects before model transport; zero model calls');
 
+const negativeSuite = await import('./negative-examples.mjs');
+await negativeSuite.verifySources();
+const fixtureHistory = Array.from({ length: 18 }, (_, i) => [
+  { role: 'user', content: `独立用户消息 ${i + 1}` },
+  { role: 'assistant', content: `独立回复 ${i + 1}` },
+]).flat();
+fixtureHistory.push({ role: 'user', content: '需要保留的当前消息' });
+const compiledVariants = [];
+for (const profile of negativeSuite.profiles) {
+  const state = snapshot({ ...profile.role, postHistory: 'PRIVATE_HOST_STYLE_CANARY',
+    detail: 'PRIVATE_HOST_DETAIL_CANARY' }, { userName: '用户' });
+  state.preset = { ...state.preset, openai_max_context: negativeSuite.preset.context,
+    openai_max_tokens: negativeSuite.preset.maxTokens };
+  state.chat.push(...fixtureHistory.map(m => ({ name: m.role === 'user' ? '用户' : '周宁',
+    is_user: m.role === 'user', mes: m.content, extra: {} })));
+  const compiled = negativeSuite.compileRequest(await createCore(state).run());
+  assert.equal(compiled.id, profile.id);
+  assert.deepEqual(compiled.messages.filter(m => ['user', 'assistant'].includes(m.role)), fixtureHistory);
+  assert(!JSON.stringify(compiled.messages).includes('PRIVATE_HOST_'));
+  assert(!JSON.stringify(compiled.messages).includes('BETWEEN_LOCAL_NEGATIVE_CASE_PROFILE_'));
+  const wire = toResponses(compiled.messages, 'gpt-6.1-sol', 'medium');
+  assert.deepEqual(wire.input.map(m => m.content), compiled.messages.map(m => m.content));
+  assert.equal(wire.store, false);
+  compiledVariants.push(compiled);
+}
+assert.equal(compiledVariants[1].messages[1].content, negativeSuite.negativePrompt);
+assert.deepEqual(compiledVariants[1].messages.filter((_, i) => i !== 1), compiledVariants[0].messages);
+assert.equal(compiledVariants[0].metadata.authoredPromptBlocks.length, 0);
+assert.equal(compiledVariants[1].metadata.authoredPromptBlocks[0].sha256, negativeSuite.promptSha256);
+assert.throws(() => negativeSuite.compileRequest({ messages: [{ role: 'user', content: 'missing marker' }] }), /profile/);
+assert.throws(() => negativeSuite.compileRequest({ messages: negativeSuite.profiles.map(p => ({ role: 'system', content: p.marker })) }), /profile/);
+assert.throws(() => negativeSuite.compileRequest({ messages: [{ role: 'system', content: negativeSuite.profiles[0].marker }] }), /latest user/);
+console.log('PASS negative examples: only one exact prompt block differs; full history, host separation, wire text, hash, and invalid routing verified');
+
 const root = await fs.mkdtemp(path.join(os.tmpdir(), 'between-comparison-readonly-'));
 const password = crypto.randomBytes(24).toString('hex');
 let app;
