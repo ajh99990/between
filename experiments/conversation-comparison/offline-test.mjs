@@ -86,6 +86,39 @@ assert.throws(() => negativeSuite.compileRequest({ messages: negativeSuite.profi
 assert.throws(() => negativeSuite.compileRequest({ messages: [{ role: 'system', content: negativeSuite.profiles[0].marker }] }), /latest user/);
 console.log('PASS negative examples: only one exact prompt block differs; full history, host separation, wire text, hash, and invalid routing verified');
 
+const positiveSuite = await import('./positive-examples.mjs');
+await positiveSuite.verifySources();
+const positiveVariants = [];
+for (const profile of positiveSuite.profiles) {
+  const state = snapshot({ ...profile.role, postHistory: 'PRIVATE_HOST_STYLE_CANARY',
+    detail: 'PRIVATE_HOST_DETAIL_CANARY' }, { userName: '用户' });
+  state.preset = { ...state.preset, openai_max_context: positiveSuite.preset.context,
+    openai_max_tokens: positiveSuite.preset.maxTokens };
+  state.chat.push(...fixtureHistory.map(m => ({ name: m.role === 'user' ? '用户' : '周宁',
+    is_user: m.role === 'user', mes: m.content, extra: {} })));
+  const compiled = positiveSuite.compileRequest(await createCore(state).run());
+  assert.equal(compiled.id, profile.id);
+  assert.deepEqual(compiled.messages.filter(m => ['user', 'assistant'].includes(m.role)), fixtureHistory);
+  assert(!JSON.stringify(compiled.messages).includes('PRIVATE_HOST_'));
+  assert(!JSON.stringify(compiled.messages).includes('BETWEEN_LOCAL_'));
+  const wire = toResponses(compiled.messages, 'gpt-6.1-sol', 'medium');
+  assert.deepEqual(wire.input.map(m => m.content), compiled.messages.map(m => m.content));
+  assert.equal(wire.store, false);
+  positiveVariants.push(compiled);
+}
+assert.equal(positiveVariants[0].messages[1].content, negativeSuite.negativePrompt);
+assert.deepEqual(positiveVariants[0].messages, compiledVariants[1].messages);
+assert.equal(positiveVariants[1].messages[2].content, positiveSuite.positivePrompt);
+assert.deepEqual(positiveVariants[1].messages.filter((_, i) => i !== 2), positiveVariants[0].messages);
+assert.equal(positiveVariants[0].metadata.authoredPromptBlocks.length, 1);
+assert.equal(positiveVariants[1].metadata.authoredPromptBlocks[1].sha256, positiveSuite.promptSha256);
+assert.equal(crypto.createHash('sha256').update(positiveSuite.positivePrompt).digest('hex'), positiveSuite.promptSha256);
+assert.deepEqual(positiveSuite.inputs, negativeSuite.inputs);
+assert.throws(() => positiveSuite.compileRequest({ messages: [{ role: 'user', content: 'missing marker' }] }), /profile/);
+assert.throws(() => positiveSuite.compileRequest({ messages: positiveSuite.profiles.map(p => ({ role: 'system', content: p.marker })) }), /profile/);
+assert.throws(() => positiveSuite.compileRequest({ messages: [{ role: 'system', content: positiveSuite.profiles[0].marker }] }), /latest user/);
+console.log('PASS concrete examples: baseline is exact v0.1; only the exact supplement differs; history, wire, hash and routing verified');
+
 const root = await fs.mkdtemp(path.join(os.tmpdir(), 'between-comparison-readonly-'));
 const password = crypto.randomBytes(24).toString('hex');
 let app;

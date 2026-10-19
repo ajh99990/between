@@ -16,12 +16,13 @@ const live = args.includes('--live');
 const review = args.includes('--review');
 const rootArg = args[args.indexOf('--root') + 1];
 if (live === review || !args.includes('--root') || !rootArg || !path.isAbsolute(rootArg)) {
-  throw new Error('Use --live --root /new/private/directory or --review --root /existing/private/directory; optional --suite negative-examples');
+  throw new Error('Use --live --root /new/private/directory or --review --root /existing/private/directory; optional --suite negative-examples or positive-examples');
 }
 if (Number(process.versions.node.split('.')[0]) !== 24) throw new Error('Use Node 24');
 const suiteName = args.includes('--suite') ? args[args.indexOf('--suite') + 1] : 'core-prompts';
-if (!['core-prompts', 'negative-examples'].includes(suiteName)) throw new Error('Unknown comparison suite');
-const suiteDefinition = await import(suiteName === 'negative-examples' ? './negative-examples.mjs' : './profiles.mjs');
+const suiteFiles = { 'core-prompts': './profiles.mjs', 'negative-examples': './negative-examples.mjs', 'positive-examples': './positive-examples.mjs' };
+if (!Object.hasOwn(suiteFiles, suiteName)) throw new Error('Unknown comparison suite');
+const suiteDefinition = await import(suiteFiles[suiteName]);
 const { profiles, inputs, compileRequest, verifySources } = suiteDefinition;
 const expectedCount = inputs.length * profiles.length;
 const root = path.resolve(rootArg);
@@ -171,8 +172,12 @@ try {
       for (const m of c.chat) if (m.mes) md += `**${m.is_user ? '用户' : '回复'}**\n\n${m.mes}\n\n`;
     }
     await write('聊天记录.md', md);
-    console.log(`状态：${result.status}；聊天记录已保存。后台继续供本机查看。`);
+    console.log(`状态：${result.status}；聊天记录已保存。${suiteDefinition.stopLiveWhenComplete ? '模型服务即将关闭，可另启动只读查看。' : '后台继续供本机查看。'}`);
     // Automated suite ends here. No background model calls or automatic retries.
+    if (suiteDefinition.stopLiveWhenComplete) {
+      await close();
+      if (result.status !== 'completed') process.exitCode = 1;
+    }
   }
 } catch (error) {
   await close();
