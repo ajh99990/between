@@ -1,0 +1,127 @@
+{
+  "project": "2711944586/qqbot",
+  "repository": "https://github.com/2711944586/qqbot",
+  "commit": "61844a4e8770a634d9dd3b4e65c25d0a541ebe81",
+  "retrieved_on": "2026-10-20",
+  "upstream_file": "knowledge/wanjier.md",
+  "upstream_url": "https://raw.githubusercontent.com/2711944586/qqbot/61844a4e8770a634d9dd3b4e65c25d0a541ebe81/knowledge/wanjier.md",
+  "upstream_sha256": "f489a39bfa995577922f70677c75ec7af63b796d3957840f6b7505f8716a922b",
+  "upstream_git_blob_sha1": "3dc9afe22aa8c48a7fd4b43ae17e73dc57cfcb0e",
+  "upstream_bytes": 26108,
+  "upstream_line_count": 363,
+  "files": [
+    {
+      "file": "群聊真实感规则-原文.md",
+      "kind": "context-excerpt",
+      "upstream_lines": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "sha256": "4ee8a4108621c2263a007a4ef47e4953b76707b41cbd2267df518b0474378488",
+      "bytes": 1117,
+      "transformation": "Original UTF-8 lines concatenated in upstream order; original line endings preserved; no added headings or wording changes."
+    },
+    {
+      "file": "日常风格及AI痕迹-原文.md",
+      "kind": "context-excerpt",
+      "upstream_lines": [
+        210,
+        211,
+        212,
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253
+      ],
+      "sha256": "c87bbbca35dbd7af11fe5dac68d0332758dbff61b12f3c903151c1fdcf0ab7ed",
+      "bytes": 2010,
+      "transformation": "Original UTF-8 lines concatenated in upstream order; original line endings preserved; no added headings or wording changes."
+    },
+    {
+      "file": "日常措辞-候选摘录.md",
+      "kind": "selected-verbatim-lines",
+      "upstream_lines": [
+        31,
+        34,
+        37,
+        213,
+        217,
+        219,
+        249
+      ],
+      "sha256": "301b72066c5253c160c989d16047fbd6390249b4605204c4a7f0fee178ce1a9a",
+      "bytes": 754,
+      "transformation": "Original UTF-8 lines concatenated in upstream order; original line endings preserved; no added headings or wording changes."
+    }
+  ],
+  "license": {
+    "declared": "MIT",
+    "readme": {
+      "path": "README.md",
+      "lines": [
+        2499,
+        2500,
+        2501
+      ],
+      "text": [
+        "## License",
+        "",
+        "MIT"
+      ],
+      "file_sha256": "0db6337d49fa908b5c792d8ec1ac3059a8a2c6a5b11e05879c051c3a98dbb746"
+    },
+    "package": {
+      "path": "package.json",
+      "line": 44,
+      "text": "  \"license\": \"MIT\",",
+      "file_sha256": "a1235a6678656cb20144df08dae085601911bed9511247ac392e404bfcebd202"
+    },
+    "limitations": "No LICENSE/LICENCE/COPYING/NOTICE file found in the pinned repository tree. GitHub API has license=null. No upstream copyright holder/year notice supplied; none invented here. Project declaration does not establish rights over third-party quotations elsewhere."
+  },
+  "use_boundary": "Research reference and untested candidate only. Not loaded by the application or experiment harness; no role identity or dating behavior inferred."
+}
