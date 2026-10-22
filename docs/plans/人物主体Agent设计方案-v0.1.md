@@ -1,6 +1,8 @@
 # 人物主体 Agent 设计方案 v0.1
 
-日期：2026-10-22。性质：供讨论和评审的设计方案，尚未实施。本文把已确认的人物框架落成运行机制，不改现有服务，不编写最终提示词，不把示例当作模型测试结果。
+状态：**讨论中（部分决定已确认，尚未实施）**。更新：2026-10-22。
+
+第 2 节是当前已确认决定的统一出处；其余运行机制与验证步骤是待评审建议。虚构线下生活如何推进、平台实际能力与具体技术选型仍未确定。本方案不替代现行产品手册，示例不是模型测试结果。
 
 ## 1. 我们准备建立什么
 
@@ -347,18 +349,18 @@ sequenceDiagram
 
 | 来源 | 借鉴的具体结构 | 本方案的不同选择 |
 | --- | --- | --- |
-| Yuralume | 生活安排有跨轮依据；待回复内容、已说的原话与后续唤醒落库；聊天可以改变未来日程 | 不采用忙碌阈值、再次来信自动取消延期、到期强制生成；统一过去保护，送达与承诺落库区分。见附录实际流程 |
+| Yuralume | 生活安排有跨轮依据；待回复内容、已说的原话与后续唤醒落库；聊天可以改变未来日程 | 不采用忙碌阈值、再次来信自动取消延期及由程序门槛决定补回时机的策略；统一过去保护，送达与承诺落库区分。见附录实际流程 |
 | eros-engine | 当前重要事实常驻；自己的生活可在聊天之外持续；环境造成未接触与看过后不想回应分开 | 不采用默认沉默公式、关系升级公式；消息等待以人物自己设置的注意安排为依据；不把旧历史取窗当完整收件箱 |
 | Emotion Engine | 当前感受与关系判断有延续、有依据；当次改善不自动等于关系全部恢复 | 先用模型维护的文字状态；不设数值情绪层先替模型作决定，也不声称它已被证明无效 |
 | BetterSimTracker | 状态变化可查看、可追溯、可纠正；下一次确实读取前次保存内容 | 不以“回复里演过了”作为所有事实成立的依据；计划、尝试、实际结果与说过的话分开 |
 
-上述为设计取舍，不是四套仓库的机械拼接。固定版本、源文件与各项目运行边界见[主线报告](四个人物系统的核心设计逻辑与运行主线.md)和[后续源码补查](人物主体、日程调整与情绪状态的进一步研究.md)。尚未选定完整移植哪个项目，也未证明本方案优于它们。
+上述为设计取舍，不是四套仓库的机械拼接。固定版本、源文件与各项目运行边界见[主线报告](../research/四个人物系统的核心设计逻辑与运行主线.md)和[后续源码补查](../research/人物主体、日程调整与情绪状态的进一步研究.md)。尚未选定完整移植哪个项目，也未证明本方案优于它们。
 
 ## 12. 第一阶段验证什么
 
 建议第一阶段做出“单人物、B 站日常活动、两个交流对象”的完整最小过程。先用可控时钟和明确标注的工具替身验证连续性，再接独立测试账号验证实际观看／追番／关注和公开空间；替身成功不算平台接入成功。多对象是核心，不能只测单用户后宣称同一人物成立。技术上优先单服务与可事务化数据库；数据库产品、模型服务和 Agent SDK 在实施前选择，不受现有代码绑定。这里是验证计划，本轮不实施或操作账号。
 
-分两层验收：
+按以下方面验收：
 
 | 验收层 | 具体场景 | 判断依据 |
 | --- | --- | --- |
@@ -470,19 +472,17 @@ for row in queued_busy_defer_rows_due(now):
 
 **我们借其“保存内容与原话、安排后续机会、到时带新处境再处理”的结构；是否回复、是否改期、是否继续等待，全部交回人物模型。**
 
-## 复核与验证记录
+## 方案编写时的复核范围
 
-本轮使用「项目设计逻辑调研」和 `research-zh`，核对既有概念框架、用户最新选择与固定版本源码。两路只读专项审查分别检查人物／环境及多人／多平台边界、Yuralume 附录；修正了附录把两种待回复路径混写的伪代码，补齐无当前活动时的释放条件和等待起点。最终专项复核无剩余必须修改项。
+2026-10-22 编写时核对了概念框架、用户选择与固定版本源码，并经过人物/环境、多对象边界和 Yuralume 附录的只读复核。使用「项目设计逻辑调研」、`research-zh` 及 OpenCode（`opencode-go/deepseek-v4.1-flash`，`max`）审查；编写者据此修正两种待回复路径混写、无当前活动时的释放条件，以及状态/事实、可见范围、承诺与回执的表达。**这些是助手采纳的文档修订和运行建议，不是新增用户决定；已确认范围仍以第 2 节为准。**
 
-按 `opencode-delegation` 使用 `opencode-go/deepseek-v4.1-flash`、`max`，在同一会话 `ses_e9c3fe4b5ffe1efIqzxBlLdXKk` 完成三轮审查与讨论，各轮均取得有效正文。独立判断后：接受将主观状态、环境事实、平台接触及理解的写入边界分清；接受统一可见范围、日程与承诺占用视图、原话与回执依据；部分接受注意恢复问题，补全初始通知和持久化唤醒，但拒绝以仍有未读为由强制人物继续回应；对“14:10 不能读正文”的建议保留原场景，明确当时已读本条、随后暂停新消息至 14:40。最后续谈确认这两种时间没有矛盾，且无剩余必须修改的实质问题。
-
-完成四份相关文件的本地链接、10 个脚注、2 份 JSON 示例及 Markdown 围栏检查；用户要求记录的原句已保留，AGENTS.md 的上游提示词原样复用段未改变。只改文档，不因文档修改运行产品构建或 UI 测试；没有实现或运行新的 Agent，没有真实对话效果结果，没有接入或操作社交账号。平台目录核查仅支持所述能力类别，具体接口、媒体感知、公开空间和持续日常的效果均列为后续实测项。
+当时检查了引用、JSON 示例和用户要求原样保留的段落，没有实现或运行新的 Agent，也没有接入社交账号或取得新方案的真实聊天效果。平台目录核查只支持所述能力类别，具体接口、媒体感知和公开空间仍需实际验证。
 
 ## 参考文献
 
 [^y-schedule]: Yuralume，固定提交 `6996b152604e83a1cf6344cd236a9b9456f47bba`。[日程调整入口](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/application/services/schedule_service.py#L1464-L1740)，[整日重生成](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/application/services/schedule_service.py#L764-L817)，[按日期保存](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/infrastructure/persistence/sa_schedule_repository.py#L61-L101)。
-[^e-world]: eros-engine，固定提交 `9715af2ce7d8524ca5ce8771059d436c31951977`。[World Stories 的人生材料与记忆设计](https://github.com/etherfunlab/eros-engine/blob/9715af2ce7d8524ca5ce8771059d436c31951977/docs/superpowers/specs/2026-07-23-world-stories-design.md#L26)，实现与局限见[固定版本主线报告第 3 节](四个人物系统的核心设计逻辑与运行主线.md)。
-[^ee]: Emotion Engine，固定提交 `e7fab5c3984a4885ac74c972d573b05b45a8c496`。[推荐 API 的模型结果与写入流程](https://github.com/pioneerjeff-labs/emotion-engine/blob/e7fab5c3984a4885ac74c972d573b05b45a8c496/docs/OPENAI_GPT.md#L91-L178)。数值更新和效果证据限制见[后续研究第 6 节](人物主体、日程调整与情绪状态的进一步研究.md)。
+[^e-world]: eros-engine，固定提交 `9715af2ce7d8524ca5ce8771059d436c31951977`。[World Stories 的人生材料与记忆设计](https://github.com/etherfunlab/eros-engine/blob/9715af2ce7d8524ca5ce8771059d436c31951977/docs/superpowers/specs/2026-07-23-world-stories-design.md#L26)，实现与局限见[固定版本主线报告第 3 节](../research/四个人物系统的核心设计逻辑与运行主线.md)。
+[^ee]: Emotion Engine，固定提交 `e7fab5c3984a4885ac74c972d573b05b45a8c496`。[推荐 API 的模型结果与写入流程](https://github.com/pioneerjeff-labs/emotion-engine/blob/e7fab5c3984a4885ac74c972d573b05b45a8c496/docs/OPENAI_GPT.md#L91-L178)。数值更新和效果证据限制见[后续研究第 6 节](../research/人物主体、日程调整与情绪状态的进一步研究.md)。
 [^y-busy]: Yuralume，[0.7 调用阈值](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/application/services/busy_defer_policy.py#L1-L12)，[聊天分支](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/application/services/chat_service.py#L3715-L3978)。
 [^y-input]: Yuralume，[实际模型调用与输入渲染](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/infrastructure/busy/llm_decider.py#L98-L190)，[人物与活动块](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/infrastructure/busy/llm_decider.py#L224-L282)。
 [^y-parse]: Yuralume，[四行输出契约](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/data/prompts/busy/decider.txt#L33-L37)，[解析及时间处理](https://github.com/Yuralume/yuralume-core/blob/6996b152604e83a1cf6344cd236a9b9456f47bba/src/kokoro_link/infrastructure/busy/llm_decider.py#L305-L454)。本文仅解释协议，未导入或改写上游核心提示词。

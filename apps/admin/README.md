@@ -2,7 +2,7 @@
 
 面向管理员的独立内容和运行管理界面，通过同源 `/api/admin/*` 调用服务。React、TypeScript、Tailwind CSS 与 Vite 负责界面；业务状态、路由、请求和草稿由本应用管理。通用控件、图标、字体、玻璃、程序背景与浮层动画统一从私有 `@between/ui` 引入；不保留另一套应用内组件或重复设计目录。仓库另有服务、角色引擎和共享 UI，共四个 npm workspace。
 
-本轮共享组件迁移的结构、删除项、命令、七项自查和实测边界见 [共享组件库与验收](../../docs/共享组件库与验收.md)。组件接口与工作台场景见 [UI 包说明](../../packages/ui/README.md)。
+现行组件接口与工作台场景见 [UI 包说明](../../packages/ui/README.md)；重写及迁移经过见 [后台演进记录](../../docs/records/后台演进记录.md)。
 
 ## 工作区
 
@@ -36,9 +36,9 @@
 
 `@between/ui` 使用 Base UI 管理键盘、焦点、交互状态、浮层和无障碍语义；共享 React 组件补齐默认样式、材质和生命周期。材质与字体源于已保存在包内的通用 `glass-workbench-ui` 资源，使用时不读取其他项目或仓库。导航/按钮与弹窗使用不同配方，长正文优先保证阅读。通用复杂组件仍可进入 UI 包；角色、世界书、模型设置等业务组合，以及权限、草稿、请求、保存和冲突处理留在本应用。
 
-图标统一从 `@between/ui` 的 `Icon` / `IconButton` 使用，语义映射在 `packages/ui/src/icons.tsx` 静态登记，使用本地锁定的 Lucide，无 CDN。导航和操作默认 18px / 1.75 线宽，辅助图标 14–17px，空状态 26px。图标按钮提供可访问名称，SVG 作为装饰隐藏。选型背景见 [图标调研](../../docs/图标库选型与视觉修正.md)；第三方依赖完整许可由根 `licenses/THIRD-PARTY-NOTICES.txt` 随依赖清单更新。
+图标统一从 `@between/ui` 的 `Icon` / `IconButton` 使用，语义映射在 `packages/ui/src/icons.tsx` 静态登记，使用本地锁定的 Lucide，无 CDN。导航和操作默认 18px / 1.75 线宽，辅助图标 14–17px，空状态 26px。图标按钮提供可访问名称，SVG 作为装饰隐藏。选型背景见 [图标选型与历史修正](../../docs/records/后台演进记录.md)；第三方依赖完整许可由根 `licenses/THIRD-PARTY-NOTICES.txt` 随依赖清单更新。
 
-共享资源验证覆盖 SHA-256、完整目录和本地依赖闭包。失败时辨认来源，审查实际代码、来源 hash 与许可后更新清单，不删除验证绕过问题。公开字体许可与归因保留在 [共享资源](../../packages/ui/src/materials/runtime/ASSET-SOURCES.md) 中；内容编辑的设计依据和固定上游版本见 [调研](../../docs/管理员内容编辑调研.md)。旧 `src/ui.tsx`、`src/skill.ts`、原生控件控制器和 `public/design` 不再是当前入口。
+共享资源验证覆盖 SHA-256、完整目录和本地依赖闭包。失败时辨认来源，审查实际代码、来源 hash 与许可后更新清单，不删除验证绕过问题。公开字体许可与归因保留在 [共享资源](../../packages/ui/src/materials/runtime/ASSET-SOURCES.md) 中；内容编辑的设计依据和固定上游版本见 [调研](../../docs/research/管理员内容编辑调研.md)。旧 `src/ui.tsx`、`src/skill.ts`、原生控件控制器和 `public/design` 不再是当前入口。
 
 ## 开发与验证
 
@@ -70,7 +70,7 @@ npm run build
 BETWEEN_ADMIN_PREVIEW_PORT=0 npm run preview
 ```
 
-终端输出随机回环 URL 与示例管理员口令。`tests/preview-fixtures.mjs` 提供可阅读的原创虚构角色、世界书与默认未连接的离线套餐替身；`browser-fixtures.mjs` 保留压力载荷和异常回归数据，不能把后者当正式展示内容。用户及会话为临时示例，使用实际 HTTP 接口，聊天为合成流；页面标题及模型模式保留示例身份。该预览不能证明真实模型、OAuth 或生产服务可用。Ctrl+C 清理此次服务和临时目录；不要把已有用户数据目录交给测试入口。内容审查、保留边界与实测结果见 [产品内容验收](../../docs/后台产品内容清理与验收.md)。
+终端输出随机回环 URL 与示例管理员口令。`tests/preview-fixtures.mjs` 提供可阅读的原创虚构角色、世界书与默认未连接的离线套餐替身；`browser-fixtures.mjs` 保留压力载荷和异常回归数据，不能把后者当正式展示内容。用户及会话为临时示例，使用实际 HTTP 接口，聊天为合成流；页面标题及模型模式保留示例身份。该预览不能证明真实模型、OAuth 或生产服务可用。Ctrl+C 清理此次服务和临时目录；不要把已有用户数据目录交给测试入口。内容审查、保留边界与实测结果见 [产品内容清理记录](../../docs/records/后台演进记录.md)。
 
 开发界面并代理自己已经启动的回环测试服务：
 

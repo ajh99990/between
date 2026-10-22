@@ -2,6 +2,8 @@
 
 基于裁剪并复用 SillyTavern 核心的角色聊天应用，包含独立管理员后台。当前第一版只运行在本机回环地址；真实文本聊天已实现，模型服务由运行配置提供。演示模式使用本地合成流，不代表真实模型效果。
 
+研究与后续设计另从 [文档总索引](docs/README.md) 阅读：新人物 Agent 尚在方案讨论中，已确认决定与待评审建议分开记录。下文介绍现有可运行产品。
+
 ## 目录与依赖
 
 | 路径 | 职责 |
@@ -12,7 +14,8 @@
 | `packages/ui` | 私有 `@between/ui`：Base UI 交互、通用 React 组件、图标、字体、玻璃、背景与动画；含独立开发 playground |
 | `scripts/vendor` | 从外部固定 SillyTavern checkout 重新抽取源码的开发工具，不是另一套运行应用 |
 | `tests/browser` | 聊天入口的隔离浏览器回归；后台回归在 `apps/admin/tests`，共享 UI 回归在 `packages/ui/tests` |
-| `docs`、`design-system` | 当前协作、配置、结构决策与后台设计规范 |
+| `docs` | 总索引、现行协作/配置说明，以及分开的研究、方案、验证记录 |
+| `design-system` | 当前后台设计规范 |
 | `licenses` | 已安装依赖的许可证/版权通知及目标平台覆盖范围 |
 
 运行代码共四个 npm workspace。依赖方向为 `apps/server → @between/role-engine`、`apps/admin → @between/ui`；后台只通过同源 HTTP API 调用服务。服务同时提供 `/` 聊天和 `/admin/` 后台，后台不能读取运行时模型凭据。根 npm workspaces 和唯一 `package-lock.json` 管理全部第一方包。Electron、Qwen Host、独立 MCP、旧 Skills 产品及原酒馆完整应用已删除；追溯使用 Git 历史。
@@ -44,7 +47,7 @@ CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm
 
 `npm run dev` 启动后台开发服务器 `127.0.0.1:8888/admin/`；API 目标由 `BETWEEN_ADMIN_DEV_API` 设置为自己已启动的回环服务，例如 `http://127.0.0.1:8799`。只允许显式指定回环地址，代理保留管理员同源请求约束。开发服务器不是完整应用入口。后台目录职责、组件与接口见 [后台说明](apps/admin/README.md)。
 
-`npm run dev:ui` 启动独立组件工作台，仅监听回环地址并输出实际随机端口。它直接使用 `@between/ui` 正式源码，提供基础控件、长表单、菜单、表格、草稿与故障场景；状态只在本页内存，不连接业务 API。`npm run build:ui-playground` 只生成 `packages/ui/dist-playground`，不发布到 `/admin/`。组件接口与开发入口见 [UI 包说明](packages/ui/README.md)，本轮架构、迁移清理、实测证据和待验边界见 [共享组件库与验收](docs/共享组件库与验收.md)。本轮新增阅读、长文、多选、数字、JSON/差异、列布局与复合筛选，组件工作台扩为 11 组，当前范围与验收记录见 [共享组件扩展与验收](docs/共享组件扩展与验收.md)。
+`npm run dev:ui` 启动独立组件工作台，仅监听回环地址并输出实际随机端口。它直接使用 `@between/ui` 正式源码，提供基础控件、长表单、菜单、表格、草稿与故障场景；状态只在本页内存，不连接业务 API。`npm run build:ui-playground` 只生成 `packages/ui/dist-playground`，不发布到 `/admin/`。组件接口、11 组工作台场景及当前限制见 [UI 包说明](packages/ui/README.md)。历史迁移与扩展证据从 [文档总索引](docs/README.md) 的实施记录进入。
 
 ## 启动
 
@@ -68,15 +71,15 @@ printf '%s' "$between_password" | npm run start:demo -- --data /tmp/between-demo
 unset between_password
 ```
 
-`npm start -- --data /绝对路径/专用数据目录 --port 8799 --admin-password-stdin` 为真实配置入口：读取 `BETWEEN_MODEL_URL`（HTTPS 或本机 HTTP 的 Chat Completions 根地址）、`BETWEEN_MODEL_NAME`、可选 `BETWEEN_MODEL_KEY`。环境变量优先于保存设置，不自动读取 `.env`。后台修改配置不会自动发送推理请求；“已配置”不等于“真实推理通过”。当前计数器固定 `gpt-4o-mini`，换出站模型名不保证预算精确一致。
+`npm start -- --data /绝对路径/专用数据目录 --port 8799 --admin-password-stdin` 为真实配置入口：读取 `BETWEEN_MODEL_URL`（HTTPS 或本机 HTTP 的 Chat Completions 根地址）、`BETWEEN_MODEL_NAME`、可选 `BETWEEN_MODEL_KEY`。启动时环境变量优先于保存设置，不自动读取 `.env`；后台保存可改变本次进程的连接，重启后仍按启动环境变量重新选择。后台修改配置不会自动发送推理请求；“已配置”不等于“真实推理通过”。当前计数器固定 `gpt-4o-mini`，换出站模型名不保证预算精确一致。
 
-`npm run start:local` 启动已接入的独立套餐兼容服务与应用，默认使用仓库外 macOS `~/Library/Application Support/Between` 的独立 Between 授权和数据，仅监听 `8787` / `8766`，不抢占现存服务。它会常驻；停止须核验状态文件中的本次 PID 后发送 SIGTERM。本次重组未启动或修改用户现有运行目录。配置、授权与恢复边界见 [套餐后端](docs/套餐后端.md) 和 [服务说明](apps/server/README.md)。
+`npm run start:local` 启动已接入的独立套餐兼容服务与应用，默认使用仓库外 macOS `~/Library/Application Support/Between` 的独立 Between 授权和数据，仅监听 `8787` / `8766`，不抢占现存服务。它会常驻；停止须核验状态文件中的本次 PID 后发送 SIGTERM。首次初始化会保存启用套餐的设置；更改运行根不会自动隔离授权，具体行为见下方手册。配置、授权与恢复边界见 [套餐后端](docs/套餐后端.md) 和 [服务说明](apps/server/README.md)。
 
 ## 能力与限制
 
 保留真实文本聊天、角色卡/世界书管理和全文、管理员鉴权、模型设置、套餐兼容后端、用户与会话隔离、流式停止/重试及上下文组装。角色设定、世界书和内部字段仅参与模型上下文，不能进入用户 API/SSE 的可见消息或朗读输入；回归覆盖该边界。角色/世界书/预设修改作用于新会话，既有快照不被重写。
 
-后台围绕角色库、世界书、社区素材、模型与提示词、会话与任务、用户与全局、诊断七个工作区组织。角色提供 11 个正文字段的全文阅读、字段定位与编辑；世界书区分简单模式和独立条目模式，提供正文搜索、触发配置与完整原始字段。保存等待服务器确认，配置版本冲突保留草稿；世界书冲突不自动覆盖或合并同一本书。导航、按钮与弹窗采用不同玻璃配方，长正文保留稳定阅读衬底。通用组件、图标、字体、玻璃、抽象背景与浮层动画统一从 `@between/ui` 引入；底层材质保留自包含的 `glass-workbench-ui` 来源与归因，不访问其他业务仓库。应用保留角色/世界书等业务组合、接口、权限、草稿、保存与冲突处理，不复制另一套通用组件或材质。交互研究与参考许可见 [管理员内容编辑调研](docs/管理员内容编辑调研.md)。
+后台围绕角色库、世界书、社区素材、模型与提示词、会话与任务、用户与全局、诊断七个工作区组织。角色提供 11 个正文字段的全文阅读、字段定位与编辑；世界书区分简单模式和独立条目模式，提供正文搜索、触发配置与完整原始字段。保存等待服务器确认，配置版本冲突保留草稿；世界书冲突不自动覆盖或合并同一本书。导航、按钮与弹窗采用不同玻璃配方，长正文保留稳定阅读衬底。通用组件、图标、字体、玻璃、抽象背景与浮层动画统一从 `@between/ui` 引入；底层材质保留自包含的 `glass-workbench-ui` 来源与归因，不访问其他业务仓库。应用保留角色/世界书等业务组合、接口、权限、草稿、保存与冲突处理，不复制另一套通用组件或材质。交互研究与参考许可见 [管理员内容编辑调研](docs/research/管理员内容编辑调研.md)。
 
 当前 API 只支持固定社区目录导入，不支持任意文件上传、外部 URL 导入或角色卡导出；会话管理提供元数据、已保存聊天正文的只读查看与查找、停止任务和删除。管理员正文接口按用户与会话核对归属，只返回可见文本和受限内联图片，不返回角色上下文、提示词或隐藏消息；未完成的生成不计入已保存记录，语音附件播放与聊天导出尚未提供。后台不能读取或修改模型密钥，保存连接配置不会试跑推理。世界书最终纳入上下文的运行诊断尚未接通，不能把关键词搜索命中解释为实际激活。全局暂停阻止后续生成，不会自动停止正在运行的任务；禁止新用户只影响尚未初始化的浏览器身份。审计记录为当前进程内存记录。
 
@@ -86,6 +89,6 @@ unset between_password
 
 真实聊天、授权、密钥、运行配置和构建产物不得提交。数据目录包含身份材料和聊天，禁止放入 Git；所有权锁存在时先核实进程，不盲删、不自动迁移旧数据。结构重组不影响其他检出或现存服务。
 
-SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。新后台未沿用旧模板 UI；当前通用设计资源的来源及 Geist 字体 OFL 见 [共享设计资源说明](packages/ui/src/materials/runtime/ASSET-SOURCES.md)。本次对 SillyTavern、RisuAI 和 Lorebook Manager 的编辑体验研究不复制其 UI 代码，不改变各项目原有许可。四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
+SillyTavern 固定源码 `06bde939fb1e9c4c8d8641d810f0a916b5bce127` 的 AGPL 正文在 [LICENSE](LICENSE)，来源/抽取适配见 [引擎 SOURCE](packages/role-engine/SOURCE.md)。新后台未沿用旧模板 UI；当前通用设计资源的来源及 Geist 字体 OFL 见 [共享设计资源说明](packages/ui/src/materials/runtime/ASSET-SOURCES.md)。SillyTavern、RisuAI 和 Lorebook Manager 的编辑体验研究不复制其 UI 代码，不改变各项目原有许可。四张社区卡保留 [CC BY 4.0 与归因](apps/server/community/manifest.json)。灵光复用模块遵守其原有 [来源与许可边界](apps/server/lingguang/SOURCE.zh-CN.md)，不为用户自有代码新增第三方许可。`npm run licenses` 更新当前安装平台的依赖通知；分发其他平台须在目标依赖安装后重新收集，不能把上游链接当成本修改版对应源码。
 
-只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前组件结构与验收要求见 [UI 包说明](packages/ui/README.md) 和 [设计规范](design-system/between-admin/MASTER.md)。以下报告保存对应历史版本的证据，不能作为本次组件迁移已通过的证明：[玻璃工作台验收](docs/后台玻璃工作台重写与验收.md)；浮层、切换与保存动效历史见 [过渡动画验收](docs/后台过渡动画与视觉验收.md)；研发文案与预览残留清理见 [产品内容验收](docs/后台产品内容清理与验收.md)；早先目录重组记录见 [历史重组验收](docs/项目结构重组与验收.md)。
+只使用 `dev` 开发、验收后正常快进 `main`，中文提交、不强推。见 [AGENTS.md](AGENTS.md) 与 [Git 交接流程](docs/Git双向开发与交接流程.md)。当前组件结构与验收要求见 [UI 包说明](packages/ui/README.md) 和 [设计规范](design-system/between-admin/MASTER.md)。历史改造、实验结果与各阶段的有效范围统一见 [文档总索引](docs/README.md)，不以旧报告代替当前版本验收。
