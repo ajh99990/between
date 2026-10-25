@@ -1,0 +1,121 @@
+{
+  "baseline": "c5fddc8d3b3ae81b77d41cba4cede78286e8dd0d",
+  "scope": "15篇机制正文、4份配套、阅读索引及必要审查资料；不包含工具日志、内部工作笔记或运行材料",
+  "files": [
+    {
+      "path": "README.md",
+      "size_bytes": 7351,
+      "sha256": "66652ec66f020c7dbe913d40c9d0ef586588b814bfae4d3397ae4dacd88caf57"
+    },
+    {
+      "path": "审查资料/审查记录.md",
+      "size_bytes": 6110,
+      "sha256": "35de5886ab35b0c22f019309ebcc6f2e289cfdf36cf5212e4b1e95aa1f2bdc08"
+    },
+    {
+      "path": "审查资料/来源覆盖映射.json",
+      "size_bytes": 21921,
+      "sha256": "ba5b47017cedcfd5cfb98ac8f9e27174be7e4dabb050539dce664bb72e8c77b4"
+    },
+    {
+      "path": "审查资料/来源覆盖映射.md",
+      "size_bytes": 11915,
+      "sha256": "1579c1cf8af7357da1228cb2614fa9cc79b47a617ed49a8280dafa20cd70b2dd"
+    },
+    {
+      "path": "文档/01-人物什么时候才算看过一条消息.md",
+      "size_bytes": 10876,
+      "sha256": "38f37bae59a64db4a14da7c1139fb9136cce9d42a52ee1c6f179d89b6907aa6a"
+    },
+    {
+      "path": "文档/02-选择稍后再看以后谁来提醒.md",
+      "size_bytes": 16736,
+      "sha256": "d5e3b3380526e51f2bcec041f8ac63bfef37570b5914dc13a9d2cdd7e452c333"
+    },
+    {
+      "path": "文档/03-一句话怎样成为可回查的记录.md",
+      "size_bytes": 16215,
+      "sha256": "ac189ed9dd3f4975f8ceead3fc5ed6df45372e98a2910028fb07a2bd7c25bc9a"
+    },
+    {
+      "path": "文档/04-没有新消息时生活怎样继续.md",
+      "size_bytes": 30828,
+      "sha256": "2033c5b4ee8df71ee59b3c35119cf968860c6a42ee53cc98db420cc514060394"
+    },
+    {
+      "path": "文档/05-改了安排以后还记得欠谁什么.md",
+      "size_bytes": 18980,
+      "sha256": "4f1c047b2a4a5bb054e996f735d845c070cf5088eee7061de8e294ae31265936"
+    },
+    {
+      "path": "文档/06-经历怎样留下以后找得到的记忆.md",
+      "size_bytes": 19275,
+      "sha256": "53e9acee7b7c1b371c5552e01025ce18cc98bb5191f830a1e97ec9dd830db42d"
+    },
+    {
+      "path": "文档/07-一次事情怎样留下持续的感受.md",
+      "size_bytes": 19531,
+      "sha256": "cd253de3b3e330d4666d8d1dde9cbbb4abce1026541a12a4a9957c6328967839"
+    },
+    {
+      "path": "文档/08-关系怎样依据经历变化和纠错.md",
+      "size_bytes": 17600,
+      "sha256": "21e673a8c1425f78b1fc660dd5853d223a36dbf55955d6a19800db7511cf0f26"
+    },
+    {
+      "path": "文档/09-这一轮模型究竟拿到什么.md",
+      "size_bytes": 10146,
+      "sha256": "b01628f5ac15cecf4b4fe85a409a76d51685cf33c30ddbf0ec8f88c32163fe3b"
+    },
+    {
+      "path": "文档/10-有了感受以后怎样自然地说话.md",
+      "size_bytes": 9755,
+      "sha256": "7ab0720bee4be980c55e2302f67309b6184e970913d37fa880ec67ef12edd00a"
+    },
+    {
+      "path": "文档/11-工具没做完时人物怎样继续行动.md",
+      "size_bytes": 22884,
+      "sha256": "7830eee321d0b029cacb4ae77482741b388b7d8b4ce7259a44d80853c63f696a"
+    },
+    {
+      "path": "文档/12-一次真实浏览怎样开始和停下.md",
+      "size_bytes": 12243,
+      "sha256": "0bb47da31069b389e796f61e3d33a40a5a0be3446e61e0a009598150f628fc47"
+    },
+    {
+      "path": "文档/13-一份资源怎样进入她自己的创作.md",
+      "size_bytes": 13524,
+      "sha256": "da7d6b07a606cbc02a05fa7af1337d6085377d7e8f1bdca172f8dd6a70f58fd4"
+    },
+    {
+      "path": "文档/14-作品怎样公开并收到后续反馈.md",
+      "size_bytes": 19461,
+      "sha256": "78eb5d1b8dc0481306094dca89f7ee03fef37fd993c130b03261cee4fb6d4514"
+    },
+    {
+      "path": "文档/15-怎样暂停排障和清除人物数据.md",
+      "size_bytes": 10031,
+      "sha256": "93f66df7e1824febc75db9e229bf15e726636868323639976d36a38ae3f07c0d"
+    },
+    {
+      "path": "文档/A-用户愿望原文.md",
+      "size_bytes": 9465,
+      "sha256": "ef04db3c697f604aa746743cef3a90940aefe4cda4df81f3cd2ec3626fcbfb91"
+    },
+    {
+      "path": "文档/B-决定取舍与来源导读.md",
+      "size_bytes": 24521,
+      "sha256": "88a0fd32a59604ada8ef8e765b1e1e43b5d9e10ddebbecd3637d650f38f28829"
+    },
+    {
+      "path": "文档/C-实施与验证路线.md",
+      "size_bytes": 18844,
+      "sha256": "8061054dc227ec006c61b54669b70c963e59315fbb61f3a40c8cab7657f719df"
+    },
+    {
+      "path": "文档/D-仍待细化的实现与验证事项.md",
+      "size_bytes": 8843,
+      "sha256": "683eabf011ede66f6ab3c5067095533f6218987768990ce4ce21daaf4ada912b"
+    }
+  ]
+}
